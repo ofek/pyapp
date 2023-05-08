@@ -1,5 +1,7 @@
 # PyApp
 
+[![CI - Test](https://github.com/ofek/pyapp/actions/workflows/test.yml/badge.svg)](https://github.com/ofek/pyapp/actions/workflows/test.yml)
+[![CD - Publish](https://github.com/ofek/pyapp/actions/workflows/publish.yml/badge.svg)](https://github.com/ofek/pyapp/actions/workflows/publish.yml)
 [![Project - Version](https://img.shields.io/crates/v/pyapp)](https://crates.io/crates/pyapp)
 [![Project - Downloads](https://img.shields.io/crates/d/pyapp)](https://crates.io/crates/pyapp)
 [![License - Apache-2.0 OR MIT](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-9400d3.svg)](https://spdx.org/licenses/)
