@@ -29,6 +29,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [Execution mode](#execution-mode)
   - [Python distribution](#python-distribution)
     - [Known](#known)
+      - [CPython](#cpython)
     - [Custom](#custom)
       - [Compression](#compression)
       - [Python location](#python-location)
@@ -115,9 +116,19 @@ If none are set then the `PYAPP_EXEC_MODULE` option will default to the value of
 
 #### Known
 
-Setting the `PYAPP_PYTHON_VERSION` option in the form `MAJOR.MINOR` will determine the distribution used at runtime based on the environment at build time. If unset then the default will be the latest stable minor version of Python.
+Setting the `PYAPP_PYTHON_VERSION` option will determine the distribution used at runtime based on the environment at build time. If unset then the default will be the latest stable minor version of [CPython](#cpython).
 
-The default source of relocatable distributions is the [python-build-standalone](https://github.com/indygreg/python-build-standalone) project.
+##### CPython
+
+| ID |
+| --- |
+| `3.7` |
+| `3.8` |
+| `3.9` |
+| `3.10` |
+| `3.11` |
+
+The source of distributions is the [python-build-standalone](https://github.com/indygreg/python-build-standalone) project.
 
 Some distributions have [variants](https://gregoryszorc.com/docs/python-build-standalone/main/running.html) that may be configured with the `PYAPP_DISTRIBUTION_VARIANT` option:
 
