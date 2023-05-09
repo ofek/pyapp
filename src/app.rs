@@ -60,6 +60,10 @@ pub fn exec_code() -> String {
     env!("PYAPP_EXEC_CODE").into()
 }
 
+pub fn pass_location() -> bool {
+    env!("PYAPP_PASS_LOCATION") == "1"
+}
+
 pub fn starship_prompt() -> String {
     env!("PYAPP_STARSHIP_PROMPT").into()
 }
