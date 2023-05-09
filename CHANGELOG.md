@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Add `--pre` flag to the `self update` command to allow pre-release and development versions
 
+***Fixed:***
+
+- Fix project version reading for the Starship prompt hidden command on non-Windows systems
+
 ## 0.2.0 - 2023-05-07
 
 This is the initial public release.

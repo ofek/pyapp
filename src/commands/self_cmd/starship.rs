@@ -24,8 +24,14 @@ impl Cli {
         } else {
             (|| {
                 let lib_dir = python.parent()?.parent()?.join("lib");
-                let mut entries = fs::read_dir(lib_dir).ok()?;
-                let version_dir = entries.next()?.ok()?;
+                let version_dir =
+                    fs::read_dir(lib_dir)
+                        .ok()?
+                        .filter_map(Result::ok)
+                        .find(|entry| {
+                            let file_name = entry.file_name().to_string_lossy().to_string();
+                            file_name.starts_with("python") || file_name.starts_with("pypy")
+                        })?;
 
                 Some(version_dir.path().join("site-packages"))
             })()
