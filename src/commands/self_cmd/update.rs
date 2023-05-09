@@ -9,7 +9,11 @@ use crate::{app, distribution, terminal};
 /// Install the latest version
 #[derive(Args, Debug)]
 #[command()]
-pub struct Cli {}
+pub struct Cli {
+    /// Allow pre-release and development versions
+    #[arg(long)]
+    pre: bool,
+}
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
@@ -22,6 +26,9 @@ impl Cli {
         }
 
         let mut command = distribution::pip_command(&python);
+        if self.pre {
+            command.arg("--pre");
+        }
         command.args(["--upgrade", app::project_name().as_str()]);
 
         let spinner = terminal::spinner(format!("Updating {}", app::project_name()));

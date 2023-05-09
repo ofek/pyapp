@@ -197,7 +197,6 @@ when = true
 ## TODO
 
 - Support PyPy [stable versions](https://www.pypy.org/download.html) and [nightlies](https://buildbot.pypy.org/nightly/)
-- Add a `--pre` flag to the update command to allow prereleases
 - Add a `PYAPP_SKIP_INSTALL` build time option to skip project installation, allowing for entirely predefined distributions and thus no network calls at runtime if used in conjunction with [embedding](#embedding)
 - Support `PYAPP_PIP_INDEX_URL` and `PYAPP_PIP_EXTRA_INDEX_URL` build time options that correspond to the `--index-url` and `--extra-index-url` flags of the `pip install` command, respectively
 - Add a `PYAPP_PIP_EXTERNAL` build time option that indicates the distribution does not ship with `pip` and will use its [standalone installation](https://pip.pypa.io/en/stable/installation/#standalone-zip-application) (note that this may be the default behavior in future depending on feedback)

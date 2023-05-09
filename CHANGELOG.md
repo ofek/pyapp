@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `--pre` flag to the `self update` command to allow pre-release and development versions
+
 ## 0.2.0 - 2023-05-07
 
 This is the initial public release.
