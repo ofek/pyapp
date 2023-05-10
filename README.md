@@ -24,6 +24,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Update](#update)
     - [Hidden](#hidden)
       - [Starship](#starship)
+  - [Detection](#detection)
 - [Configuration](#configuration)
   - [Project](#project)
   - [Execution mode](#execution-mode)
@@ -34,6 +35,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Compression](#compression)
       - [Python location](#python-location)
     - [Embedding](#embedding)
+  - [Installation indicator](#installation-indicator)
   - [Starship prompt](#starship-prompt)
 - [TODO](#todo)
 - [License](#license)
@@ -91,6 +93,10 @@ This will update the project to the latest available version in the currently us
 ```
 
 This displays [customized](#starship-prompt) output that may be used by the [Starship](https://github.com/starship/starship) prompt.
+
+### Detection
+
+A single environment variable called `PYAPP` is injected with the value of `1` when running applications and may be used to detect this mode of installation versus others.
 
 ## Configuration
 
@@ -160,6 +166,10 @@ You may set the relative path to the Python executable after unpacking the archi
 #### Embedding
 
 You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime.
+
+### Installation indicator
+
+The environment variable that is used for [detection](#detection) may be set to the path of the executable at runtime if you set the `PYAPP_PASS_LOCATION` option to `true` or `1`. This is useful if your application wishes to in some way manage itself.
 
 ### Starship prompt
 

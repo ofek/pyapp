@@ -18,6 +18,14 @@ pub fn run_project(python: &PathBuf) -> Result<()> {
     }
     command.args(env::args().skip(1));
 
+    if !app::pass_location() {
+        command.env("PYAPP", "1");
+    } else if let Ok(exe_path) = env::current_exe() {
+        command.env("PYAPP", exe_path);
+    } else {
+        command.env("PYAPP", "");
+    }
+
     let status = command.status()?;
     exit(status.code().unwrap_or(1));
 }

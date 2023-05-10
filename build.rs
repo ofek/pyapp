@@ -156,6 +156,10 @@ fn check_environment_variable(name: &str) -> String {
     value
 }
 
+fn is_enabled(name: &str) -> bool {
+    ["true", "1"].contains(&env::var(name).unwrap_or_default().as_str())
+}
+
 fn normalize_project_name(name: &String) -> String {
     // https://peps.python.org/pep-0508/#names
     if !Regex::new(r"^([[:alnum:]]|[[:alnum:]][[:alnum:]._-]*[[:alnum:]])$")
@@ -327,6 +331,15 @@ fn set_execution_mode() {
     }
 }
 
+fn set_indicator() {
+    let variable = "PYAPP_PASS_LOCATION";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
 fn main() {
     set_runtime_variable("PYAPP_STARSHIP_PROMPT", "{project} v{version}");
 
@@ -346,6 +359,7 @@ fn main() {
     set_compression_algorithm(&distribution_source);
     set_python_path(&distribution_source);
     set_execution_mode();
+    set_indicator();
 
     let archive_path: PathBuf = [
         env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),
@@ -355,21 +369,16 @@ fn main() {
     ]
     .iter()
     .collect();
-    match env::var("PYAPP_DISTRIBUTION_EMBED")
-        .unwrap_or_default()
-        .as_str()
-    {
-        "true" | "1" => {
-            let bytes = reqwest::blocking::get(&distribution_source)
-                .unwrap()
-                .bytes()
-                .unwrap();
-            fs::write(&archive_path, bytes).unwrap();
-        }
-        _ => {
-            // Ensure the file is empty as that is the heuristic used at runtime to
-            // determine whether to fetch from the source
-            fs::File::create(&archive_path).unwrap().set_len(0).unwrap();
-        }
+
+    if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
+        let bytes = reqwest::blocking::get(&distribution_source)
+            .unwrap()
+            .bytes()
+            .unwrap();
+        fs::write(&archive_path, bytes).unwrap();
+    } else {
+        // Ensure the file is empty as that is the heuristic used at runtime to
+        // determine whether to fetch from the source
+        fs::File::create(&archive_path).unwrap().set_len(0).unwrap();
     }
 }
