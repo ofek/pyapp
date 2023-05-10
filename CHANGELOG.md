@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Fixed:***
 
+- Properly display error messages from `pip install` commands
 - Fix project version reading for the Starship prompt hidden command on non-Windows systems
 
 ## 0.2.0 - 2023-05-07
