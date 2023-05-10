@@ -8,7 +8,7 @@ use highway::PortableHash;
 use regex::Regex;
 
 const DEFAULT_PYTHON_VERSION: &str = "3.11";
-const KNOWN_COMPRESSION_ALGORITHMS: &[&str] = &["tar|gzip", "tar|zstd", "zip"];
+const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|gzip", "tar|zstd", "zip"];
 
 // Python version in the form MAJOR.MINOR
 // Target OS https://doc.rust-lang.org/reference/conditional-compilation.html#target_os
@@ -241,14 +241,14 @@ fn get_distribution_source() -> String {
     );
 }
 
-fn set_compression_algorithm(distribution_source: &String) {
-    let variable = "PYAPP_DISTRIBUTION_COMPRESSION";
-    let distribution_compression = env::var(variable).unwrap_or_default();
-    if !distribution_compression.is_empty() {
-        if KNOWN_COMPRESSION_ALGORITHMS.contains(&distribution_compression.as_str()) {
-            set_runtime_variable(variable, &distribution_compression);
+fn set_distribution_format(distribution_source: &String) {
+    let variable = "PYAPP_DISTRIBUTION_FORMAT";
+    let distribution_format = env::var(variable).unwrap_or_default();
+    if !distribution_format.is_empty() {
+        if KNOWN_DISTRIBUTION_FORMATS.contains(&distribution_format.as_str()) {
+            set_runtime_variable(variable, &distribution_format);
         } else {
-            panic!("\n\nUnknown compression algorithm: {distribution_compression}\n\n");
+            panic!("\n\nUnknown distribution format: {distribution_format}\n\n");
         }
     } else if distribution_source.ends_with(".tar.gz") || distribution_source.ends_with(".tgz") {
         set_runtime_variable(variable, "tar|gzip");
@@ -259,7 +259,7 @@ fn set_compression_algorithm(distribution_source: &String) {
     } else if distribution_source.ends_with(".zip") {
         set_runtime_variable(variable, "zip");
     } else {
-        panic!("\n\nUnable to determine compression algorithm for distribution source: {distribution_source}\n\n");
+        panic!("\n\nUnable to determine format for distribution source: {distribution_source}\n\n");
     }
 }
 
@@ -375,7 +375,7 @@ fn main() {
     distribution_source.hash(&mut h);
     set_runtime_variable("PYAPP__DISTRIBUTION_ID", h.finish());
 
-    set_compression_algorithm(&distribution_source);
+    set_distribution_format(&distribution_source);
     set_python_path(&distribution_source);
     set_execution_mode();
     set_skip_install();

@@ -36,8 +36,8 @@ pub fn distribution_source() -> String {
     env!("PYAPP_DISTRIBUTION_SOURCE").into()
 }
 
-pub fn distribution_compression() -> String {
-    env!("PYAPP_DISTRIBUTION_COMPRESSION").into()
+pub fn distribution_format() -> String {
+    env!("PYAPP_DISTRIBUTION_FORMAT").into()
 }
 
 pub fn distribution_python_path() -> String {
