@@ -46,7 +46,11 @@ impl Cli {
                 fs::remove_dir_all(&installation_directory).ok();
             }
 
-            println!("{}", String::from_utf8_lossy(&output.stdout));
+            println!(
+                "{}{}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
             exit(output.status.code().unwrap_or(1));
         }
 
