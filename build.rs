@@ -331,6 +331,15 @@ fn set_execution_mode() {
     }
 }
 
+fn set_skip_install() {
+    let variable = "PYAPP_SKIP_INSTALL";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
 fn set_indicator() {
     let variable = "PYAPP_PASS_LOCATION";
     if is_enabled(variable) {
@@ -369,6 +378,7 @@ fn main() {
     set_compression_algorithm(&distribution_source);
     set_python_path(&distribution_source);
     set_execution_mode();
+    set_skip_install();
     set_indicator();
     set_self_command();
 

@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add `--pre` flag to the `self update` command to allow pre-release and development versions
 - Add environment variable for detection
 - Add `PYAPP_SELF_COMMAND` option to control the name of the management command
+- Add `PYAPP_SKIP_INSTALL` option to skip project installation
 
 ***Fixed:***
 
