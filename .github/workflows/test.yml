@@ -35,3 +35,6 @@ jobs:
 
     - name: Build
       run: cargo build
+
+    - name: See dependency tree
+      run: cargo tree
