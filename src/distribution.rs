@@ -7,7 +7,7 @@ use std::process::{exit, Command};
 use anyhow::{bail, Context, Result};
 use tempfile::tempdir;
 
-use crate::{app, compression, network, terminal};
+use crate::{app, compression, network, process};
 
 pub fn run_project(python: &PathBuf) -> Result<()> {
     let mut command = Command::new(python);
@@ -120,23 +120,19 @@ pub fn install_project(installation_directory: &PathBuf, python: &PathBuf) -> Re
     let mut command = pip_command(python);
     command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
 
-    let spinner = terminal::spinner(format!(
-        "Installing {} {}",
-        app::project_name(),
-        app::project_version()
-    ));
-    let result = command.output();
-    spinner.finish_and_clear();
+    let (status, output) = process::wait_for(
+        command,
+        format!(
+            "Installing {} {}",
+            app::project_name(),
+            app::project_version()
+        ),
+    )?;
 
-    let output = result?;
-    if !output.status.success() {
+    if !status.success() {
         fs::remove_dir_all(installation_directory).ok();
-        println!(
-            "{}{}",
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
-        exit(output.status.code().unwrap_or(1));
+        println!("{}", output.trim_end());
+        exit(status.code().unwrap_or(1));
     }
 
     Ok(())

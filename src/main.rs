@@ -3,6 +3,7 @@ mod commands;
 mod compression;
 mod distribution;
 mod network;
+mod process;
 mod terminal;
 
 use std::env;
