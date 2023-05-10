@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     app::initialize()?;
 
     match env::args().nth(1).as_deref() {
-        Some("self") => Cli::parse().exec(),
+        Some(env!("PYAPP_SELF_COMMAND")) => Cli::parse().exec(),
         _ => {
             let installation_directory = app::installation_directory();
             let python = installation_directory.join(app::distribution_python_path());

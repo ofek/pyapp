@@ -10,7 +10,7 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    #[clap(name = "self")]
+    #[clap(name = env!("PYAPP_SELF_COMMAND"))]
     SelfCmd(super::self_cmd::cli::Cli),
 }
 
