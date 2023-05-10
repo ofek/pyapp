@@ -35,6 +35,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Compression](#compression)
       - [Python location](#python-location)
     - [Embedding](#embedding)
+  - [Skipping project installation](#skipping-project-installation)
   - [Installation indicator](#installation-indicator)
   - [Management command name](#management-command-name)
   - [Starship prompt](#starship-prompt)
@@ -168,6 +169,10 @@ You may set the relative path to the Python executable after unpacking the archi
 
 You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime.
 
+### Skipping project installation
+
+You may set the `PYAPP_SKIP_INSTALL` option to `true` or `1` to skip installing the project in the distribution. This allows for entirely predefined distributions and thus no network calls at runtime if used in conjunction with [embedding](#embedding).
+
 ### Installation indicator
 
 The environment variable that is used for [detection](#detection) may be set to the path of the executable at runtime if you set the `PYAPP_PASS_LOCATION` option to `true` or `1`. This is useful if your application wishes to in some way manage itself.
@@ -212,7 +217,6 @@ when = true
 ## TODO
 
 - Support PyPy [stable versions](https://www.pypy.org/download.html) and [nightlies](https://buildbot.pypy.org/nightly/)
-- Add a `PYAPP_SKIP_INSTALL` build time option to skip project installation, allowing for entirely predefined distributions and thus no network calls at runtime if used in conjunction with [embedding](#embedding)
 - Support `PYAPP_PIP_INDEX_URL` and `PYAPP_PIP_EXTRA_INDEX_URL` build time options that correspond to the `--index-url` and `--extra-index-url` flags of the `pip install` command, respectively
 - Add a `PYAPP_PIP_EXTERNAL` build time option that indicates the distribution does not ship with `pip` and will use its [standalone installation](https://pip.pypa.io/en/stable/installation/#standalone-zip-application) (note that this may be the default behavior in future depending on feedback)
 

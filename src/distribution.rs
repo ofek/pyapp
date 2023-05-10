@@ -34,22 +34,8 @@ pub fn ensure_ready(installation_directory: &PathBuf, python: &PathBuf) -> Resul
     if !installation_directory.is_dir() {
         materialize(installation_directory)?;
 
-        let mut command = pip_command(python);
-        command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
-
-        let spinner = terminal::spinner(format!(
-            "Installing {} {}",
-            app::project_name(),
-            app::project_version()
-        ));
-        let result = command.output();
-        spinner.finish_and_clear();
-
-        let output = result?;
-        if !output.status.success() {
-            fs::remove_dir_all(installation_directory).ok();
-            println!("{}", String::from_utf8_lossy(&output.stdout));
-            exit(output.status.code().unwrap_or(1));
+        if !app::skip_install() {
+            install_project(installation_directory, python)?;
         }
     }
 
@@ -126,6 +112,28 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
             err
         );
     })?;
+
+    Ok(())
+}
+
+pub fn install_project(installation_directory: &PathBuf, python: &PathBuf) -> Result<()> {
+    let mut command = pip_command(python);
+    command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
+
+    let spinner = terminal::spinner(format!(
+        "Installing {} {}",
+        app::project_name(),
+        app::project_version()
+    ));
+    let result = command.output();
+    spinner.finish_and_clear();
+
+    let output = result?;
+    if !output.status.success() {
+        fs::remove_dir_all(installation_directory).ok();
+        println!("{}", String::from_utf8_lossy(&output.stdout));
+        exit(output.status.code().unwrap_or(1));
+    }
 
     Ok(())
 }

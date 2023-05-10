@@ -17,6 +17,11 @@ pub struct Cli {
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
+        if app::skip_install() {
+            println!("Cannot update as installation is disabled");
+            exit(1);
+        }
+
         let installation_directory = app::installation_directory();
         let python = installation_directory.join(app::distribution_python_path());
 
