@@ -4,7 +4,7 @@ use std::process::exit;
 use anyhow::Result;
 use clap::Args;
 
-use crate::{app, distribution, terminal};
+use crate::{app, distribution, process};
 
 /// Install the latest version
 #[derive(Args, Debug)]
@@ -36,28 +36,20 @@ impl Cli {
         }
         command.args(["--upgrade", app::project_name().as_str()]);
 
-        let spinner = terminal::spinner(format!("Updating {}", app::project_name()));
-        let result = command.output();
-        spinner.finish_and_clear();
+        let (status, output) =
+            process::wait_for(command, format!("Updating {}", app::project_name()))?;
 
-        let output = result?;
-        if !output.status.success() {
+        if !status.success() {
             if !existing_installation {
                 fs::remove_dir_all(&installation_directory).ok();
             }
-
-            println!(
-                "{}{}",
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            );
-            exit(output.status.code().unwrap_or(1));
+            println!("{}", output.trim_end());
+            exit(status.code().unwrap_or(1));
         }
 
-        let install_output = String::from_utf8_lossy(&output.stdout);
         let mut existing_version: Option<&str> = None;
         let mut installed_version: Option<&str> = None;
-        for line in install_output.lines() {
+        for line in output.lines() {
             if line.starts_with(
                 format!("Requirement already satisfied: {} in", app::project_name()).as_str(),
             ) {
