@@ -199,12 +199,13 @@ fn get_distribution_source() -> String {
         _ => "linux",
     }
     .to_string();
+    let selected_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
     let selected_variant = {
         let mut variant = env::var("PYAPP_DISTRIBUTION_VARIANT").unwrap_or_default();
         if variant.is_empty() {
             if selected_platform == "windows" {
                 variant = "shared".to_string();
-            } else if selected_platform == "linux" {
+            } else if selected_platform == "linux" && selected_arch == "x86_64" {
                 variant = "v3".to_string();
             }
         };
@@ -221,7 +222,6 @@ fn get_distribution_source() -> String {
         };
         abi
     };
-    let selected_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
 
     for (python_version, platform, arch, abi, variant, url) in DEFAULT_CPYTHON_DISTRIBUTIONS.iter()
     {

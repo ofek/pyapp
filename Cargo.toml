@@ -1,7 +1,8 @@
 [package]
 name = "pyapp"
-version = "0.3.0"
+version = "0.3.1"
 description = "CLI for self-bootstrapped Python applications"
+repository = "https://github.com/ofek/pyapp"
 license = "Apache-2.0 OR MIT"
 edition = "2021"
 
