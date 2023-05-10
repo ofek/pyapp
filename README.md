@@ -194,7 +194,7 @@ The default [output](#starship) is `{project} v{version}` if this option is unse
 
 The following example configuration assumes that the built executable has been renamed to `foo`:
 
-```toml
+````toml
 format = """
 ...
 ${custom.foo}\
@@ -212,7 +212,7 @@ when = true
 # shell = ["cmd", "/C"]
 ## Other
 # shell = ["sh", "--norc"]
-```
+````
 
 ## TODO
 
