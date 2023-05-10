@@ -44,7 +44,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
 
 ## Building
 
-Select the directory in which to build your application with the `--root` option:
+First configure your [project](#project), then select the directory in which to build the executable with the `--root` option and run:
 
 ```
 cargo install pyapp --force --root <DIR>
