@@ -340,6 +340,16 @@ fn set_indicator() {
     }
 }
 
+fn set_self_command() {
+    let variable = "PYAPP_SELF_COMMAND";
+    let command_name = env::var(variable).unwrap_or_default();
+    if !command_name.is_empty() {
+        set_runtime_variable(variable, &command_name);
+    } else {
+        set_runtime_variable(variable, "self");
+    }
+}
+
 fn main() {
     set_runtime_variable("PYAPP_STARSHIP_PROMPT", "{project} v{version}");
 
@@ -360,6 +370,7 @@ fn main() {
     set_python_path(&distribution_source);
     set_execution_mode();
     set_indicator();
+    set_self_command();
 
     let archive_path: PathBuf = [
         env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),
