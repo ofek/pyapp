@@ -32,7 +32,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
     - [Known](#known)
       - [CPython](#cpython)
     - [Custom](#custom)
-      - [Compression](#compression)
+      - [Format](#format)
       - [Python location](#python-location)
     - [Embedding](#embedding)
   - [Skipping project installation](#skipping-project-installation)
@@ -151,11 +151,11 @@ You may explicitly set the `PYAPP_DISTRIBUTION_SOURCE` option which overrides th
 
 Setting this manually may require you to define extra metadata about the distribution that is required for accurate [runtime behavior](#runtime-behavior).
 
-##### Compression
+##### Format
 
-The following compression methods are supported for the `PYAPP_DISTRIBUTION_COMPRESSION` option, with the default chosen based on the ending of the source URL:
+The following formats are supported for the `PYAPP_DISTRIBUTION_FORMAT` option, with the default chosen based on the ending of the source URL:
 
-| Method | Extensions | Description |
+| Format | Extensions | Description |
 | --- | --- | --- |
 | `tar\|gzip` | <ul><li><code>.tar.gz</code></li><li><code>.tgz</code></li></ul> | A [tar file](https://en.wikipedia.org/wiki/Tar_(computing)) with [gzip compression](https://en.wikipedia.org/wiki/Gzip) |
 | `tar\|zstd` | <ul><li><code>.tar.zst</code></li><li><code>.tar.zstd</code></li></ul> | A [tar file](https://en.wikipedia.org/wiki/Tar_(computing)) with [Zstandard compression](https://en.wikipedia.org/wiki/Zstd) |

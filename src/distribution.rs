@@ -100,7 +100,7 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
     }
 
     compression::unpack(
-        app::distribution_compression(),
+        app::distribution_format(),
         &distribution_file,
         installation_directory,
     )

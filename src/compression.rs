@@ -5,12 +5,12 @@ use anyhow::{bail, Result};
 
 use crate::terminal;
 
-pub fn unpack(algorithm: String, archive: &PathBuf, destination: &PathBuf) -> Result<()> {
-    match algorithm.as_ref() {
+pub fn unpack(format: String, archive: &PathBuf, destination: &PathBuf) -> Result<()> {
+    match format.as_ref() {
         "tar|gzip" => unpack_tar_gzip(archive, destination)?,
         "tar|zstd" => unpack_tar_zstd(archive, destination)?,
         "zip" => unpack_zip(archive, destination)?,
-        _ => bail!("unsupported compression algorithm: {}", algorithm),
+        _ => bail!("unsupported distribution format: {}", format),
     }
 
     Ok(())

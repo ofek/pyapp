@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Changed:***
+
+- Rename `PYAPP_DISTRIBUTION_COMPRESSION` option to `PYAPP_DISTRIBUTION_FORMAT`
+
 ***Added:***
 
 - Add `--pre` flag to the `self update` command to allow pre-release and development versions
