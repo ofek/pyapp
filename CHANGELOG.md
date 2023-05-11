@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.4.0 - 2023-05-10
+
 ***Changed:***
 
 - Rename `PYAPP_STARSHIP_PROMPT` option to `PYAPP_METADATA_TEMPLATE`
@@ -16,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Add `PYAPP_PIP_EXTRA_ARGS` option to provide extra `pip install` arguments
 - Add `PYAPP_PIP_ALLOW_CONFIG` option to allow runtime configuration of `pip`
+- Add configuration for correct cross compilation
 
 ## 0.3.1 - 2023-05-10
 
