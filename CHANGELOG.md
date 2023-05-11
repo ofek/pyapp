@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `PYAPP_PIP_EXTRA_ARGS` option to provide extra `pip install` arguments
+- Add `PYAPP_PIP_ALLOW_CONFIG` option to allow runtime configuration of `pip`
+
 ## 0.3.1 - 2023-05-10
 
 ***Fixed:***

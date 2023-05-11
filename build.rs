@@ -331,6 +331,20 @@ fn set_execution_mode() {
     }
 }
 
+fn set_pip_extra_args() {
+    let variable = "PYAPP_PIP_EXTRA_ARGS";
+    set_runtime_variable(variable, env::var(variable).unwrap_or_default());
+}
+
+fn set_pip_allow_config() {
+    let variable = "PYAPP_PIP_ALLOW_CONFIG";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
 fn set_skip_install() {
     let variable = "PYAPP_SKIP_INSTALL";
     if is_enabled(variable) {
@@ -378,6 +392,8 @@ fn main() {
     set_distribution_format(&distribution_source);
     set_python_path(&distribution_source);
     set_execution_mode();
+    set_pip_extra_args();
+    set_pip_allow_config();
     set_skip_install();
     set_indicator();
     set_self_command();

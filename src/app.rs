@@ -60,6 +60,14 @@ pub fn exec_code() -> String {
     env!("PYAPP_EXEC_CODE").into()
 }
 
+pub fn pip_extra_args() -> String {
+    env!("PYAPP_PIP_EXTRA_ARGS").into()
+}
+
+pub fn pip_allow_config() -> bool {
+    env!("PYAPP_PIP_ALLOW_CONFIG") == "1"
+}
+
 pub fn skip_install() -> bool {
     env!("PYAPP_SKIP_INSTALL") == "1"
 }
