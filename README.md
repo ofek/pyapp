@@ -27,7 +27,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Restore](#restore)
       - [Update](#update)
     - [Hidden](#hidden)
-      - [Starship](#starship)
+      - [Metadata](#metadata)
 - [Configuration](#configuration)
   - [Project](#project)
   - [Execution mode](#execution-mode)
@@ -44,7 +44,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [Skipping project installation](#skipping-project-installation)
   - [Installation indicator](#installation-indicator)
   - [Management command name](#management-command-name)
-  - [Starship prompt](#starship-prompt)
+  - [Metadata template](#metadata-template)
 - [TODO](#todo)
 - [License](#license)
 
@@ -120,13 +120,13 @@ This will update the project to the latest available version in the currently us
 
 #### Hidden
 
-##### Starship
+##### Metadata
 
 ```
-<EXE> self starship
+<EXE> self metadata
 ```
 
-This displays [customized](#starship-prompt) output that may be used by the [Starship](https://github.com/starship/starship) prompt.
+This displays [customized](#metadata-template) output based on a template.
 
 ## Configuration
 
@@ -221,18 +221,18 @@ The environment variable that is used for [detection](#detection) may be set to 
 
 You may set the `PYAPP_SELF_COMMAND` option to override the default name (`self`) of the [management command](#commands). This is useful if you wish to have complete control of the interface or to set it to a bogus value with the intention of not using it.
 
-### Starship prompt
+### Metadata template
 
-You may set a [custom command](https://starship.rs/config/#custom-commands) for the [Starship](https://github.com/starship/starship) prompt with the `PYAPP_STARSHIP_PROMPT` option which supports the following placeholders:
+You may set a custom template used to [output metadata](#metadata) with the `PYAPP_METADATA_TEMPLATE` option which supports the following placeholders:
 
 | Placeholder | Description |
 | --- | --- |
 | `{project}` | The normalized project name |
 | `{version}` | The currently installed version of the project |
 
-The default [output](#starship) is `{project} v{version}` if this option is unset.
+The default template is `{project} v{version}` if this option is unset.
 
-The following example configuration assumes that the built executable has been renamed to `foo`:
+This is useful for setting [custom commands](https://starship.rs/config/#custom-commands) for the [Starship](https://github.com/starship/starship) prompt. The following example configuration assumes that the built executable has been renamed to `foo`:
 
 ````toml
 format = """
@@ -246,7 +246,7 @@ $character"""
 # <clipped>
 
 [custom.foo]
-command = "foo self starship"
+command = "foo self metadata"
 when = true
 ## Windows
 # shell = ["cmd", "/C"]

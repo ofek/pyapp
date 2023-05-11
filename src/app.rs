@@ -76,8 +76,8 @@ pub fn pass_location() -> bool {
     env!("PYAPP_PASS_LOCATION") == "1"
 }
 
-pub fn starship_prompt() -> String {
-    env!("PYAPP_STARSHIP_PROMPT").into()
+pub fn metadata_template() -> String {
+    env!("PYAPP_METADATA_TEMPLATE").into()
 }
 
 pub fn cache_directory() -> PathBuf {

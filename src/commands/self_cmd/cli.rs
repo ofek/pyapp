@@ -11,16 +11,16 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Metadata(super::metadata::Cli),
     Restore(super::restore::Cli),
-    Starship(super::starship::Cli),
     Update(super::update::Cli),
 }
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
         match self.command {
+            Commands::Metadata(cli) => cli.exec(),
             Commands::Restore(cli) => cli.exec(),
-            Commands::Starship(cli) => cli.exec(),
             Commands::Update(cli) => cli.exec(),
         }
     }

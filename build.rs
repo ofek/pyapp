@@ -374,7 +374,7 @@ fn set_self_command() {
 }
 
 fn main() {
-    set_runtime_variable("PYAPP_STARSHIP_PROMPT", "{project} v{version}");
+    set_runtime_variable("PYAPP_METADATA_TEMPLATE", "{project} v{version}");
 
     let project_name = check_environment_variable("PYAPP_PROJECT_NAME");
     set_runtime_variable("PYAPP_PROJECT_NAME", normalize_project_name(&project_name));

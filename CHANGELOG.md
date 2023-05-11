@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Changed:***
+
+- Rename `PYAPP_STARSHIP_PROMPT` option to `PYAPP_METADATA_TEMPLATE`
+
 ***Added:***
 
 - Add `PYAPP_PIP_EXTRA_ARGS` option to provide extra `pip install` arguments
@@ -36,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Fixed:***
 
 - Properly display error messages from `pip install` commands
-- Fix project version reading for the Starship prompt hidden command on non-Windows systems
+- Fix project version reading for the metadata command on non-Windows systems
 
 ## 0.2.0 - 2023-05-07
 
