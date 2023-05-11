@@ -72,7 +72,7 @@ Clone this repository then enter the cloned directory and run:
 cargo build --release
 ```
 
-The executable will be located at `target/release/pyapp.exe` if on Windows or `target/release/pyapp` otherwise. If a particular [target](https://doc.rust-lang.org/cargo/reference/config.html#buildtarget) has been set then the `release` directory will be nested one level deeper under `target/<TARGET>`.
+The executable will be located at `target/release/pyapp.exe` if on Windows or `target/release/pyapp` otherwise. If a particular [target](https://doc.rust-lang.org/cargo/reference/config.html#buildtarget) has been set (or if [cross](https://github.com/cross-rs/cross) is used since it always sets one), then the `release` directory will be nested one level deeper under `target/<TARGET>`.
 
 ***Note:*** If you want to cross compile using [cross](https://github.com/cross-rs/cross), there is currently a [limitation](https://github.com/cross-rs/cross/issues/1215) that requires this method of building.
 
