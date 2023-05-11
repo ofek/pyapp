@@ -48,10 +48,18 @@ pub fn pip_command(python: &PathBuf) -> Command {
         "-m",
         "pip",
         "install",
-        "--isolated",
         "--disable-pip-version-check",
         "--no-warn-script-location",
     ]);
+    if !app::pip_allow_config() {
+        command.arg("--isolated");
+    }
+    command.args(
+        app::pip_extra_args()
+            .split(' ')
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<&str>>(),
+    );
     command
 }
 
