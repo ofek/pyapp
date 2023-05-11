@@ -16,6 +16,8 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
 **Table of Contents**
 
 - [Building](#building)
+  - [Installation](#installation)
+  - [Local repository](#local-repository)
 - [Runtime behavior](#runtime-behavior)
   - [Initialization](#initialization)
   - [Detection](#detection)
@@ -48,13 +50,31 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
 
 ## Building
 
-First configure your [project](#project), then select the directory in which to build the executable with the `--root` option and run:
+Before building your application, you must [configure](#configuration) your [project](#project) at the very least.
+
+After you have done that, there are 2 ways to build your application.
+
+### Installation
+
+Select the directory in which to build the executable with the `--root` option and run:
 
 ```
 cargo install pyapp --force --root <DIR>
 ```
 
 The executable will be located at `<DIR>/bin/pyapp.exe` if on Windows or `<DIR>/bin/pyapp` otherwise.
+
+### Local repository
+
+Clone this repository then enter the cloned directory and run:
+
+```
+cargo build --release
+```
+
+The executable will be located at `target/release/pyapp.exe` if on Windows or `target/release/pyapp` otherwise. If a particular [target](https://doc.rust-lang.org/cargo/reference/config.html#buildtarget) has been set then the `release` directory will be nested one level deeper under `target/<TARGET>`.
+
+***Note:*** If you want to cross compile using [cross](https://github.com/cross-rs/cross), there is currently a [limitation](https://github.com/cross-rs/cross/issues/1215) that requires this method of building.
 
 ## Runtime behavior
 
