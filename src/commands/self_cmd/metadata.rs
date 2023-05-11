@@ -6,7 +6,7 @@ use clap::Args;
 
 use crate::app;
 
-/// Starship prompt provider
+/// Display metadata
 #[derive(Args, Debug)]
 #[command(hide = true)]
 pub struct Cli {}
@@ -58,7 +58,7 @@ impl Cli {
                         if line.starts_with("Version: ") {
                             println!(
                                 "{}",
-                                app::starship_prompt()
+                                app::metadata_template()
                                     .replace("{project}", &app::project_name())
                                     .replace("{version}", line.split_at(9).1)
                             );
