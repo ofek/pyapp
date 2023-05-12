@@ -24,3 +24,26 @@ zstd = "0.12.3"
 highway = "1.0.0"
 regex = "1.8.1"
 reqwest = { version = "0.11", features = ["blocking", "rustls-tls"], default-features = false }
+
+[profile.release]
+strip = "symbols"
+
+[package.metadata.cross.build.env]
+passthrough = [
+  "PYAPP_DISTRIBUTION_EMBED",
+  "PYAPP_DISTRIBUTION_FORMAT",
+  "PYAPP_DISTRIBUTION_PYTHON_PATH",
+  "PYAPP_DISTRIBUTION_SOURCE",
+  "PYAPP_DISTRIBUTION_VARIANT",
+  "PYAPP_EXEC_CODE",
+  "PYAPP_EXEC_MODULE",
+  "PYAPP_EXEC_SPEC",
+  "PYAPP_METADATA_TEMPLATE",
+  "PYAPP_PASS_LOCATION",
+  "PYAPP_PIP_ALLOW_CONFIG",
+  "PYAPP_PIP_EXTRA_ARGS",
+  "PYAPP_PROJECT_NAME",
+  "PYAPP_PROJECT_VERSION",
+  "PYAPP_SELF_COMMAND",
+  "PYAPP_SKIP_INSTALL",
+]
