@@ -373,9 +373,17 @@ fn set_self_command() {
     }
 }
 
-fn main() {
-    set_runtime_variable("PYAPP_METADATA_TEMPLATE", "{project} v{version}");
+fn set_metadata_template() {
+    let variable = "PYAPP_METADATA_TEMPLATE";
+    let metadata_template = env::var(variable).unwrap_or_default();
+    if !metadata_template.is_empty() {
+        set_runtime_variable(variable, &metadata_template);
+    } else {
+        set_runtime_variable(variable, "{project} v{version}");
+    }
+}
 
+fn main() {
     let project_name = check_environment_variable("PYAPP_PROJECT_NAME");
     set_runtime_variable("PYAPP_PROJECT_NAME", normalize_project_name(&project_name));
 
@@ -397,6 +405,7 @@ fn main() {
     set_skip_install();
     set_indicator();
     set_self_command();
+    set_metadata_template();
 
     let archive_path: PathBuf = [
         env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),

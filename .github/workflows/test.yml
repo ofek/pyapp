@@ -12,6 +12,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
+env:
+  STABLE_PYTHON_VERSION: "3.11"
+
 jobs:
   test:
     name: Test ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
@@ -23,6 +30,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ env.STABLE_PYTHON_VERSION }}
+      if: runner.os == 'Linux'
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.STABLE_PYTHON_VERSION }}
+
+    - name: Validate
+      if: runner.os == 'Linux'
+      run: python scripts/validate_options.py
 
     - name: Set up tooling
       run: rustup component add clippy rustfmt
