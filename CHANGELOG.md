@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.5.0 - 2023-05-11
+
 ***Added:***
 
 - Strip symbols from release builds
@@ -17,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Properly pass through all required environment variable options to cross compilation images
 - Properly allow configuration of the template used for the metadata command
 
-## 0.4.0 - 2023-05-10
+## 0.4.0 - 2023-05-11
 
 ***Changed:***
 
