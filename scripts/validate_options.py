@@ -4,7 +4,7 @@ import tomllib
 from itertools import zip_longest
 from pathlib import Path
 
-IGNORED = set()
+IGNORED = {'PYAPP_PROJECT_{}'}
 
 
 def main():

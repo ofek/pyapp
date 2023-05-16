@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `PYAPP_PROJECT_PATH` option to embed the project for installation at runtime
+
+***Fixed:***
+
+- Properly handle distributions packed as ZIP files
+
 ## 0.5.0 - 2023-05-11
 
 ***Added:***

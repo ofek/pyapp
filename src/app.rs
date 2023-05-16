@@ -25,7 +25,12 @@ pub fn initialize() -> Result<()> {
 
 pub fn embedded_distribution() -> &'static [u8] {
     // If this is empty, then the distribution will be downloaded at runtime
-    include_bytes!("embed/archive")
+    include_bytes!("embed/distribution")
+}
+
+pub fn embedded_project() -> &'static [u8] {
+    // If this is empty, then the project will be downloaded at runtime
+    include_bytes!("embed/project")
 }
 
 pub fn distribution_id() -> String {
@@ -50,6 +55,10 @@ pub fn project_name() -> String {
 
 pub fn project_version() -> String {
     env!("PYAPP_PROJECT_VERSION").into()
+}
+
+pub fn project_embed_file_name() -> String {
+    env!("PYAPP__PROJECT_EMBED_FILE_NAME").into()
 }
 
 pub fn exec_module() -> String {

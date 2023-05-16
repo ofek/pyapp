@@ -30,6 +30,8 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Metadata](#metadata)
 - [Configuration](#configuration)
   - [Project](#project)
+    - [Package index](#package-index)
+    - [Embedding](#embedding)
   - [Execution mode](#execution-mode)
   - [Python distribution](#python-distribution)
     - [Known](#known)
@@ -37,7 +39,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
     - [Custom](#custom)
       - [Format](#format)
       - [Python location](#python-location)
-    - [Embedding](#embedding)
+    - [Embedding](#embedding-1)
   - [pip](#pip-1)
     - [Extra arguments](#extra-arguments)
     - [Allowing configuration](#allowing-configuration)
@@ -134,7 +136,15 @@ All configuration is done with environment variables.
 
 ### Project
 
+There are 2 ways to configure runtime installation, neither of which will occur when [disabled](#skipping-project-installation).
+
+#### Package index
+
 The desired project name and version are configured with the `PYAPP_PROJECT_NAME` and `PYAPP_PROJECT_VERSION` options, respectively. The project name must adhere to [PEP 508](https://peps.python.org/pep-0508/#names) and will be normalized during builds according to [PEP 503](https://peps.python.org/pep-0503/#normalized-names).
+
+#### Embedding
+
+You may embed the project with the `PYAPP_PROJECT_PATH` option which should be an absolute path to a wheel ending in `.whl` or a source distribution ending in `.tar.gz`.
 
 ### Execution mode
 

@@ -126,16 +126,32 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
 
 pub fn install_project(installation_directory: &PathBuf, python: &PathBuf) -> Result<()> {
     let mut command = pip_command(python);
-    command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
 
-    let (status, output) = process::wait_for(
-        command,
-        format!(
-            "Installing {} {}",
-            app::project_name(),
-            app::project_version()
-        ),
-    )?;
+    let wait_message = format!(
+        "Installing {} {}",
+        app::project_name(),
+        app::project_version()
+    );
+    let (status, output) = if !app::embedded_project().is_empty() {
+        let dir = tempdir().with_context(|| "unable to create temporary directory")?;
+        let temp_path = dir.path().join(app::project_embed_file_name());
+
+        let mut f = fs::File::create(&temp_path).with_context(|| {
+            format!("unable to create temporary file: {}", &temp_path.display())
+        })?;
+        f.write(app::embedded_project()).with_context(|| {
+            format!(
+                "unable to write embedded project to temporary file: {}",
+                &temp_path.display()
+            )
+        })?;
+
+        command.arg(temp_path.to_string_lossy().as_ref());
+        process::wait_for(command, wait_message)?
+    } else {
+        command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
+        process::wait_for(command, wait_message)?
+    };
 
     if !status.success() {
         fs::remove_dir_all(installation_directory).ok();
