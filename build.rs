@@ -1,7 +1,8 @@
 use std::env;
 use std::fmt::Display;
-use std::fs;
+use std::fs::{self, File};
 use std::hash::{Hash, Hasher};
+use std::io::Read;
 use std::path::PathBuf;
 
 use highway::PortableHash;
@@ -180,8 +181,111 @@ fn normalize_project_name(name: &String) -> String {
         .to_lowercase()
 }
 
+fn embed_file(name: &str) -> PathBuf {
+    [
+        env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),
+        "src",
+        "embed",
+        name,
+    ]
+    .iter()
+    .collect()
+}
+
+fn truncate_embed_file(path: &PathBuf) {
+    // Ensure the file is empty as that is the heuristic used at runtime to
+    // determine whether to make network calls
+    fs::File::create(path).unwrap().set_len(0).unwrap();
+}
+
 fn get_python_version() -> String {
     env::var("PYAPP_PYTHON_VERSION").unwrap_or(DEFAULT_PYTHON_VERSION.to_string())
+}
+
+fn set_project_from_metadata(metadata: &str, file_name: &str) {
+    for item in ["Name", "Version"] {
+        match Regex::new(&format!("(?m)^{item}: (.+)$"))
+            .unwrap()
+            .captures(metadata)
+        {
+            Some(captures) => {
+                let value = if item == "Name" {
+                    normalize_project_name(&captures[1].to_string())
+                } else {
+                    captures[1].to_string()
+                };
+                set_runtime_variable(&format!("PYAPP_PROJECT_{}", item.to_uppercase()), value);
+            }
+            None => {
+                panic!("\n\nFailed to parse metadata {item} in {file_name}\n\n");
+            }
+        }
+    }
+}
+
+fn set_project() {
+    let embed_path = embed_file("project");
+    let local_path = env::var("PYAPP_PROJECT_PATH").unwrap_or_default();
+    if !local_path.is_empty() {
+        let path = PathBuf::from(&local_path);
+        if !path.is_file() {
+            panic!("\n\nProject path is not a file: {local_path}\n\n");
+        }
+        fs::copy(&local_path, &embed_path).unwrap_or_else(|_| {
+            panic!(
+                "\n\nFailed to copy project's archive from {local_path} to {embed_path}\n\n",
+                embed_path = embed_path.display()
+            )
+        });
+
+        let file_name = path.file_name().unwrap().to_str().unwrap();
+        if file_name.ends_with(".whl") {
+            let mut archive = zip::ZipArchive::new(File::open(embed_path).unwrap()).unwrap();
+
+            // *.dist-info/ comes last by convention
+            for i in (0..archive.len()).rev() {
+                let mut file = archive.by_index(i).unwrap();
+                let entry_path = file.enclosed_name().unwrap().to_string_lossy().to_string();
+                if entry_path.ends_with(".dist-info/METADATA") {
+                    let mut metadata = String::new();
+                    file.read_to_string(&mut metadata).unwrap();
+
+                    set_project_from_metadata(&metadata, &entry_path);
+                    set_runtime_variable("PYAPP__PROJECT_EMBED_FILE_NAME", file_name);
+                    return;
+                }
+            }
+        } else if file_name.ends_with(".tar.gz") {
+            let gz = flate2::read::GzDecoder::new(File::open(embed_path).unwrap());
+            let mut archive = tar::Archive::new(gz);
+
+            for file in archive.entries().unwrap() {
+                let mut file = file.unwrap();
+                let entry_path = file.path().unwrap().to_string_lossy().to_string();
+                if entry_path.ends_with("/PKG-INFO") && entry_path.matches('/').count() == 1 {
+                    let mut metadata = String::new();
+                    file.read_to_string(&mut metadata).unwrap();
+
+                    set_project_from_metadata(&metadata, &entry_path);
+                    set_runtime_variable("PYAPP__PROJECT_EMBED_FILE_NAME", file_name);
+                    return;
+                }
+            }
+        } else {
+            panic!("\n\nUnsupported project archive format: {file_name}\n\n");
+        }
+
+        panic!("\n\nUnable to find project metadata in {file_name}\n\n");
+    } else {
+        let project_name = check_environment_variable("PYAPP_PROJECT_NAME");
+        set_runtime_variable("PYAPP_PROJECT_NAME", normalize_project_name(&project_name));
+
+        let project_version = check_environment_variable("PYAPP_PROJECT_VERSION");
+        set_runtime_variable("PYAPP_PROJECT_VERSION", project_version);
+
+        set_runtime_variable("PYAPP__PROJECT_EMBED_FILE_NAME", "");
+        truncate_embed_file(&embed_path);
+    }
 }
 
 fn get_distribution_source() -> String {
@@ -384,11 +488,7 @@ fn set_metadata_template() {
 }
 
 fn main() {
-    let project_name = check_environment_variable("PYAPP_PROJECT_NAME");
-    set_runtime_variable("PYAPP_PROJECT_NAME", normalize_project_name(&project_name));
-
-    let project_version = check_environment_variable("PYAPP_PROJECT_VERSION");
-    set_runtime_variable("PYAPP_PROJECT_VERSION", project_version);
+    set_project();
 
     let distribution_source = get_distribution_source();
     set_runtime_variable("PYAPP_DISTRIBUTION_SOURCE", &distribution_source);
@@ -407,15 +507,7 @@ fn main() {
     set_self_command();
     set_metadata_template();
 
-    let archive_path: PathBuf = [
-        env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),
-        "src",
-        "embed",
-        "archive",
-    ]
-    .iter()
-    .collect();
-
+    let archive_path = embed_file("distribution");
     if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
         let bytes = reqwest::blocking::get(&distribution_source)
             .unwrap()
@@ -423,8 +515,6 @@ fn main() {
             .unwrap();
         fs::write(&archive_path, bytes).unwrap();
     } else {
-        // Ensure the file is empty as that is the heuristic used at runtime to
-        // determine whether to fetch from the source
-        fs::File::create(&archive_path).unwrap().set_len(0).unwrap();
+        truncate_embed_file(&archive_path);
     }
 }

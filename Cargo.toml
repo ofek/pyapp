@@ -17,13 +17,16 @@ os_pipe = "1.1.4"
 reqwest = { version = "0.11", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.38"
 tempfile = "3.5.0"
-zip = { version = "0.6.4", default-features = false }
+zip = { version = "0.6.4", features = ["deflate"] }
 zstd = "0.12.3"
 
 [build-dependencies]
+flate2 = "1.0.26"
 highway = "1.0.0"
 regex = "1.8.1"
 reqwest = { version = "0.11", features = ["blocking", "rustls-tls"], default-features = false }
+tar = "0.4.38"
+zip = { version = "0.6.4", features = ["deflate"] }
 
 [profile.release]
 panic = "abort"
@@ -44,6 +47,7 @@ passthrough = [
   "PYAPP_PIP_ALLOW_CONFIG",
   "PYAPP_PIP_EXTRA_ARGS",
   "PYAPP_PROJECT_NAME",
+  "PYAPP_PROJECT_PATH",
   "PYAPP_PROJECT_VERSION",
   "PYAPP_PYTHON_VERSION",
   "PYAPP_SELF_COMMAND",
