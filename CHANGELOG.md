@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Added:***
 
 - Add `PYAPP_PROJECT_PATH` option to embed the project for installation at runtime
+- Add `PYAPP_DISTRIBUTION_PATH` option to embed the distribution from a local path rather than fetching the source
 
 ***Fixed:***
 
