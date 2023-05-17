@@ -16,8 +16,8 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
 **Table of Contents**
 
 - [Building](#building)
-  - [Installation](#installation)
   - [Local repository](#local-repository)
+  - [Installation](#installation)
 - [Runtime behavior](#runtime-behavior)
   - [Initialization](#initialization)
   - [Detection](#detection)
@@ -47,6 +47,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [Installation indicator](#installation-indicator)
   - [Management command name](#management-command-name)
   - [Metadata template](#metadata-template)
+- [Cross compilation](#cross-compilation)
 - [TODO](#todo)
 - [License](#license)
 
@@ -55,16 +56,6 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
 Before building your application, you must [configure](#configuration) your [project](#project) at the very least.
 
 After you have done that, there are 2 ways to build your application.
-
-### Installation
-
-Select the directory in which to build the executable with the `--root` option and run:
-
-```
-cargo install pyapp --force --root <DIR>
-```
-
-The executable will be located at `<DIR>/bin/pyapp.exe` if on Windows or `<DIR>/bin/pyapp` otherwise.
 
 ### Local repository
 
@@ -76,7 +67,17 @@ cargo build --release
 
 The executable will be located at `target/release/pyapp.exe` if on Windows or `target/release/pyapp` otherwise. If a particular [target](https://doc.rust-lang.org/cargo/reference/config.html#buildtarget) has been set (or if [cross](https://github.com/cross-rs/cross) is used since it always sets one), then the `release` directory will be nested one level deeper under `target/<TARGET>`.
 
-***Note:*** If you want to cross compile using [cross](https://github.com/cross-rs/cross), there is currently a [limitation](https://github.com/cross-rs/cross/issues/1215) that requires this method of building.
+### Installation
+
+Select the directory in which to build the executable with the `--root` option and run:
+
+```
+cargo install pyapp --force --root <DIR>
+```
+
+The executable will be located at `<DIR>/bin/pyapp.exe` if on Windows or `<DIR>/bin/pyapp` otherwise.
+
+***Note:*** If you want to cross compile using [cross](https://github.com/cross-rs/cross), this method of building is currently [unsupported](https://github.com/cross-rs/cross/issues/1215).
 
 ## Runtime behavior
 
@@ -144,7 +145,7 @@ The desired project name and version are configured with the `PYAPP_PROJECT_NAME
 
 #### Embedding
 
-You may embed the project with the `PYAPP_PROJECT_PATH` option which should be an absolute path to a wheel ending in `.whl` or a source distribution ending in `.tar.gz`.
+You may embed the project with the `PYAPP_PROJECT_PATH` option which should be a path to a wheel ending in `.whl` or a source distribution ending in `.tar.gz`.
 
 ### Execution mode
 
@@ -205,11 +206,11 @@ You may set the relative path to the Python executable after unpacking the archi
 
 #### Embedding
 
-You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime.
+You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime. When distribution embedding is enabled, you can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source.
 
 ### pip
 
-These options have no effect when the project installation is [skipped](#skipping-project-installation).
+These options have no effect when the project installation is [disabled](#skipping-project-installation).
 
 #### Extra arguments
 
@@ -263,6 +264,12 @@ when = true
 ## Other
 # shell = ["sh", "--norc"]
 ````
+
+## Cross compilation
+
+Configuration for [cross](https://github.com/cross-rs/cross) is validated by CI to ensure all known environment variable options are passed through to the containers.
+
+When embedding the [project](#embedding) or the [distribution](#embedding-1) using a local path, you must use the [local repository](#local-repository) way of building and ensure that the configured files to embed reside within the repository and the options refer to relative paths.
 
 ## TODO
 

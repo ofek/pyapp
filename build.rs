@@ -202,6 +202,63 @@ fn get_python_version() -> String {
     env::var("PYAPP_PYTHON_VERSION").unwrap_or(DEFAULT_PYTHON_VERSION.to_string())
 }
 
+fn get_distribution_source() -> String {
+    let distribution_source = env::var("PYAPP_DISTRIBUTION_SOURCE").unwrap_or_default();
+    if !distribution_source.is_empty() {
+        return distribution_source;
+    };
+
+    let selected_python_version = get_python_version();
+
+    // https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
+    let selected_platform = match env::var("CARGO_CFG_TARGET_OS").unwrap().as_str() {
+        "windows" => "windows",
+        "macos" | "ios" => "macos",
+        _ => "linux",
+    }
+    .to_string();
+    let selected_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let selected_variant = {
+        let mut variant = env::var("PYAPP_DISTRIBUTION_VARIANT").unwrap_or_default();
+        if variant.is_empty() {
+            if selected_platform == "windows" {
+                variant = "shared".to_string();
+            } else if selected_platform == "linux" && selected_arch == "x86_64" {
+                variant = "v3".to_string();
+            }
+        };
+        variant
+    };
+    let selected_abi = {
+        let mut abi = env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
+        if abi.is_empty() {
+            if selected_platform == "windows" {
+                abi = "msvc".to_string();
+            } else if selected_platform == "linux" {
+                abi = "gnu".to_string();
+            }
+        };
+        abi
+    };
+
+    for (python_version, platform, arch, abi, variant, url) in DEFAULT_CPYTHON_DISTRIBUTIONS.iter()
+    {
+        if python_version == &selected_python_version
+            && platform == &selected_platform
+            && arch == &selected_arch
+            && abi == &selected_abi
+            && variant == &selected_variant
+        {
+            return url.to_string();
+        }
+    }
+
+    panic!(
+        "\n\nNo default distribution source found\nPython version: {}\nPlatform: {}\nArchitecture: {}\nABI: {}\nVariant: {}\n\n",
+        selected_python_version, selected_platform, selected_arch, selected_abi, selected_variant
+    );
+}
+
 fn set_project_from_metadata(metadata: &str, file_name: &str) {
     for item in ["Name", "Version"] {
         match Regex::new(&format!("(?m)^{item}: (.+)$"))
@@ -288,61 +345,53 @@ fn set_project() {
     }
 }
 
-fn get_distribution_source() -> String {
-    let distribution_source = env::var("PYAPP_DISTRIBUTION_SOURCE").unwrap_or_default();
-    if !distribution_source.is_empty() {
-        return distribution_source;
-    };
+fn set_distribution() {
+    let embed_path = embed_file("distribution");
+    let mut hasher = PortableHash::default();
 
-    let selected_python_version = get_python_version();
-
-    // https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
-    let selected_platform = match env::var("CARGO_CFG_TARGET_OS").unwrap().as_str() {
-        "windows" => "windows",
-        "macos" | "ios" => "macos",
-        _ => "linux",
-    }
-    .to_string();
-    let selected_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
-    let selected_variant = {
-        let mut variant = env::var("PYAPP_DISTRIBUTION_VARIANT").unwrap_or_default();
-        if variant.is_empty() {
-            if selected_platform == "windows" {
-                variant = "shared".to_string();
-            } else if selected_platform == "linux" && selected_arch == "x86_64" {
-                variant = "v3".to_string();
+    let distribution_source = if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
+        let local_path = env::var("PYAPP_DISTRIBUTION_PATH").unwrap_or_default();
+        let distribution_source = if !local_path.is_empty() {
+            let path = PathBuf::from(&local_path);
+            if !path.is_file() {
+                panic!("\n\nDistribution path is not a file: {local_path}\n\n");
             }
+            fs::copy(&local_path, &embed_path).unwrap_or_else(|_| {
+                panic!(
+                    "\n\nFailed to copy distribution's archive from {local_path} to {embed_path}\n\n",
+                    embed_path = embed_path.display()
+                )
+            });
+
+            "".to_string()
+        } else {
+            let distribution_source = get_distribution_source();
+            let bytes = reqwest::blocking::get(&distribution_source)
+                .unwrap()
+                .bytes()
+                .unwrap();
+            fs::write(&embed_path, bytes).unwrap();
+
+            distribution_source
         };
-        variant
-    };
-    let selected_abi = {
-        let mut abi = env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
-        if abi.is_empty() {
-            if selected_platform == "windows" {
-                abi = "msvc".to_string();
-            } else if selected_platform == "linux" {
-                abi = "gnu".to_string();
-            }
-        };
-        abi
+
+        let mut file = File::open(&embed_path).unwrap();
+        std::io::copy(&mut file, &mut hasher).unwrap();
+
+        distribution_source
+    } else {
+        truncate_embed_file(&embed_path);
+        let distribution_source = get_distribution_source();
+        distribution_source.hash(&mut hasher);
+
+        distribution_source
     };
 
-    for (python_version, platform, arch, abi, variant, url) in DEFAULT_CPYTHON_DISTRIBUTIONS.iter()
-    {
-        if python_version == &selected_python_version
-            && platform == &selected_platform
-            && arch == &selected_arch
-            && abi == &selected_abi
-            && variant == &selected_variant
-        {
-            return url.to_string();
-        }
-    }
+    set_runtime_variable("PYAPP_DISTRIBUTION_SOURCE", &distribution_source);
+    set_runtime_variable("PYAPP__DISTRIBUTION_ID", hasher.finish());
 
-    panic!(
-        "\n\nNo default distribution source found\nPython version: {}\nPlatform: {}\nArchitecture: {}\nABI: {}\nVariant: {}\n\n",
-        selected_python_version, selected_platform, selected_arch, selected_abi, selected_variant
-    );
+    set_distribution_format(&distribution_source);
+    set_python_path(&distribution_source);
 }
 
 fn set_distribution_format(distribution_source: &String) {
@@ -489,16 +538,7 @@ fn set_metadata_template() {
 
 fn main() {
     set_project();
-
-    let distribution_source = get_distribution_source();
-    set_runtime_variable("PYAPP_DISTRIBUTION_SOURCE", &distribution_source);
-
-    let mut h = PortableHash::default();
-    distribution_source.hash(&mut h);
-    set_runtime_variable("PYAPP__DISTRIBUTION_ID", h.finish());
-
-    set_distribution_format(&distribution_source);
-    set_python_path(&distribution_source);
+    set_distribution();
     set_execution_mode();
     set_pip_extra_args();
     set_pip_allow_config();
@@ -506,15 +546,4 @@ fn main() {
     set_indicator();
     set_self_command();
     set_metadata_template();
-
-    let archive_path = embed_file("distribution");
-    if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
-        let bytes = reqwest::blocking::get(&distribution_source)
-            .unwrap()
-            .bytes()
-            .unwrap();
-        fs::write(&archive_path, bytes).unwrap();
-    } else {
-        truncate_embed_file(&archive_path);
-    }
 }
