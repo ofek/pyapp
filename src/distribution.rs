@@ -11,6 +11,10 @@ use crate::{app, compression, network, process};
 
 pub fn run_project(python: &PathBuf) -> Result<()> {
     let mut command = Command::new(python);
+
+    // https://docs.python.org/3/using/cmdline.html#cmdoption-I
+    command.arg("-I");
+
     if app::exec_module().is_empty() {
         command.args(["-c", app::exec_code().as_str()]);
     } else {
