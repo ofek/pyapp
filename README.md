@@ -230,7 +230,7 @@ The environment variable that is used for [detection](#detection) may be set to 
 
 ### Management command name
 
-You may set the `PYAPP_SELF_COMMAND` option to override the default name (`self`) of the [management command](#commands). This is useful if you wish to have complete control of the interface or to set it to a bogus value with the intention of not using it.
+You may set the `PYAPP_SELF_COMMAND` option to override the default name (`self`) of the [management command group](#commands), useful if you wish to have complete control of the interface. You may set this to `none` to effectively disable the use of management commands.
 
 ### Metadata template
 

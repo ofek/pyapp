@@ -21,6 +21,7 @@ zip = { version = "0.6.4", features = ["deflate"] }
 zstd = "0.12.3"
 
 [build-dependencies]
+rand = "0.8.5"
 flate2 = "1.0.26"
 highway = "1.0.0"
 regex = "1.8.1"

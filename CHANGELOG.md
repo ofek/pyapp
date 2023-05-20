@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Added:***
 
 - Add `-r`/`--restore` flag to the `update` command
+- Allow for disabling of management commands
 - Update default CPython distributions
 
 ## 0.6.0 - 2023-05-16
