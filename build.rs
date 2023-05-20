@@ -17,6 +17,8 @@ const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|gzip", "tar|zstd", "zip"];
 // Target ABI https://doc.rust-lang.org/reference/conditional-compilation.html#target_env
 // Variant e.g. shared/static for Windows, CPU optimization level for Linux
 // URL for fetching the distribution
+//
+// See also https://llvm.org/doxygen/classllvm_1_1Triple.html
 #[rustfmt::skip]
 const DEFAULT_CPYTHON_DISTRIBUTIONS: &[(&str, &str, &str, &str, &str, &str)] = &[
     ("3.11", "linux", "aarch64", "gnu", "",
