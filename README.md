@@ -89,7 +89,7 @@ On the first run of the application:
 2. the distribution will be unpacked
 3. the project will be installed
 
-All subsequent invocations will only check if the unpacked distribution directory exists and nothing else, to maximize CLI responsiveness.
+All subsequent invocations will only check if the installation directory exists and nothing else, to maximize CLI responsiveness.
 
 ### Detection
 
@@ -113,7 +113,7 @@ These commands are always exposed.
 <EXE> self restore
 ```
 
-This will wipe the unpacked distribution and start fresh.
+This will wipe the installation and start fresh.
 
 ##### Update
 
