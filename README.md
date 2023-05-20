@@ -20,8 +20,8 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [Installation](#installation)
 - [Runtime behavior](#runtime-behavior)
   - [Initialization](#initialization)
+  - [Isolation](#isolation)
   - [Detection](#detection)
-  - [pip](#pip)
   - [Commands](#commands)
     - [Default](#default)
       - [Restore](#restore)
@@ -40,7 +40,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Format](#format)
       - [Python location](#python-location)
     - [Embedding](#embedding-1)
-  - [pip](#pip-1)
+  - [pip](#pip)
     - [Extra arguments](#extra-arguments)
     - [Allowing configuration](#allowing-configuration)
   - [Skipping project installation](#skipping-project-installation)
@@ -91,13 +91,16 @@ On the first run of the application:
 
 All subsequent invocations will only check if the installation directory exists and nothing else, to maximize CLI responsiveness.
 
+### Isolation
+
+To provide consistent behavior on each user's machine:
+
+- Python [executes](#execution-mode) projects in [isolated mode](https://docs.python.org/3/using/cmdline.html#cmdoption-I)
+- When installing or upgrading projects, [pip](https://github.com/pypa/pip) uses [isolation](https://pip.pypa.io/en/stable/cli/pip/#cmdoption-isolated) ([by default](#allowing-configuration))
+
 ### Detection
 
 A single environment variable called `PYAPP` is injected with the value of `1` ([by default](#installation-indicator)) when running applications and may be used to detect this mode of installation versus others.
-
-### pip
-
-When installing or upgrading projects, [pip](https://github.com/pypa/pip) uses [isolation](https://pip.pypa.io/en/stable/cli/pip/#cmdoption-isolated) ([by default](#allowing-configuration)) to provide consistent behavior on each user's machine.
 
 ### Commands
 
