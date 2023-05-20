@@ -4,7 +4,7 @@ use std::process::exit;
 use anyhow::Result;
 use clap::Args;
 
-use crate::{app, distribution, process};
+use crate::{app, distribution, process, terminal};
 
 /// Install the latest version
 #[derive(Args, Debug)]
@@ -13,6 +13,10 @@ pub struct Cli {
     /// Allow pre-release and development versions
     #[arg(long)]
     pre: bool,
+
+    /// Restore the installation to the default state before upgrading
+    #[arg(short, long)]
+    restore: bool,
 }
 
 impl Cli {
@@ -27,6 +31,12 @@ impl Cli {
 
         let existing_installation = installation_directory.is_dir();
         if !existing_installation {
+            distribution::materialize(&installation_directory)?;
+        } else if self.restore {
+            let spinner = terminal::spinner("Removing installation".to_string());
+            let result = fs::remove_dir_all(&installation_directory);
+            spinner.finish_and_clear();
+            result?;
             distribution::materialize(&installation_directory)?;
         }
 
