@@ -23,10 +23,10 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [Detection](#detection)
   - [pip](#pip)
   - [Commands](#commands)
-    - [Exposed](#exposed)
+    - [Default](#default)
       - [Restore](#restore)
       - [Update](#update)
-    - [Hidden](#hidden)
+    - [Optional](#optional)
       - [Metadata](#metadata)
 - [Configuration](#configuration)
   - [Project](#project)
@@ -103,7 +103,9 @@ When installing or upgrading projects, [pip](https://github.com/pypa/pip) uses [
 
 Built applications have a single top-level command group named `self` ([by default](#management-command-name)) and all other invocations will be forwarded to your actual [execution logic](#execution-mode).
 
-#### Exposed
+#### Default
+
+These commands are always exposed.
 
 ##### Restore
 
@@ -121,7 +123,9 @@ This will wipe the unpacked distribution and start fresh.
 
 This will update the project to the latest available version in the currently used distribution.
 
-#### Hidden
+#### Optional
+
+These commands are hidden by default and each can be individually exposed by setting its corresponding `PYAPP_EXPOSE_<COMMAND>` option (e.g. `PYAPP_EXPOSE_METADATA`) to `true` or `1`.
 
 ##### Metadata
 

@@ -4,17 +4,22 @@ import tomllib
 from itertools import zip_longest
 from pathlib import Path
 
-IGNORED = {'PYAPP_PROJECT_{}'}
+IGNORED = {'PYAPP_EXPOSE_{}', 'PYAPP_PROJECT_{}'}
 
 
 def main():
-    available_options = set(re.findall(r'"(PYAPP_[^_].+?)"', Path('build.rs').read_text('utf-8')))
-    available_options -= IGNORED
-    expected_options = sorted(available_options)
     defined_options = tomllib.loads(
         Path('Cargo.toml').read_text('utf-8')
     )['package']['metadata']['cross']['build']['env']['passthrough']
+    available_options = set(re.findall(r'"(PYAPP_[^_].+?)"', Path('build.rs').read_text('utf-8')))
+    available_options -= IGNORED
 
+    expose_option = re.compile(r'^#\[command\(hide = env!\("(PYAPP_EXPOSE_.+?)"\)', re.MULTILINE)
+    for entry in Path('src/commands/self_cmd').iterdir():
+        if entry.is_file() and (match := expose_option.search(entry.read_text('utf-8'))):
+            available_options.add(match.group(1))
+
+    expected_options = sorted(available_options)
     if defined_options != expected_options:
         left_padding = max(len(option) for option in expected_options)
         right_padding = max(len(option) for option in defined_options)
