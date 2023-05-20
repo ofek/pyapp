@@ -278,7 +278,6 @@ When embedding the [project](#embedding) or the [distribution](#embedding-1) usi
 ## TODO
 
 - Support PyPy [stable versions](https://www.pypy.org/download.html) and [nightlies](https://buildbot.pypy.org/nightly/)
-- Add a `PYAPP_PIP_EXTERNAL` build time option that indicates the distribution does not ship with `pip` and will use its [standalone installation](https://pip.pypa.io/en/stable/installation/#standalone-zip-application) (note that this may be the default behavior in future depending on feedback)
 
 ## License
 
