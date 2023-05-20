@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `-r`/`--restore` flag to the `update` command
+
 ## 0.6.0 - 2023-05-16
 
 ***Added:***
