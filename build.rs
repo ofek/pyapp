@@ -540,6 +540,38 @@ fn set_self_command() {
     }
 }
 
+fn set_exposed_commands() {
+    let indicator = Regex::new(r"(?m)^#\[command\(hide = env!").unwrap();
+    let commands_dir: PathBuf = [
+        env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),
+        "src",
+        "commands",
+        "self_cmd",
+    ]
+    .iter()
+    .collect();
+
+    for entry in fs::read_dir(commands_dir).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+
+        let command_name = path.file_stem().unwrap().to_str().unwrap();
+        let command_path = path.to_str().unwrap();
+        let command_source = fs::read_to_string(command_path).unwrap();
+        if indicator.is_match(&command_source) {
+            let variable = format!("PYAPP_EXPOSE_{}", command_name.to_uppercase());
+            if is_enabled(&variable) {
+                set_runtime_variable(&variable, "1");
+            } else {
+                set_runtime_variable(&variable, "0");
+            }
+        }
+    }
+}
+
 fn set_metadata_template() {
     let variable = "PYAPP_METADATA_TEMPLATE";
     let metadata_template = env::var(variable).unwrap_or_default();
@@ -559,5 +591,6 @@ fn main() {
     set_skip_install();
     set_indicator();
     set_self_command();
+    set_exposed_commands();
     set_metadata_template();
 }

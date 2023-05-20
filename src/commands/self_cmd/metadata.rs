@@ -8,7 +8,7 @@ use crate::app;
 
 /// Display metadata
 #[derive(Args, Debug)]
-#[command(hide = true)]
+#[command(hide = env!("PYAPP_EXPOSE_METADATA") == "0")]
 pub struct Cli {}
 
 impl Cli {
