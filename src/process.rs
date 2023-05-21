@@ -1,4 +1,8 @@
 use std::io::Read;
+#[cfg(unix)]
+use std::os::unix::process::CommandExt;
+#[cfg(windows)]
+use std::process::exit;
 use std::process::{Command, ExitStatus};
 
 use anyhow::Result;
@@ -24,4 +28,15 @@ pub fn wait_for(mut command: Command, message: String) -> Result<(ExitStatus, St
 
     spinner.finish_and_clear();
     Ok((result?, output))
+}
+
+#[cfg(unix)]
+pub fn exec(mut command: Command) -> Result<()> {
+    Err(command.exec().into())
+}
+
+#[cfg(windows)]
+pub fn exec(mut command: Command) -> Result<()> {
+    let status = command.status()?;
+    exit(status.code().unwrap_or(1));
 }

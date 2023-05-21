@@ -19,7 +19,7 @@ impl Cli {
         }
 
         let python = installation_directory.join(app::distribution_python_path());
-        let site_packages: Option<PathBuf> = if cfg!(target_os = "windows") {
+        let site_packages: Option<PathBuf> = if cfg!(windows) {
             (|| Some(python.parent()?.join("Lib").join("site-packages")))()
         } else {
             (|| {

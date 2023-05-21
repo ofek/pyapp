@@ -10,10 +10,7 @@ use tempfile::tempdir;
 use crate::{app, compression, network, process};
 
 pub fn run_project(python: &PathBuf) -> Result<()> {
-    let mut command = Command::new(python);
-
-    // https://docs.python.org/3/using/cmdline.html#cmdoption-I
-    command.arg("-I");
+    let mut command = python_command(python);
 
     if app::exec_module().is_empty() {
         command.args(["-c", app::exec_code().as_str()]);
@@ -30,8 +27,7 @@ pub fn run_project(python: &PathBuf) -> Result<()> {
         command.env("PYAPP", "");
     }
 
-    let status = command.status()?;
-    exit(status.code().unwrap_or(1));
+    process::exec(command)
 }
 
 pub fn ensure_ready(installation_directory: &PathBuf, python: &PathBuf) -> Result<()> {
@@ -47,7 +43,7 @@ pub fn ensure_ready(installation_directory: &PathBuf, python: &PathBuf) -> Resul
 }
 
 pub fn pip_command(python: &PathBuf) -> Command {
-    let mut command = Command::new(python);
+    let mut command = python_command(python);
     command.args([
         "-m",
         "pip",
@@ -164,4 +160,13 @@ pub fn install_project(installation_directory: &PathBuf, python: &PathBuf) -> Re
     }
 
     Ok(())
+}
+
+fn python_command(python: &PathBuf) -> Command {
+    let mut command = Command::new(python);
+
+    // https://docs.python.org/3/using/cmdline.html#cmdoption-I
+    command.arg("-I");
+
+    command
 }
