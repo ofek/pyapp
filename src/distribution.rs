@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{exit, Command};
 
 use anyhow::{bail, Context, Result};
@@ -9,8 +9,8 @@ use tempfile::tempdir;
 
 use crate::{app, compression, network, process};
 
-pub fn run_project(python: &PathBuf) -> Result<()> {
-    let mut command = python_command(python);
+pub fn run_project(installation_directory: &Path) -> Result<()> {
+    let mut command = python_command(&app::python_path(installation_directory));
 
     if app::exec_module().is_empty() {
         command.args(["-c", app::exec_code().as_str()]);
@@ -32,22 +32,23 @@ pub fn run_project(python: &PathBuf) -> Result<()> {
     }
 
     process::exec(command)
+        .with_context(|| "project execution failed, consider restoring from scratch")
 }
 
-pub fn ensure_ready(installation_directory: &PathBuf, python: &PathBuf) -> Result<()> {
+pub fn ensure_ready(installation_directory: &PathBuf) -> Result<()> {
     if !installation_directory.is_dir() {
         materialize(installation_directory)?;
 
         if !app::skip_install() {
-            install_project(installation_directory, python)?;
+            install_project(installation_directory)?;
         }
     }
 
     Ok(())
 }
 
-pub fn pip_command(python: &PathBuf) -> Command {
-    let mut command = python_command(python);
+pub fn pip_command(installation_directory: &Path) -> Command {
+    let mut command = python_command(&app::python_path(installation_directory));
     command.args([
         "-m",
         "pip",
@@ -68,9 +69,8 @@ pub fn pip_command(python: &PathBuf) -> Command {
 }
 
 pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
-    let distribution_file = app::cache_directory()
-        .join("distributions")
-        .join(app::distribution_id());
+    let distributions_dir = app::cache_directory().join("distributions");
+    let distribution_file = distributions_dir.join(app::distribution_id());
 
     if !distribution_file.is_file() {
         let distribution_source = app::distribution_source();
@@ -111,25 +111,53 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
         })?;
     }
 
-    compression::unpack(
-        app::distribution_format(),
-        &distribution_file,
-        installation_directory,
-    )
-    .or_else(|err| {
-        fs::remove_dir_all(installation_directory).ok();
-        bail!(
-            "unable to unpack to {}\n{}",
-            &installation_directory.display(),
-            err
-        );
-    })?;
+    if app::full_isolation() {
+        compression::unpack(
+            app::distribution_format(),
+            &distribution_file,
+            installation_directory,
+        )
+        .or_else(|err| {
+            fs::remove_dir_all(installation_directory).ok();
+            bail!(
+                "unable to unpack to {}\n{}",
+                &installation_directory.display(),
+                err
+            );
+        })?;
+    } else {
+        let unpacked_distribution = distributions_dir.join(format!("_{}", app::distribution_id()));
+        if !unpacked_distribution.is_dir() {
+            compression::unpack(
+                app::distribution_format(),
+                &distribution_file,
+                &unpacked_distribution,
+            )
+            .or_else(|err| {
+                fs::remove_dir_all(&unpacked_distribution).ok();
+                bail!(
+                    "unable to unpack to {}\n{}",
+                    &unpacked_distribution.display(),
+                    err
+                );
+            })?;
+        }
+
+        let mut command =
+            python_command(&unpacked_distribution.join(app::distribution_python_path()));
+        command.args([
+            "-m",
+            "venv",
+            installation_directory.to_string_lossy().as_ref(),
+        ]);
+        process::wait_for(command, "Creating virtual environment".to_string())?;
+    }
 
     Ok(())
 }
 
-pub fn install_project(installation_directory: &PathBuf, python: &PathBuf) -> Result<()> {
-    let mut command = pip_command(python);
+pub fn install_project(installation_directory: &PathBuf) -> Result<()> {
+    let mut command = pip_command(installation_directory);
 
     let wait_message = format!(
         "Installing {} {}",

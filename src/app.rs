@@ -1,5 +1,5 @@
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use directories::ProjectDirs;
@@ -31,6 +31,10 @@ pub fn embedded_distribution() -> &'static [u8] {
 pub fn embedded_project() -> &'static [u8] {
     // If this is empty, then the project will be downloaded at runtime
     include_bytes!("embed/project")
+}
+
+fn installation_python_path() -> String {
+    env!("PYAPP__INSTALLATION_PYTHON_PATH").into()
 }
 
 pub fn exposed_command() -> String {
@@ -81,6 +85,10 @@ pub fn pip_allow_config() -> bool {
     env!("PYAPP_PIP_ALLOW_CONFIG") == "1"
 }
 
+pub fn full_isolation() -> bool {
+    env!("PYAPP_FULL_ISOLATION") == "1"
+}
+
 pub fn skip_install() -> bool {
     env!("PYAPP_SKIP_INSTALL") == "1"
 }
@@ -91,6 +99,10 @@ pub fn pass_location() -> bool {
 
 pub fn metadata_template() -> String {
     env!("PYAPP_METADATA_TEMPLATE").into()
+}
+
+pub fn python_path(installation_directory: &Path) -> PathBuf {
+    installation_directory.join(installation_python_path())
 }
 
 pub fn cache_directory() -> PathBuf {
