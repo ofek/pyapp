@@ -20,7 +20,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [Installation](#installation)
 - [Runtime behavior](#runtime-behavior)
   - [Initialization](#initialization)
-  - [Isolation](#isolation)
+  - [Execution](#execution)
   - [Detection](#detection)
   - [Commands](#commands)
     - [Default](#default)
@@ -91,11 +91,13 @@ On the first run of the application:
 
 All subsequent invocations will only check if the installation directory exists and nothing else, to maximize CLI responsiveness.
 
-### Isolation
+### Execution
+
+Projects are [executed](#execution-mode) using [`execvp`](https://linux.die.net/man/3/execvp) on non-Windows systems, replacing the process.
 
 To provide consistent behavior on each user's machine:
 
-- Python [executes](#execution-mode) projects in [isolated mode](https://docs.python.org/3/using/cmdline.html#cmdoption-I)
+- Python runs projects in [isolated mode](https://docs.python.org/3/using/cmdline.html#cmdoption-I)
 - When installing or upgrading projects, [pip](https://github.com/pypa/pip) uses [isolation](https://pip.pypa.io/en/stable/cli/pip/#cmdoption-isolated) ([by default](#allowing-configuration))
 
 ### Detection
