@@ -426,30 +426,40 @@ fn set_distribution_format(distribution_source: &String) {
 }
 
 fn set_python_path(distribution_source: &str) {
-    let variable = "PYAPP_DISTRIBUTION_PYTHON_PATH";
+    let distribution_variable = "PYAPP_DISTRIBUTION_PYTHON_PATH";
     let on_windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
-    let relative_path = env::var(variable).unwrap_or_default();
-    if !relative_path.is_empty() {
-        set_runtime_variable(variable, &relative_path);
+    let python_path = env::var(distribution_variable).unwrap_or_default();
+    let relative_path = if !python_path.is_empty() {
+        &python_path
     } else if distribution_source
         .starts_with("https://github.com/indygreg/python-build-standalone/releases/download/")
     {
         if get_python_version() == "3.7" {
             if on_windows {
-                set_runtime_variable(variable, r"python\install\python.exe");
+                r"python\install\python.exe"
             } else {
-                set_runtime_variable(variable, "python/install/bin/python3");
+                "python/install/bin/python3"
             }
         } else if on_windows {
-            set_runtime_variable(variable, r"python\python.exe");
+            r"python\python.exe"
         } else {
-            set_runtime_variable(variable, "python/bin/python3");
+            "python/bin/python3"
         }
     } else if on_windows {
-        set_runtime_variable(variable, "python.exe");
+        "python.exe"
     } else {
-        set_runtime_variable(variable, "bin/python3");
-    }
+        "bin/python3"
+    };
+    set_runtime_variable(distribution_variable, relative_path);
+
+    let installation_variable = "PYAPP__INSTALLATION_PYTHON_PATH";
+    if is_enabled("PYAPP_FULL_ISOLATION") {
+        set_runtime_variable(installation_variable, relative_path);
+    } else if on_windows {
+        set_runtime_variable(installation_variable, r"Scripts\python.exe");
+    } else {
+        set_runtime_variable(installation_variable, "bin/python3");
+    };
 }
 
 fn set_execution_mode() {
@@ -490,6 +500,15 @@ fn set_execution_mode() {
             normalize_project_name(&env::var("PYAPP_PROJECT_NAME").unwrap_or_default())
                 .replace('-', "_"),
         );
+    }
+}
+
+fn set_isolation_mode() {
+    let variable = "PYAPP_FULL_ISOLATION";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
     }
 }
 
@@ -589,6 +608,7 @@ fn main() {
     set_project();
     set_distribution();
     set_execution_mode();
+    set_isolation_mode();
     set_pip_extra_args();
     set_pip_allow_config();
     set_skip_install();

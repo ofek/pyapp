@@ -20,10 +20,8 @@ fn main() -> Result<()> {
         Some(env!("PYAPP_SELF_COMMAND")) => Cli::parse().exec(),
         _ => {
             let installation_directory = app::installation_directory();
-            let python = installation_directory.join(app::distribution_python_path());
-
-            distribution::ensure_ready(&installation_directory, &python)?;
-            distribution::run_project(&python)?;
+            distribution::ensure_ready(&installation_directory)?;
+            distribution::run_project(&installation_directory)?;
 
             Ok(())
         }

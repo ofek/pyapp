@@ -27,8 +27,6 @@ impl Cli {
         }
 
         let installation_directory = app::installation_directory();
-        let python = installation_directory.join(app::distribution_python_path());
-
         let existing_installation = installation_directory.is_dir();
         if !existing_installation {
             distribution::materialize(&installation_directory)?;
@@ -40,7 +38,7 @@ impl Cli {
             distribution::materialize(&installation_directory)?;
         }
 
-        let mut command = distribution::pip_command(&python);
+        let mut command = distribution::pip_command(&installation_directory);
         if self.pre {
             command.arg("--pre");
         }

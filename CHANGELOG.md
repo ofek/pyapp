@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Changed:***
+
+- Installations use virtual environments by default; the previous behavior can be enabled with the `PYAPP_FULL_ISOLATION` option
+
 ***Added:***
 
 - Add `-r`/`--restore` flag to the `update` command

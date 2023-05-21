@@ -43,6 +43,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
   - [pip](#pip)
     - [Extra arguments](#extra-arguments)
     - [Allowing configuration](#allowing-configuration)
+  - [Isolation](#isolation)
   - [Skipping project installation](#skipping-project-installation)
   - [Installation indicator](#installation-indicator)
   - [Management command](#management-command)
@@ -228,6 +229,10 @@ You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the 
 #### Allowing configuration
 
 You may set the `PYAPP_PIP_ALLOW_CONFIG` option to `true` or `1` to allow the use of environment variables and other configuration at runtime.
+
+### Isolation
+
+You may set the `PYAPP_FULL_ISOLATION` option to `true` or `1` to provide each installation with a full copy of the distribution rather than a virtual environment.
 
 ### Skipping project installation
 
