@@ -28,6 +28,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
       - [Update](#update)
     - [Optional](#optional)
       - [Metadata](#metadata)
+      - [Python](#python)
 - [Configuration](#configuration)
   - [Project](#project)
     - [Package index](#package-index)
@@ -140,6 +141,14 @@ These commands are hidden by default and each can be individually exposed by set
 ```
 
 This displays [customized](#metadata-template) output based on a template.
+
+##### Python
+
+```
+<EXE> self python
+```
+
+This directly invokes the installed Python.
 
 ## Configuration
 

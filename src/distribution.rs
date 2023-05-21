@@ -9,6 +9,15 @@ use tempfile::tempdir;
 
 use crate::{app, compression, network, process};
 
+pub fn python_command(python: &PathBuf) -> Command {
+    let mut command = Command::new(python);
+
+    // https://docs.python.org/3/using/cmdline.html#cmdoption-I
+    command.arg("-I");
+
+    command
+}
+
 pub fn run_project(installation_directory: &Path) -> Result<()> {
     let mut command = python_command(&app::python_path(installation_directory));
 
@@ -156,7 +165,7 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn install_project(installation_directory: &PathBuf) -> Result<()> {
+fn install_project(installation_directory: &PathBuf) -> Result<()> {
     let install_target = format!("{} {}", app::project_name(), app::project_version());
     let binary_only = app::pip_extra_args().contains("--only-binary :all:")
         || app::pip_extra_args().contains("--only-binary=:all:");
@@ -203,13 +212,4 @@ pub fn install_project(installation_directory: &PathBuf) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn python_command(python: &PathBuf) -> Command {
-    let mut command = Command::new(python);
-
-    // https://docs.python.org/3/using/cmdline.html#cmdoption-I
-    command.arg("-I");
-
-    command
 }
