@@ -157,16 +157,15 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
 }
 
 pub fn install_project(installation_directory: &PathBuf) -> Result<()> {
-    let mut command = pip_command(installation_directory);
+    let install_target = format!("{} {}", app::project_name(), app::project_version());
+    let binary_only = app::pip_extra_args().contains("--only-binary :all:")
+        || app::pip_extra_args().contains("--only-binary=:all:");
 
-    let wait_message = format!(
-        "Installing {} {}",
-        app::project_name(),
-        app::project_version()
-    );
+    let mut command = pip_command(installation_directory);
     let (status, output) = if !app::embedded_project().is_empty() {
         let dir = tempdir().with_context(|| "unable to create temporary directory")?;
-        let temp_path = dir.path().join(app::project_embed_file_name());
+        let file_name = app::project_embed_file_name();
+        let temp_path = dir.path().join(&file_name);
 
         let mut f = fs::File::create(&temp_path).with_context(|| {
             format!("unable to create temporary file: {}", &temp_path.display())
@@ -179,9 +178,21 @@ pub fn install_project(installation_directory: &PathBuf) -> Result<()> {
         })?;
 
         command.arg(temp_path.to_string_lossy().as_ref());
+
+        let wait_message = if binary_only && file_name.ends_with(".whl") {
+            format!("Unpacking {}", install_target)
+        } else {
+            format!("Installing {}", install_target)
+        };
         process::wait_for(command, wait_message)?
     } else {
         command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
+
+        let wait_message = if binary_only {
+            format!("Unpacking {}", install_target)
+        } else {
+            format!("Installing {}", install_target)
+        };
         process::wait_for(command, wait_message)?
     };
 

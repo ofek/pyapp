@@ -14,13 +14,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Added:***
 
+- Update default CPython distributions
 - Add `-r`/`--restore` flag to the `update` command
 - Allow for disabling of management commands
 - Add ability to expose optional commands
 - Run Python in isolated mode
 - Execute projects with `execvp` on non-Windows systems
 - When the management command is enabled its name is available at runtime via an environment variable
-- Update default CPython distributions
+- Add different installation wait message for when there is a guarantee of no side effects (e.g. pip's `--only-binary :all:`)
 
 ## 0.6.0 - 2023-05-16
 
