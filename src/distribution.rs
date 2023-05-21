@@ -27,6 +27,10 @@ pub fn run_project(python: &PathBuf) -> Result<()> {
         command.env("PYAPP", "");
     }
 
+    if !app::exposed_command().is_empty() {
+        command.env("PYAPP_COMMAND_NAME", app::exposed_command());
+    }
+
     process::exec(command)
 }
 

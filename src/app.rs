@@ -33,6 +33,10 @@ pub fn embedded_project() -> &'static [u8] {
     include_bytes!("embed/project")
 }
 
+pub fn exposed_command() -> String {
+    env!("PYAPP__EXPOSED_COMMAND").into()
+}
+
 pub fn distribution_id() -> String {
     env!("PYAPP__DISTRIBUTION_ID").into()
 }

@@ -45,7 +45,7 @@ For a more streamlined workflow, consider using the built-in [app](https://hatch
     - [Allowing configuration](#allowing-configuration)
   - [Skipping project installation](#skipping-project-installation)
   - [Installation indicator](#installation-indicator)
-  - [Management command name](#management-command-name)
+  - [Management command](#management-command)
   - [Metadata template](#metadata-template)
 - [Cross compilation](#cross-compilation)
 - [TODO](#todo)
@@ -106,7 +106,7 @@ A single environment variable called `PYAPP` is injected with the value of `1` (
 
 ### Commands
 
-Built applications have a single top-level command group named `self` ([by default](#management-command-name)) and all other invocations will be forwarded to your actual [execution logic](#execution-mode).
+Built applications have a single top-level command group named `self` ([by default](#management-command)) and all other invocations will be forwarded to your actual [execution logic](#execution-mode).
 
 #### Default
 
@@ -237,9 +237,11 @@ You may set the `PYAPP_SKIP_INSTALL` option to `true` or `1` to skip installing 
 
 The environment variable that is used for [detection](#detection) may be set to the path of the executable at runtime if you set the `PYAPP_PASS_LOCATION` option to `true` or `1`. This is useful if your application wishes to in some way manage itself.
 
-### Management command name
+### Management command
 
-You may set the `PYAPP_SELF_COMMAND` option to override the default name (`self`) of the [management command group](#commands), useful if you wish to have complete control of the interface. You may set this to `none` to effectively disable the use of management commands.
+You may set the `PYAPP_SELF_COMMAND` option to override the default name (`self`) of the [management command group](#commands). Setting this to `none` effectively disables the use of management commands.
+
+When enabled, the value will be available at runtime as the `PYAPP_COMMAND_NAME` environment variable.
 
 ### Metadata template
 

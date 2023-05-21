@@ -533,10 +533,13 @@ fn set_self_command() {
             variable,
             Alphanumeric.sample_string(&mut rand::thread_rng(), 16),
         );
+        set_runtime_variable("PYAPP__EXPOSED_COMMAND", "");
     } else if !command_name.is_empty() {
         set_runtime_variable(variable, &command_name);
+        set_runtime_variable("PYAPP__EXPOSED_COMMAND", &command_name);
     } else {
         set_runtime_variable(variable, "self");
+        set_runtime_variable("PYAPP__EXPOSED_COMMAND", "self");
     }
 }
 

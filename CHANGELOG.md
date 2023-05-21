@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add ability to expose optional commands
 - Run Python in isolated mode
 - Execute projects with `execvp` on non-Windows systems
+- When the management command is enabled its name is available at runtime via an environment variable
 - Update default CPython distributions
 
 ## 0.6.0 - 2023-05-16
