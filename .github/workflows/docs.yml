@@ -1,0 +1,81 @@
+name: docs
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      publish:
+        required: true
+        type: boolean
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PYTHONUNBUFFERED: '1'
+  FORCE_COLOR: '1'
+  STABLE_PYTHON_VERSION: "3.11"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        # Fetch all history for applying timestamps to every page
+        fetch-depth: 0
+
+    - name: Set up Python ${{ env.STABLE_PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.STABLE_PYTHON_VERSION }}
+
+    - name: Install Hatch
+      run: pip install hatch
+
+    - name: Configure Git for GitHub Actions bot
+      run: |-
+        git config --local user.name 'github-actions[bot]'
+        git config --local user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Build documentation
+      run: hatch run docs:build-check
+
+    - name: Commit documentation
+      run: hatch run docs:ci-build ${{ inputs.version }}
+
+    - name: Create archive
+      run: git archive -o site.tar.gz gh-pages
+
+    - name: Upload site
+      uses: actions/upload-artifact@v3
+      with:
+        name: site
+        path: site.tar.gz
+
+  publish:
+    if: ${{ inputs.publish }}
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download site
+      uses: actions/download-artifact@v3
+      with:
+        name: site
+
+    - name: Unpack archive
+      run: tar -xzf site.tar.gz site
+
+    - name: Publish site
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: site
+        commit_message: ${{ github.event.head_commit.message }}

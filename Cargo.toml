@@ -1,8 +1,9 @@
 [package]
 name = "pyapp"
 version = "0.6.0"
-description = "CLI for self-bootstrapped Python applications"
+description = "Build self-bootstrapped Python applications"
 repository = "https://github.com/ofek/pyapp"
+documentation = "https://ofek.dev/pyapp/"
 license = "Apache-2.0 OR MIT"
 edition = "2021"
 
