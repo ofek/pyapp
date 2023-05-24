@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://ofek.dev/pyapp/latest/</loc>
+         <loc>https://ofek.dev/pyapp/dev/</loc>
          <lastmod>2020-02-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://ofek.dev/pyapp/latest/build/</loc>
+         <loc>https://ofek.dev/pyapp/dev/build/</loc>
          <lastmod>2020-02-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://ofek.dev/pyapp/latest/config/</loc>
+         <loc>https://ofek.dev/pyapp/dev/config/</loc>
          <lastmod>2020-02-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://ofek.dev/pyapp/latest/runtime/</loc>
+         <loc>https://ofek.dev/pyapp/dev/runtime/</loc>
          <lastmod>2020-02-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
