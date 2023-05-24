@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.7.0 - 2023-05-24
+
 ***Changed:***
 
 - Installations use virtual environments by default; the previous behavior can be enabled with the `PYAPP_FULL_ISOLATION` option
