@@ -14,3 +14,5 @@ jobs:
     with:
       version: latest
       publish: true
+    permissions:
+      contents: write

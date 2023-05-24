@@ -18,3 +18,5 @@ jobs:
     with:
       version: dev
       publish: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    permissions:
+      contents: write

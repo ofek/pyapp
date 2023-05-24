@@ -50,7 +50,7 @@ jobs:
       run: hatch run docs:ci-build ${{ inputs.version }}
 
     - name: Create archive
-      run: git archive -o site.tar.gz gh-pages
+      run: git archive --prefix site/ -o site.tar.gz gh-pages
 
     - name: Upload site
       uses: actions/upload-artifact@v3
@@ -71,7 +71,7 @@ jobs:
         name: site
 
     - name: Unpack archive
-      run: tar -xzf site.tar.gz site
+      run: tar -xzf site.tar.gz
 
     - name: Publish site
       uses: peaceiris/actions-gh-pages@v3
