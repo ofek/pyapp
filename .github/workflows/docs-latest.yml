@@ -1,0 +1,16 @@
+name: Docs latest
+
+on:
+  push:
+    tags:
+    - v*
+
+concurrency:
+  group: docs-deploy
+
+jobs:
+  docs:
+    uses: ./.github/workflows/docs.yml
+    with:
+      version: latest
+      publish: true

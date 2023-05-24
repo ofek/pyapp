@@ -1,0 +1,141 @@
+# Configuration
+
+-----
+
+All configuration is done with environment variables.
+
+## Project
+
+There are 2 ways to configure runtime installation, neither of which will occur when [disabled](#skipping-project-installation).
+
+### Package index
+
+The desired project name and version are configured with the `PYAPP_PROJECT_NAME` and `PYAPP_PROJECT_VERSION` options, respectively. The project name must adhere to [PEP 508](https://peps.python.org/pep-0508/#names) and will be normalized during builds according to [PEP 503](https://peps.python.org/pep-0503/#normalized-names).
+
+### Embedding ### {: #project-embedding }
+
+You may embed the project with the `PYAPP_PROJECT_PATH` option which should be a path to a wheel ending in `.whl` or a source distribution ending in `.tar.gz`.
+
+## Execution mode
+
+The following options are mutually exclusive:
+
+| Option | Description |
+| --- | --- |
+| `PYAPP_EXEC_MODULE` | This is the name of the module to execute via `python -m <MODULE>` |
+| `PYAPP_EXEC_SPEC` | This is an [object reference](https://packaging.python.org/en/latest/specifications/entry-points/#data-model) to execute e.g. `pkg.foo:cli` |
+| `PYAPP_EXEC_CODE` | This is arbitrary code to run via `python -c <CODE>` (the spec option uses this internally) |
+
+If none are set then the `PYAPP_EXEC_MODULE` option will default to the value of `PYAPP_PROJECT_NAME` with hyphens replaced by underscores.
+
+## Python distribution
+
+### Known
+
+Setting the `PYAPP_PYTHON_VERSION` option will determine the distribution used at runtime based on the environment at build time. If unset then the default will be the latest stable minor version of [CPython](#cpython).
+
+#### CPython
+
+| ID |
+| --- |
+| `3.7` |
+| `3.8` |
+| `3.9` |
+| `3.10` |
+| `3.11` |
+
+The source of distributions is the [python-build-standalone](https://github.com/indygreg/python-build-standalone) project.
+
+Some distributions have [variants](https://gregoryszorc.com/docs/python-build-standalone/main/running.html) that may be configured with the `PYAPP_DISTRIBUTION_VARIANT` option:
+
+| Platform | Options |
+| --- | --- |
+| Linux | <ul><li><code>v1</code></li><li><code>v2</code></li><li><code>v3</code> (default)</li><li><code>v4</code></li></ul> |
+| Windows | <ul><li><code>shared</code> (default)</li><li><code>static</code></li></ul> |
+
+### Custom
+
+You may explicitly set the `PYAPP_DISTRIBUTION_SOURCE` option which overrides the [known](#known) distribution settings. The source must be a URL that points to an archived version of the desired Python distribution.
+
+Setting this manually may require you to define extra metadata about the distribution that is required for correct [runtime behavior](runtime.md).
+
+#### Format
+
+The following formats are supported for the `PYAPP_DISTRIBUTION_FORMAT` option, with the default chosen based on the ending of the source URL:
+
+| Format | Extensions | Description |
+| --- | --- | --- |
+| `tar|gzip` | <ul><li><code>.tar.gz</code></li><li><code>.tgz</code></li></ul> | A [tar file](https://en.wikipedia.org/wiki/Tar_(computing)) with [gzip compression](https://en.wikipedia.org/wiki/Gzip) |
+| `tar|zstd` | <ul><li><code>.tar.zst</code></li><li><code>.tar.zstd</code></li></ul> | A [tar file](https://en.wikipedia.org/wiki/Tar_(computing)) with [Zstandard compression](https://en.wikipedia.org/wiki/Zstd) |
+| `zip` | <ul><li><code>.zip</code></li></ul> | A [ZIP file](https://en.wikipedia.org/wiki/ZIP_(file_format)) with [DEFLATE compression](https://en.wikipedia.org/wiki/Deflate) |
+
+#### Python location
+
+You may set the relative path to the Python executable after unpacking the archive with the `PYAPP_DISTRIBUTION_PYTHON_PATH` option. The default is `python.exe` on Windows and `bin/python3` on all other platforms.
+
+### Embedding ### {: #distribution-embedding }
+
+You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime. When distribution embedding is enabled, you can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source.
+
+## pip
+
+These options have no effect when the project installation is [disabled](#skipping-project-installation).
+
+### Extra arguments
+
+You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the [`pip install`](https://pip.pypa.io/en/stable/cli/pip_install/) command at runtime when installing or updating the project e.g. `--index-url URL --only-binary :all:`.
+
+### Allowing configuration
+
+You may set the `PYAPP_PIP_ALLOW_CONFIG` option to `true` or `1` to allow the use of environment variables and other configuration at runtime.
+
+## Isolation
+
+You may set the `PYAPP_FULL_ISOLATION` option to `true` or `1` to provide each installation with a full copy of the distribution rather than a virtual environment.
+
+## Skipping project installation
+
+You may set the `PYAPP_SKIP_INSTALL` option to `true` or `1` to skip installing the project in the distribution. This allows for entirely predefined distributions and thus no network calls at runtime if used in conjunction with [distribution embedding](#distribution-embedding).
+
+## Installation indicator
+
+The environment variable that is used for [detection](runtime.md#detection) may be set to the path of the executable at runtime if you set the `PYAPP_PASS_LOCATION` option to `true` or `1`. This is useful if your application wishes to in some way manage itself.
+
+## Management command
+
+You may set the `PYAPP_SELF_COMMAND` option to override the default name (`self`) of the [management command group](runtime.md#commands). Setting this to `none` effectively disables the use of management commands.
+
+When enabled, the value will be available at runtime as the `PYAPP_COMMAND_NAME` environment variable.
+
+## Metadata template
+
+You may set a custom template used to [output metadata](runtime.md#metadata) with the `PYAPP_METADATA_TEMPLATE` option which supports the following placeholders:
+
+| Placeholder | Description |
+| --- | --- |
+| `{project}` | The normalized project name |
+| `{version}` | The currently installed version of the project |
+
+The default template is `{project} v{version}` if this option is unset.
+
+This is useful for setting [custom commands](https://starship.rs/config/#custom-commands) for the [Starship](https://github.com/starship/starship) prompt. The following example configuration assumes that the built executable has been renamed to `foo`:
+
+````toml
+format = """
+...
+${custom.foo}\
+...
+$line_break\
+...
+$character"""
+
+# <clipped>
+
+[custom.foo]
+command = "foo self metadata"
+when = true
+## Windows
+# shell = ["cmd", "/C"]
+## Other
+# shell = ["sh", "--norc"]
+````

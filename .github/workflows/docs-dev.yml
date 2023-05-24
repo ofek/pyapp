@@ -1,0 +1,20 @@
+name: Docs dev
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    uses: ./.github/workflows/docs.yml
+    with:
+      version: dev
+      publish: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
