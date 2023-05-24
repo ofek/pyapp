@@ -11,7 +11,19 @@ After you have done that, your application can be built using a [local copy](#lo
 
 ## Local repository
 
-Fetch this repository then enter the directory and run:
+The recommended method of downloading the repository is via the `source` asset archives attached to each [release](https://github.com/ofek/pyapp/releases).
+
+The latest release can always be downloaded at the following URLs:
+
+- https://github.com/ofek/pyapp/releases/latest/download/source.tar.gz
+- https://github.com/ofek/pyapp/releases/latest/download/source.zip
+
+Specific releases may be downloaded at the following URLs, replacing `X.Y.Z` with the desired version:
+
+- https://github.com/ofek/pyapp/releases/download/vX.Y.Z/source.tar.gz
+- https://github.com/ofek/pyapp/releases/download/vX.Y.Z/source.zip
+
+After unpacking the repository, enter the directory and run:
 
 ```
 cargo build --release
@@ -28,6 +40,8 @@ cargo install pyapp --force --root <DIR>
 ```
 
 The executable will be located at `<DIR>/bin/pyapp.exe` if on Windows or `<DIR>/bin/pyapp` otherwise.
+
+Specific versions may be chosen with the `--version` flag.
 
 ***Note:*** If you want to [cross compile](#cross-compilation), this method of building is currently [unsupported](https://github.com/cross-rs/cross/issues/1215).
 
