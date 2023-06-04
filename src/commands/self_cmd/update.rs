@@ -43,6 +43,7 @@ impl Cli {
             command.arg("--pre");
         }
         command.args(["--upgrade", app::project_name().as_str()]);
+        distribution::ensure_pip()?;
 
         let (status, output) =
             process::wait_for(command, format!("Updating {}", app::project_name()))?;

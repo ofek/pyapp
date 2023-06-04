@@ -58,9 +58,14 @@ pub fn ensure_ready(installation_directory: &PathBuf) -> Result<()> {
 
 pub fn pip_command(installation_directory: &Path) -> Command {
     let mut command = python_command(&app::python_path(installation_directory));
+    if app::pip_external() {
+        let external_pip = app::external_pip_zipapp();
+        command.arg(external_pip.to_string_lossy().as_ref());
+    } else {
+        command.args(["-m", "pip"]);
+    }
+
     command.args([
-        "-m",
-        "pip",
         "install",
         "--disable-pip-version-check",
         "--no-warn-script-location",
@@ -78,7 +83,7 @@ pub fn pip_command(installation_directory: &Path) -> Command {
 }
 
 pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
-    let distributions_dir = app::cache_directory().join("distributions");
+    let distributions_dir = app::distributions_cache();
     let distribution_file = distributions_dir.join(app::distribution_id());
 
     if !distribution_file.is_file() {
@@ -154,11 +159,11 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
 
         let mut command =
             python_command(&unpacked_distribution.join(app::distribution_python_path()));
-        command.args([
-            "-m",
-            "venv",
-            installation_directory.to_string_lossy().as_ref(),
-        ]);
+        command.args(["-m", "venv"]);
+        if app::pip_external() {
+            command.arg("--without-pip");
+        }
+        command.arg(installation_directory.to_string_lossy().as_ref());
         process::wait_for(command, "Creating virtual environment".to_string())?;
     }
 
@@ -187,6 +192,7 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
         })?;
 
         command.arg(temp_path.to_string_lossy().as_ref());
+        ensure_pip()?;
 
         let wait_message = if binary_only && file_name.ends_with(".whl") {
             format!("Unpacking {}", install_target)
@@ -196,6 +202,7 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
         process::wait_for(command, wait_message)?
     } else {
         command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
+        ensure_pip()?;
 
         let wait_message = if binary_only {
             format!("Unpacking {}", install_target)
@@ -210,6 +217,57 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
         println!("{}", output.trim_end());
         exit(status.code().unwrap_or(1));
     }
+
+    Ok(())
+}
+
+pub fn ensure_pip() -> Result<()> {
+    if !app::pip_external() {
+        return Ok(());
+    }
+
+    let external_pip = app::external_pip_zipapp();
+    if external_pip.is_file() {
+        return Ok(());
+    }
+
+    let external_pip_cache = app::external_pip_cache();
+    fs::create_dir_all(&external_pip_cache).with_context(|| {
+        format!(
+            "unable to create distribution cache {}",
+            &external_pip_cache.display()
+        )
+    })?;
+
+    let dir = tempdir().with_context(|| "unable to create temporary directory")?;
+    let temp_path = dir.path().join("pip.pyz");
+
+    let mut f = fs::File::create(&temp_path)
+        .with_context(|| format!("unable to create temporary file: {}", &temp_path.display()))?;
+
+    let pip_version = app::pip_version();
+    let url = if pip_version == "latest" {
+        "https://bootstrap.pypa.io/pip/pip.pyz".to_string()
+    } else {
+        format!(
+            "https://bootstrap.pypa.io/pip/pip.pyz#/pip-{}.pyz",
+            app::pip_version()
+        )
+    };
+
+    network::download(
+        &url,
+        &mut f,
+        external_pip.file_name().unwrap().to_str().unwrap(),
+    )?;
+
+    fs::rename(&temp_path, &external_pip).with_context(|| {
+        format!(
+            "unable to move {} to {}",
+            &temp_path.display(),
+            &external_pip.display()
+        )
+    })?;
 
     Ok(())
 }

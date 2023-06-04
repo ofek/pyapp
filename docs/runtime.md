@@ -18,12 +18,17 @@ flowchart TD
     DISTEXTRACT --> FULLISOLATION
     FULLISOLATION -- No --> VENV[[Create virtual environment]]
     FULLISOLATION -- Yes --> UNPACK[[Unpack distribution directly]]
-    PROJEMBEDDED([Project embedded]) -- No --> PROJINDEX[[Install from package index]]
+    EXTERNALPIP([External pip]) -- No --> PROJEMBEDDED([Project embedded])
+    EXTERNALPIP -- Yes --> PIPCACHED([pip cached])
+    PIPCACHED -- No --> DOWNLOADPIP[[Download pip]]
+    PIPCACHED -- Yes --> PROJEMBEDDED([Project embedded])
+    DOWNLOADPIP --> PROJEMBEDDED
+    PROJEMBEDDED -- No --> PROJINDEX[[Install from package index]]
     PROJEMBEDDED -- Yes --> PROJEMBED[[Install from embedded data]]
     PROJINDEX --> MNG
     PROJEMBED --> MNG
-    VENV --> PROJEMBEDDED
-    UNPACK --> PROJEMBEDDED
+    VENV --> EXTERNALPIP
+    UNPACK --> EXTERNALPIP
     MNG -- No --> EXECUTE[[Execute project]]
     MNG -- Yes --> MNGCMD([Command invoked])
     MNGCMD -- No --> EXECUTE
