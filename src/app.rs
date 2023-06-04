@@ -85,6 +85,14 @@ pub fn pip_allow_config() -> bool {
     env!("PYAPP_PIP_ALLOW_CONFIG") == "1"
 }
 
+pub fn pip_version() -> String {
+    env!("PYAPP_PIP_VERSION").into()
+}
+
+pub fn pip_external() -> bool {
+    env!("PYAPP_PIP_EXTERNAL") == "1"
+}
+
 pub fn full_isolation() -> bool {
     env!("PYAPP_FULL_ISOLATION") == "1"
 }
@@ -117,4 +125,22 @@ pub fn installation_directory() -> PathBuf {
     storage_directory()
         .join(distribution_id())
         .join(project_version())
+}
+
+pub fn distributions_cache() -> PathBuf {
+    cache_directory().join("distributions")
+}
+
+pub fn external_pip_cache() -> PathBuf {
+    cache_directory().join("pip")
+}
+
+pub fn external_pip_zipapp() -> PathBuf {
+    let pip_version = pip_version();
+    let filename = if pip_version == "latest" {
+        "pip.pyz".to_string()
+    } else {
+        format!("pip-{}.pyz", pip_version)
+    };
+    external_pip_cache().join(filename)
 }

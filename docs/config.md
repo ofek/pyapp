@@ -81,6 +81,15 @@ You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the 
 
 These options have no effect when the project installation is [disabled](#skipping-project-installation).
 
+### Externally managed
+
+You may set the `PYAPP_PIP_EXTERNAL` option to `true` or `1` to use the [standalone](https://pip.pypa.io/en/stable/installation/#standalone-zip-application) versions of pip rather than whatever the distribution provides.
+
+By default, the latest version is used. You may use a specific `X.Y.Z` version by setting the `PYAPP_PIP_VERSION` option.
+
+!!! tip
+    This provides a significant installation speed up when [full isolation](#isolation) is not enabled.
+
 ### Extra arguments
 
 You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the [`pip install`](https://pip.pypa.io/en/stable/cli/pip_install/) command at runtime when installing or updating the project e.g. `--index-url URL --only-binary :all:`.

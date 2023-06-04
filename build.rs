@@ -512,6 +512,20 @@ fn set_isolation_mode() {
     }
 }
 
+fn set_pip_external() {
+    let variable = "PYAPP_PIP_EXTERNAL";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
+fn set_pip_version() {
+    let variable = "PYAPP_PIP_VERSION";
+    set_runtime_variable(variable, env::var(variable).unwrap_or("latest".to_string()));
+}
+
 fn set_pip_extra_args() {
     let variable = "PYAPP_PIP_EXTRA_ARGS";
     set_runtime_variable(variable, env::var(variable).unwrap_or_default());
@@ -609,6 +623,8 @@ fn main() {
     set_distribution();
     set_execution_mode();
     set_isolation_mode();
+    set_pip_external();
+    set_pip_version();
     set_pip_extra_args();
     set_pip_allow_config();
     set_skip_install();
