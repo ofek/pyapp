@@ -289,10 +289,33 @@ fn set_project_from_metadata(metadata: &str, file_name: &str) {
     }
 }
 
+fn set_project_dependency_file(dependency_file: &str) {
+    if dependency_file.is_empty() {
+        set_runtime_variable("PYAPP_PROJECT_DEPENDENCY_FILE", "");
+        set_runtime_variable("PYAPP__PROJECT_DEPENDENCY_FILE_NAME", "");
+        return;
+    }
+
+    let path = PathBuf::from(dependency_file);
+    if !path.is_file() {
+        panic!("\n\nDependency file is not a file: {dependency_file}\n\n");
+    }
+
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    set_runtime_variable(
+        "PYAPP_PROJECT_DEPENDENCY_FILE",
+        fs::read_to_string(dependency_file)
+            .unwrap_or_else(|_| panic!("\n\nFailed to read dependency file {dependency_file}\n\n")),
+    );
+    set_runtime_variable("PYAPP__PROJECT_DEPENDENCY_FILE_NAME", file_name);
+}
+
 fn set_project() {
     let embed_path = embed_file("project");
     let local_path = env::var("PYAPP_PROJECT_PATH").unwrap_or_default();
     if !local_path.is_empty() {
+        set_project_dependency_file("");
+
         let path = PathBuf::from(&local_path);
         if !path.is_file() {
             panic!("\n\nProject path is not a file: {local_path}\n\n");
@@ -348,6 +371,13 @@ fn set_project() {
 
         let project_version = check_environment_variable("PYAPP_PROJECT_VERSION");
         set_runtime_variable("PYAPP_PROJECT_VERSION", project_version);
+
+        let dependency_file = env::var("PYAPP_PROJECT_DEPENDENCY_FILE").unwrap_or_default();
+        if dependency_file.is_empty() {
+            set_project_dependency_file("");
+        } else {
+            set_project_dependency_file(&dependency_file);
+        }
 
         set_runtime_variable("PYAPP__PROJECT_EMBED_FILE_NAME", "");
         truncate_embed_file(&embed_path);

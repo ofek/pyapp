@@ -2,7 +2,7 @@ use std::env;
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::{exit, Command};
+use std::process::{exit, Command, ExitStatus};
 
 use anyhow::{bail, Context, Result};
 use tempfile::tempdir;
@@ -56,7 +56,7 @@ pub fn ensure_ready(installation_directory: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn pip_command(installation_directory: &Path) -> Command {
+pub fn pip_install_command(installation_directory: &Path) -> Command {
     let mut command = python_command(&app::python_path(installation_directory));
     if app::pip_external() {
         let external_pip = app::external_pip_zipapp();
@@ -175,7 +175,7 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
     let binary_only = app::pip_extra_args().contains("--only-binary :all:")
         || app::pip_extra_args().contains("--only-binary=:all:");
 
-    let mut command = pip_command(installation_directory);
+    let mut command = pip_install_command(installation_directory);
     let (status, output) = if !app::embedded_project().is_empty() {
         let dir = tempdir().with_context(|| "unable to create temporary directory")?;
         let file_name = app::project_embed_file_name();
@@ -192,24 +192,27 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
         })?;
 
         command.arg(temp_path.to_string_lossy().as_ref());
-        ensure_pip()?;
 
         let wait_message = if binary_only && file_name.ends_with(".whl") {
             format!("Unpacking {}", install_target)
         } else {
             format!("Installing {}", install_target)
         };
-        process::wait_for(command, wait_message)?
+        pip_install(command, wait_message)?
     } else {
-        command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
-        ensure_pip()?;
-
         let wait_message = if binary_only {
             format!("Unpacking {}", install_target)
         } else {
             format!("Installing {}", install_target)
         };
-        process::wait_for(command, wait_message)?
+
+        let dependency_file = app::project_dependency_file();
+        if dependency_file.is_empty() {
+            command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
+            pip_install(command, wait_message)?
+        } else {
+            pip_install_dependency_file(&dependency_file, command, wait_message)?
+        }
     };
 
     if !status.success() {
@@ -221,7 +224,36 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn ensure_pip() -> Result<()> {
+pub fn pip_install(command: Command, wait_message: String) -> Result<(ExitStatus, String)> {
+    ensure_pip()?;
+    process::wait_for(command, wait_message)
+}
+
+pub fn pip_install_dependency_file(
+    dependency_file: &String,
+    mut command: Command,
+    wait_message: String,
+) -> Result<(ExitStatus, String)> {
+    let dir = tempdir().with_context(|| "unable to create temporary directory")?;
+    let file_name = app::project_dependency_file_name();
+    let temp_path = dir.path().join(file_name);
+
+    let mut f = fs::File::create(&temp_path)
+        .with_context(|| format!("unable to create temporary file: {}", &temp_path.display()))?;
+    f.write(dependency_file.as_bytes()).with_context(|| {
+        format!(
+            "unable to write dependency file to temporary file: {}",
+            &temp_path.display()
+        )
+    })?;
+
+    command.args(["-r", temp_path.to_string_lossy().as_ref()]);
+
+    ensure_pip()?;
+    process::wait_for(command, wait_message)
+}
+
+fn ensure_pip() -> Result<()> {
     if !app::pip_external() {
         return Ok(());
     }

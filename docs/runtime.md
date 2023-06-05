@@ -23,9 +23,12 @@ flowchart TD
     PIPCACHED -- No --> DOWNLOADPIP[[Download pip]]
     PIPCACHED -- Yes --> PROJEMBEDDED([Project embedded])
     DOWNLOADPIP --> PROJEMBEDDED
-    PROJEMBEDDED -- No --> PROJINDEX[[Install from package index]]
+    PROJEMBEDDED -- No --> DEPFILE([Dependency file])
     PROJEMBEDDED -- Yes --> PROJEMBED[[Install from embedded data]]
-    PROJINDEX --> MNG
+    DEPFILE -- No --> SINGLEPROJECT[[Install single project]]
+    DEPFILE -- Yes --> DEPFILEINSTALL[[Install from dependency file]]
+    SINGLEPROJECT --> MNG
+    DEPFILEINSTALL --> MNG
     PROJEMBED --> MNG
     VENV --> EXTERNALPIP
     UNPACK --> EXTERNALPIP
