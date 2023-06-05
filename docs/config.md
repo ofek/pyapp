@@ -6,15 +6,30 @@ All configuration is done with environment variables.
 
 ## Project
 
-There are 2 ways to configure runtime installation, neither of which will occur when [disabled](#skipping-project-installation).
+There are 3 ways to configure runtime installation, none of which will occur when [disabled](#skipping-project-installation).
+
+The project name and version must be known in all cases.
 
 ### Package index
 
 The desired project name and version are configured with the `PYAPP_PROJECT_NAME` and `PYAPP_PROJECT_VERSION` options, respectively. The project name must adhere to [PEP 508](https://peps.python.org/pep-0508/#names) and will be normalized during builds according to [PEP 503](https://peps.python.org/pep-0503/#normalized-names).
 
+#### Dependency file
+
+You may install your project using a dependency file with the `PYAPP_PROJECT_DEPENDENCY_FILE` option which should be a local path to the file. In this mode, the project name and version have nothing to do with installation and are just used as metadata.
+
+The following formats are supported:
+
+| Extensions | Description |
+| --- | --- |
+| <code>.txt</code><br><code>.in</code> | This is the [requirements file format](https://pip.pypa.io/en/stable/reference/requirements-file-format/) |
+
 ### Embedding ### {: #project-embedding }
 
 You may embed the project with the `PYAPP_PROJECT_PATH` option which should be a path to a wheel ending in `.whl` or a source distribution ending in `.tar.gz`.
+
+!!! note
+    The project name and version is automatically derived from the metadata files inside.
 
 ## Execution mode
 

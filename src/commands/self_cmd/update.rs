@@ -4,7 +4,7 @@ use std::process::exit;
 use anyhow::Result;
 use clap::Args;
 
-use crate::{app, distribution, process, terminal};
+use crate::{app, distribution, terminal};
 
 /// Install the latest version
 #[derive(Args, Debug)]
@@ -38,15 +38,20 @@ impl Cli {
             distribution::materialize(&installation_directory)?;
         }
 
-        let mut command = distribution::pip_command(&installation_directory);
+        let mut command = distribution::pip_install_command(&installation_directory);
         if self.pre {
             command.arg("--pre");
         }
-        command.args(["--upgrade", app::project_name().as_str()]);
-        distribution::ensure_pip()?;
+        command.arg("--upgrade");
 
-        let (status, output) =
-            process::wait_for(command, format!("Updating {}", app::project_name()))?;
+        let wait_message = format!("Updating {}", app::project_name());
+        let dependency_file = app::project_dependency_file();
+        let (status, output) = if dependency_file.is_empty() {
+            command.arg(app::project_name().as_str());
+            distribution::pip_install(command, wait_message)?
+        } else {
+            distribution::pip_install_dependency_file(&dependency_file, command, wait_message)?
+        };
 
         if !status.success() {
             if !existing_installation {
@@ -54,6 +59,11 @@ impl Cli {
             }
             println!("{}", output.trim_end());
             exit(status.code().unwrap_or(1));
+        }
+
+        if !dependency_file.is_empty() {
+            println!("Updated");
+            return Ok(());
         }
 
         let mut existing_version: Option<&str> = None;

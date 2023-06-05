@@ -65,6 +65,14 @@ pub fn project_version() -> String {
     env!("PYAPP_PROJECT_VERSION").into()
 }
 
+pub fn project_dependency_file() -> String {
+    env!("PYAPP_PROJECT_DEPENDENCY_FILE").into()
+}
+
+pub fn project_dependency_file_name() -> String {
+    env!("PYAPP__PROJECT_DEPENDENCY_FILE_NAME").into()
+}
+
 pub fn project_embed_file_name() -> String {
     env!("PYAPP__PROJECT_EMBED_FILE_NAME").into()
 }
