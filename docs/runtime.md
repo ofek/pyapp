@@ -6,6 +6,11 @@
 
 Applications will bootstrap themselves on the first run. All subsequent invocations will only check if the installation directory exists and nothing else, to maximize CLI responsiveness.
 
+!!! note
+    The following diagram shows the possible behavior at runtime. The nodes with rounded edges are conditions and those with jagged edges are actions.
+
+    Most nodes are clickable and will take you to the relevant documentation.
+
 ```mermaid
 flowchart TD
     INSTALLED([Installed]) -- No --> DISTCACHED([Distribution cached])
@@ -36,6 +41,18 @@ flowchart TD
     MNG -- Yes --> MNGCMD([Command invoked])
     MNGCMD -- No --> EXECUTE
     MNGCMD -- Yes --> MANAGE[[Run management command]]
+    click DISTEMBEDDED href "../config/#distribution-embedding"
+    click FULLISOLATION href "../config/#isolation"
+    click EXTERNALPIP href "../config/#externally-managed"
+    click PROJEMBEDDED href "../config/#project-embedding"
+    click DEPFILE href "../config/#dependency-file"
+    click SINGLEPROJECT href "../config/#package-index"
+    click DEPFILEINSTALL href "../config/#dependency-file"
+    click PROJEMBED href "../config/#project-embedding"
+    click MNG href "../config/#management-command"
+    click MNGCMD href "../config/#management-command"
+    click MANAGE href "#commands"
+    click EXECUTE href "../config/#execution-mode"
 ```
 
 ## Execution
