@@ -43,6 +43,9 @@ nav:
   - Building: build.md
   - Runtime behavior: runtime.md
   - Configuration: config.md
+  - Meta:
+    - Users: users.md
+    - Changelog: changelog.md
 
 plugins:
   # Built-in
