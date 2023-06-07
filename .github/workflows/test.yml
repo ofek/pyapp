@@ -42,6 +42,9 @@ jobs:
         - target: i686-unknown-linux-gnu
           os: ubuntu-22.04
           cross: true
+        - target: powerpc64le-unknown-linux-gnu
+          os: ubuntu-22.04
+          cross: true
         # Windows
         - target: x86_64-pc-windows-msvc
           os: windows-2022
@@ -75,11 +78,6 @@ jobs:
       if: matrix.job.validate
       run: python scripts/validate_options.py
 
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: ${{ matrix.job.target }}
-
     - name: Set up cross compiling
       if: matrix.job.cross
       uses: taiki-e/install-action@v2
@@ -90,8 +88,18 @@ jobs:
       if: matrix.job.cross
       run: echo "CARGO=cross" >> $GITHUB_ENV
 
-    - name: Set up tooling
-      run: rustup component add clippy rustfmt
+    - name: Configure target
+      run: |-
+        config_file=".cargo/config_${{ matrix.job.target }}.toml"
+        if [[ -f "$config_file" ]]; then
+          mv "$config_file" .cargo/config.toml
+        fi
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.job.target }}
+        components: clippy, rustfmt
 
     - name: Lint
       run: $CARGO clippy --no-deps
