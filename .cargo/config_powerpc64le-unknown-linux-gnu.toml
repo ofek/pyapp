@@ -1,0 +1,2 @@
+[patch.crates-io]
+ring = { git = 'https://github.com/IBM/ring.git', branch = 'ppc-0.16.20' }

@@ -50,3 +50,7 @@ Specific versions may be chosen with the `--version` flag.
 Configuration for [cross](https://github.com/cross-rs/cross) is validated by CI to ensure all known environment variable options are passed through to the containers.
 
 When embedding the [project](config.md#project-embedding) or the [distribution](config.md#distribution-embedding) using a local path, you must use the [local repository](#local-repository) way of building and ensure that the configured files to embed reside within the repository and the options refer to relative paths.
+
+## Caveats
+
+Some targets like `powerpc64le-unknown-linux-gnu` need extra Cargo configuration to build properly. If there exists a file named `.cargo/config_<TARGET>.toml`, then you will need to build using the [local repository](#local-repository) way and rename that file to `.cargo/config.toml` before builds.
