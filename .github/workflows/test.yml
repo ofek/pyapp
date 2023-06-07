@@ -21,37 +21,92 @@ env:
 
 jobs:
   test:
-    name: Test ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.job.target }} (${{ matrix.job.os }})
+    runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        job:
+        # Linux
+        - target: aarch64-unknown-linux-gnu
+          os: ubuntu-22.04
+          cross: true
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-22.04
+          cross: true
+          test: true
+          validate: true
+        - target: x86_64-unknown-linux-musl
+          os: ubuntu-22.04
+          cross: true
+        - target: i686-unknown-linux-gnu
+          os: ubuntu-22.04
+          cross: true
+        # Windows
+        - target: x86_64-pc-windows-msvc
+          os: windows-2022
+          test: true
+        - target: i686-pc-windows-msvc
+          os: windows-2022
+        # macOS
+        - target: aarch64-apple-darwin
+          os: macos-12
+        - target: x86_64-apple-darwin
+          os: macos-12
+          test: true
+
+    env:
+      CARGO: cargo
+      CARGO_BUILD_TARGET: "${{ matrix.job.target }}"
+      PYAPP_PROJECT_NAME: cowsay
+      PYAPP_PROJECT_VERSION: "5.0.0"
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Set up Python ${{ env.STABLE_PYTHON_VERSION }}
-      if: runner.os == 'Linux'
+      if: matrix.job.validate
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.STABLE_PYTHON_VERSION }}
 
     - name: Validate
-      if: runner.os == 'Linux'
+      if: matrix.job.validate
       run: python scripts/validate_options.py
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.job.target }}
+
+    - name: Set up cross compiling
+      if: matrix.job.cross
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cross
+
+    - name: Configure cross compiling
+      if: matrix.job.cross
+      run: echo "CARGO=cross" >> $GITHUB_ENV
 
     - name: Set up tooling
       run: rustup component add clippy rustfmt
 
     - name: Lint
-      run: cargo clippy --no-deps
+      run: $CARGO clippy --no-deps
 
     - name: Format
+      if: matrix.job.validate
       run: cargo fmt --check
 
-    - name: Build
-      run: cargo build
-
     - name: See dependency tree
-      run: cargo tree
+      run: $CARGO tree
+
+    - name: Build
+      if: ${{ !matrix.job.test }}
+      run: $CARGO build
+
+    - name: Test
+      if: matrix.job.test
+      run: cargo run -- Moo Success!
