@@ -56,7 +56,7 @@ pub fn ensure_ready(installation_directory: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-pub fn pip_install_command(installation_directory: &Path) -> Command {
+pub fn pip_base_command(installation_directory: &Path) -> Command {
     let mut command = python_command(&app::python_path(installation_directory));
     if app::pip_external() {
         let external_pip = app::external_pip_zipapp();
@@ -64,6 +64,12 @@ pub fn pip_install_command(installation_directory: &Path) -> Command {
     } else {
         command.args(["-m", "pip"]);
     }
+
+    command
+}
+
+pub fn pip_install_command(installation_directory: &Path) -> Command {
+    let mut command = pip_base_command(installation_directory);
 
     command.args([
         "install",
@@ -79,6 +85,7 @@ pub fn pip_install_command(installation_directory: &Path) -> Command {
             .filter(|s| !s.is_empty())
             .collect::<Vec<&str>>(),
     );
+
     command
 }
 
