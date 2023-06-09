@@ -104,6 +104,14 @@ These commands are hidden by default and each can be individually exposed by set
 
 This displays [customized](config.md#metadata-template) output based on a template.
 
+#### pip
+
+```
+<EXE> self pip
+```
+
+This directly invokes pip with the installed Python.
+
 #### Python
 
 ```

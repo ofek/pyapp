@@ -11,7 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Added:***
 
 - Add the ability to externally manage pip with the `PYAPP_PIP_EXTERNAL` and `PYAPP_PIP_VERSION` options
-- Allow for project installation with a dependency file using the  `PYAPP_PROJECT_DEPENDENCY_FILE` option
+- Allow for project installation with a dependency file using the `PYAPP_PROJECT_DEPENDENCY_FILE` option
+- Add management command to directly invoke pip with the installed Python
 
 ***Fixed:***
 
