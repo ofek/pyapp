@@ -119,3 +119,11 @@ This directly invokes pip with the installed Python.
 ```
 
 This directly invokes the installed Python.
+
+#### Python path
+
+```
+<EXE> self python-path
+```
+
+This outputs the path to the installed Python.
