@@ -11,12 +11,22 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://ofek.dev/pyapp/latest/changelog/</loc>
+         <lastmod>2020-02-02</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://ofek.dev/pyapp/latest/config/</loc>
          <lastmod>2020-02-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/runtime/</loc>
+         <lastmod>2020-02-02</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://ofek.dev/pyapp/latest/users/</loc>
          <lastmod>2020-02-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
