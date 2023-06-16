@@ -3,6 +3,8 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{exit, Command, ExitStatus};
+use std::os::unix::fs::MetadataExt;
+
 
 use anyhow::{bail, Context, Result};
 use tempfile::tempdir;
@@ -122,14 +124,42 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
         } else {
             network::download(&distribution_source, &mut f, "distribution")?;
         }
+        let temp_path_dev = fs::metadata(&temp_path).unwrap().dev();
+        // Distribution file does not exist yet
+        // Find first existing parent directory to determine mountpoint
+        let mut parent_dir = distributions_dir;
+        while !parent_dir.exists() {
+            parent_dir = parent_dir.parent().unwrap();
+        }
+        let distribution_file_dev = fs::metadata(&parent_dir).unwrap().dev();
 
-        fs::rename(&temp_path, &distribution_file).with_context(|| {
-            format!(
-                "unable to move {} to {}",
-                &temp_path.display(),
-                &distribution_file.display()
-            )
-        })?;
+        // Check if target path and temp path are on the same device / mountpoint
+        if distribution_file_dev == temp_path_dev{
+            // If on the same device / mountpoint, rename the file
+            fs::rename(&temp_path, &distribution_file).with_context(|| {
+                format!(
+                    "unable to move {} to {}",
+                    &temp_path.display(),
+                    &distribution_file.display()
+                )
+            })?;
+        }
+        else {
+            // If on different devices / mountpoints, copy the file, then remove the temp file
+            fs::copy(&temp_path, &distribution_file).with_context(|| {
+                format!(
+                    "unable to copy {} to {}",
+                    &temp_path.display(),
+                    &distribution_file.display()
+                )
+            })?;
+            fs::remove_file(&temp_path).with_context(|| {
+                format!(
+                    "unable to remove {}",
+                    &temp_path.display()
+                )
+            })?;
+        }
     }
 
     if app::full_isolation() {
