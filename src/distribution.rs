@@ -7,7 +7,7 @@ use std::process::{exit, Command, ExitStatus};
 use anyhow::{bail, Context, Result};
 use tempfile::tempdir;
 
-use crate::{app, compression, network, process};
+use crate::{app, compression, fs_utils, network, process};
 
 pub fn python_command(python: &PathBuf) -> Command {
     let mut command = Command::new(python);
@@ -123,13 +123,7 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
             network::download(&distribution_source, &mut f, "distribution")?;
         }
 
-        fs::rename(&temp_path, &distribution_file).with_context(|| {
-            format!(
-                "unable to move {} to {}",
-                &temp_path.display(),
-                &distribution_file.display()
-            )
-        })?;
+        fs_utils::move_temp_file(&temp_path, &distribution_file)?;
     }
 
     if app::full_isolation() {
@@ -300,13 +294,5 @@ fn ensure_pip() -> Result<()> {
         external_pip.file_name().unwrap().to_str().unwrap(),
     )?;
 
-    fs::rename(&temp_path, &external_pip).with_context(|| {
-        format!(
-            "unable to move {} to {}",
-            &temp_path.display(),
-            &external_pip.display()
-        )
-    })?;
-
-    Ok(())
+    fs_utils::move_temp_file(&temp_path, &external_pip)
 }
