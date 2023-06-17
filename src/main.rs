@@ -2,6 +2,7 @@ mod app;
 mod commands;
 mod compression;
 mod distribution;
+mod fs_utils;
 mod network;
 mod process;
 mod terminal;
