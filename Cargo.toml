@@ -9,6 +9,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.71"
+bzip2 = "0.4.4"
 clap = { version = "4.2.5", features = ["derive"] }
 directories = "5.0.0"
 flate2 = "1.0.26"

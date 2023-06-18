@@ -10,7 +10,7 @@ use rand::distributions::{Alphanumeric, DistString};
 use regex::Regex;
 
 const DEFAULT_PYTHON_VERSION: &str = "3.11";
-const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|gzip", "tar|zstd", "zip"];
+const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|bzip2", "tar|gzip", "tar|zstd", "zip"];
 
 // Python version in the form MAJOR.MINOR
 // Target OS https://doc.rust-lang.org/reference/conditional-compilation.html#target_os
@@ -442,6 +442,8 @@ fn set_distribution_format(distribution_source: &String) {
         } else {
             panic!("\n\nUnknown distribution format: {distribution_format}\n\n");
         }
+    } else if distribution_source.ends_with(".tar.bz2") || distribution_source.ends_with(".bz2") {
+        set_runtime_variable(variable, "tar|bzip2");
     } else if distribution_source.ends_with(".tar.gz") || distribution_source.ends_with(".tgz") {
         set_runtime_variable(variable, "tar|gzip");
     } else if distribution_source.ends_with(".tar.zst")

@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add support for distributions with `bzip2` compression
+
 ***Fixed:***
 
 - Properly handle cases where temporary files are on different filesystems
