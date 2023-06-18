@@ -1,5 +1,4 @@
 use std::fs;
-use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Args;
@@ -19,8 +18,8 @@ impl Cli {
         }
 
         let python = app::python_path(&installation_directory);
-        let site_packages: Option<PathBuf> = if cfg!(windows) {
-            (|| Some(python.parent()?.join("Lib").join("site-packages")))()
+        let site_packages = if cfg!(windows) {
+            (|| Some(python.parent()?.parent()?.join("Lib").join("site-packages")))()
         } else {
             (|| {
                 let lib_dir = python.parent()?.parent()?.join("lib");
@@ -37,34 +36,46 @@ impl Cli {
             })()
         };
 
-        if let Some(site_packages) = site_packages.filter(|p| p.is_dir()) {
-            let metadata_file: Option<PathBuf> =
-                fs::read_dir(site_packages).ok().and_then(|entries| {
-                    for entry in entries.flatten() {
-                        let name = entry.file_name().to_string_lossy().to_string();
-                        if name.ends_with(".dist-info")
-                            && name
-                                .starts_with(&format!("{}-", app::project_name().replace('-', "_")))
-                        {
-                            return Some(entry.path().join("METADATA"));
-                        }
-                    }
-                    None
-                });
+        let site_packages = if let Some(site_packages) = site_packages.filter(|p| p.is_dir()) {
+            site_packages
+        } else {
+            return Ok(());
+        };
 
-            if let Some(metadata_file) = metadata_file.filter(|p| p.is_file()) {
-                if let Ok(metadata) = fs::read_to_string(metadata_file) {
-                    for line in metadata.lines() {
-                        if line.starts_with("Version: ") {
-                            println!(
-                                "{}",
-                                app::metadata_template()
-                                    .replace("{project}", &app::project_name())
-                                    .replace("{version}", line.split_at(9).1)
-                            );
-                            break;
-                        }
-                    }
+        let expected_prefix = format!("{}-", app::project_name().replace('-', "_"));
+        let metadata_file = fs::read_dir(site_packages).ok().and_then(|entries| {
+            for entry in entries.flatten() {
+                let name = entry.file_name().to_string_lossy().to_string();
+                if name.ends_with(".dist-info")
+                    && name.starts_with(&expected_prefix)
+                    && name
+                        .chars()
+                        .nth(&expected_prefix.len() + 1)
+                        .map(|c| c.is_numeric())
+                        .is_some()
+                {
+                    return Some(entry.path().join("METADATA"));
+                }
+            }
+            None
+        });
+
+        let metadata_file = if let Some(metadata_file) = metadata_file.filter(|p| p.is_file()) {
+            metadata_file
+        } else {
+            return Ok(());
+        };
+
+        if let Ok(metadata) = fs::read_to_string(metadata_file) {
+            for line in metadata.lines() {
+                if line.starts_with("Version: ") {
+                    println!(
+                        "{}",
+                        app::metadata_template()
+                            .replace("{project}", &app::project_name())
+                            .replace("{version}", line.split_at(9).1)
+                    );
+                    break;
                 }
             }
         }
