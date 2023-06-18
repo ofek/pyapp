@@ -7,3 +7,4 @@ The following is not intended to be a complete enumeration. Be sure to view the 
 ## Projects
 
 [Datadog QA](https://github.com/DataDog/ddqa)
+| [Hatch](https://github.com/pypa/hatch)

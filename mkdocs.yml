@@ -34,15 +34,18 @@ theme:
         icon: material/weather-sunny
         name: Switch to dark mode
   features:
-    - navigation.sections
+    - content.action.edit
+    - content.code.copy
     - navigation.expand
+    - navigation.footer
     - navigation.instant
+    - navigation.sections
 
 nav:
   - About: index.md
   - Building: build.md
-  - Runtime behavior: runtime.md
   - Configuration: config.md
+  - Runtime behavior: runtime.md
   - Meta:
     - Users: users.md
     - Changelog: changelog.md
@@ -55,6 +58,7 @@ plugins:
   minify:
     minify_html: true
   git-revision-date-localized:
+    strict: false
     type: date
 
 markdown_extensions:

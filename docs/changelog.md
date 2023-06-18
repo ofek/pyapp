@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Fixed:***
+
+- Properly handle cases where temporary files are on different filesystems
+
 ## 0.8.0 - 2023-06-09
 
 ***Added:***
