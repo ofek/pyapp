@@ -11,6 +11,9 @@ use regex::Regex;
 
 const DEFAULT_PYTHON_VERSION: &str = "3.11";
 const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|bzip2", "tar|gzip", "tar|zstd", "zip"];
+const DEFAULT_CPYTHON_SOURCE: &str =
+    "https://github.com/indygreg/python-build-standalone/releases/download/";
+const DEFAULT_PYPY_SOURCE: &str = "https://downloads.python.org/pypy/";
 
 // Python version in the form MAJOR.MINOR
 // Target OS https://doc.rust-lang.org/reference/conditional-compilation.html#target_os
@@ -154,6 +157,41 @@ const DEFAULT_CPYTHON_DISTRIBUTIONS: &[(&str, &str, &str, &str, &str, &str)] = &
     ("3.7", "macos", "x86_64", "", "", "https://github.com/indygreg/python-build-standalone/releases/download/20200823/cpython-3.7.9-x86_64-apple-darwin-pgo-20200823T2228.tar.zst"),
 ];
 
+// See https://downloads.python.org/pypy/
+#[rustfmt::skip]
+const DEFAULT_PYPY_DISTRIBUTIONS: &[(&str, &str, &str, &str, &str)] = &[
+    ("pypy3.10", "linux", "aarch64", "gnu",
+        "https://downloads.python.org/pypy/pypy3.10-v7.3.12-aarch64.tar.bz2"),
+    ("pypy3.10", "linux", "x86_64", "gnu",
+        "https://downloads.python.org/pypy/pypy3.10-v7.3.12-linux64.tar.bz2"),
+    ("pypy3.10", "windows", "x86_64", "msvc",
+        "https://downloads.python.org/pypy/pypy3.10-v7.3.12-win64.zip"),
+    ("pypy3.10", "macos", "aarch64", "",
+        "https://downloads.python.org/pypy/pypy3.10-v7.3.12-macos_arm64.tar.bz2"),
+    ("pypy3.10", "macos", "x86_64", "",
+        "https://downloads.python.org/pypy/pypy3.10-v7.3.12-macos_x86_64.tar.bz2"),
+    ("pypy3.9", "linux", "aarch64", "gnu",
+        "https://downloads.python.org/pypy/pypy3.9-v7.3.12-aarch64.tar.bz2"),
+    ("pypy3.9", "linux", "x86_64", "gnu",
+        "https://downloads.python.org/pypy/pypy3.9-v7.3.12-linux64.tar.bz2"),
+    ("pypy3.9", "windows", "x86_64", "msvc",
+        "https://downloads.python.org/pypy/pypy3.9-v7.3.12-win64.zip"),
+    ("pypy3.9", "macos", "aarch64", "",
+        "https://downloads.python.org/pypy/pypy3.9-v7.3.12-macos_arm64.tar.bz2"),
+    ("pypy3.9", "macos", "x86_64", "",
+        "https://downloads.python.org/pypy/pypy3.9-v7.3.12-macos_x86_64.tar.bz2"),
+    ("pypy2.7", "linux", "aarch64", "gnu",
+        "https://downloads.python.org/pypy/pypy2.7-v7.3.12-aarch64.tar.bz2"),
+    ("pypy2.7", "linux", "x86_64", "gnu",
+        "https://downloads.python.org/pypy/pypy2.7-v7.3.12-linux64.tar.bz2"),
+    ("pypy2.7", "windows", "x86_64", "msvc",
+        "https://downloads.python.org/pypy/pypy2.7-v7.3.12-win64.zip"),
+    ("pypy2.7", "macos", "aarch64", "",
+        "https://downloads.python.org/pypy/pypy2.7-v7.3.12-macos_arm64.tar.bz2"),
+    ("pypy2.7", "macos", "x86_64", "",
+        "https://downloads.python.org/pypy/pypy2.7-v7.3.12-macos_x86_64.tar.bz2"),
+];
+
 fn set_runtime_variable(name: &str, value: impl Display) {
     println!("cargo:rustc-env={}={}", name, value)
 }
@@ -250,13 +288,22 @@ fn get_distribution_source() -> String {
         abi
     };
 
-    for (python_version, platform, arch, abi, variant, url) in DEFAULT_CPYTHON_DISTRIBUTIONS.iter()
-    {
+    for (python_version, platform, arch, abi, variant, url) in DEFAULT_CPYTHON_DISTRIBUTIONS {
         if python_version == &selected_python_version
             && platform == &selected_platform
             && arch == &selected_arch
             && abi == &selected_abi
             && variant == &selected_variant
+        {
+            return url.to_string();
+        }
+    }
+
+    for (python_version, platform, arch, abi, url) in DEFAULT_PYPY_DISTRIBUTIONS {
+        if python_version == &selected_python_version
+            && platform == &selected_platform
+            && arch == &selected_arch
+            && abi == &selected_abi
         {
             return url.to_string();
         }
@@ -431,6 +478,18 @@ fn set_distribution() {
 
     set_distribution_format(&distribution_source);
     set_python_path(&distribution_source);
+    set_site_packages_path(&distribution_source);
+    set_distribution_pip_available(&distribution_source);
+
+    let python_isolation_flag = if get_python_version() == "pypy2.7" {
+        // https://docs.python.org/2/using/cmdline.html#cmdoption-e
+        // https://docs.python.org/2/using/cmdline.html#cmdoption-s
+        "-sE"
+    } else {
+        // https://docs.python.org/3/using/cmdline.html#cmdoption-I
+        "-I"
+    };
+    set_runtime_variable("PYAPP__PYTHON_ISOLATION_FLAG", python_isolation_flag);
 }
 
 fn set_distribution_format(distribution_source: &String) {
@@ -462,36 +521,121 @@ fn set_python_path(distribution_source: &str) {
     let on_windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
     let python_path = env::var(distribution_variable).unwrap_or_default();
     let relative_path = if !python_path.is_empty() {
-        &python_path
-    } else if distribution_source
-        .starts_with("https://github.com/indygreg/python-build-standalone/releases/download/")
-    {
+        python_path
+    } else if distribution_source.starts_with(DEFAULT_CPYTHON_SOURCE) {
         if get_python_version() == "3.7" {
             if on_windows {
-                r"python\install\python.exe"
+                r"python\install\python.exe".to_string()
             } else {
-                "python/install/bin/python3"
+                "python/install/bin/python3".to_string()
             }
         } else if on_windows {
-            r"python\python.exe"
+            r"python\python.exe".to_string()
         } else {
-            "python/bin/python3"
+            "python/bin/python3".to_string()
+        }
+    } else if distribution_source.starts_with(DEFAULT_PYPY_SOURCE) {
+        let directory = distribution_source
+            .split('/')
+            .last()
+            .unwrap()
+            .trim_end_matches(".tar.bz2")
+            .trim_end_matches(".zip");
+        if on_windows {
+            format!(r"{}\pypy.exe", directory)
+        } else {
+            format!("{}/bin/pypy3", directory)
         }
     } else if on_windows {
-        "python.exe"
+        "python.exe".to_string()
     } else {
-        "bin/python3"
+        "bin/python3".to_string()
     };
-    set_runtime_variable(distribution_variable, relative_path);
+    set_runtime_variable(distribution_variable, &relative_path);
 
     let installation_variable = "PYAPP__INSTALLATION_PYTHON_PATH";
     if is_enabled("PYAPP_FULL_ISOLATION") {
-        set_runtime_variable(installation_variable, relative_path);
+        set_runtime_variable(installation_variable, &relative_path);
     } else if on_windows {
         set_runtime_variable(installation_variable, r"Scripts\python.exe");
     } else {
         set_runtime_variable(installation_variable, "bin/python3");
     };
+}
+
+fn set_site_packages_path(distribution_source: &str) {
+    let distribution_variable = "PYAPP_DISTRIBUTION_SITE_PACKAGES_PATH";
+    let on_windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
+    let python_version = get_python_version();
+    let site_packages_path = env::var(distribution_variable).unwrap_or_default();
+    let relative_path = if !site_packages_path.is_empty() {
+        site_packages_path
+    } else if distribution_source.starts_with(DEFAULT_CPYTHON_SOURCE) {
+        if python_version == "3.7" {
+            if on_windows {
+                r"python\install\Lib\site-packages".to_string()
+            } else {
+                format!("python/install/lib/python{}/site-packages", python_version)
+            }
+        } else if on_windows {
+            r"python\Lib\site-packages".to_string()
+        } else {
+            format!("python/lib/python{}/site-packages", python_version)
+        }
+    } else if distribution_source.starts_with(DEFAULT_PYPY_SOURCE) {
+        let directory = distribution_source
+            .split('/')
+            .last()
+            .unwrap()
+            .trim_end_matches(".tar.bz2")
+            .trim_end_matches(".zip");
+        if python_version == "pypy2.7" {
+            if on_windows {
+                format!(r"{}\site-packages", directory)
+            } else {
+                format!("{}/site-packages", directory)
+            }
+        } else if on_windows {
+            format!(r"{}\Lib\site-packages", directory)
+        } else {
+            format!("{}/lib/{}/site-packages", directory, python_version)
+        }
+    } else if on_windows {
+        r"Lib\site-packages".to_string()
+    } else {
+        format!("lib/python{}/site-packages", python_version)
+    };
+    set_runtime_variable(distribution_variable, &relative_path);
+
+    let installation_variable = "PYAPP__INSTALLATION_SITE_PACKAGES_PATH";
+    if is_enabled("PYAPP_FULL_ISOLATION") {
+        set_runtime_variable(installation_variable, &relative_path);
+    } else if get_python_version() == "pypy2.7" {
+        set_runtime_variable(installation_variable, "site-packages");
+    } else if on_windows {
+        set_runtime_variable(installation_variable, r"Lib\site-packages");
+    } else {
+        set_runtime_variable(
+            installation_variable,
+            format!("lib/python{}/site-packages", python_version),
+        );
+    };
+}
+
+fn set_distribution_pip_available(distribution_source: &str) {
+    let variable = "PYAPP_DISTRIBUTION_PIP_AVAILABLE";
+    if is_enabled(variable)
+        // Enable if a default source is used and known to have pip installed already
+        || (!distribution_source.is_empty()
+            && !distribution_source.starts_with(DEFAULT_PYPY_SOURCE)
+            && env::var("PYAPP_DISTRIBUTION_SOURCE")
+                .unwrap_or_default()
+                .is_empty())
+    {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
 }
 
 fn set_execution_mode() {
@@ -538,6 +682,15 @@ fn set_execution_mode() {
 fn set_isolation_mode() {
     let variable = "PYAPP_FULL_ISOLATION";
     if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
+fn set_upgrade_virtualenv() {
+    let variable = "PYAPP_UPGRADE_VIRTUALENV";
+    if is_enabled(variable) || get_python_version() == "pypy2.7" {
         set_runtime_variable(variable, "1");
     } else {
         set_runtime_variable(variable, "0");
@@ -655,6 +808,7 @@ fn main() {
     set_distribution();
     set_execution_mode();
     set_isolation_mode();
+    set_upgrade_virtualenv();
     set_pip_external();
     set_pip_version();
     set_pip_extra_args();

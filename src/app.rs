@@ -37,12 +37,20 @@ fn installation_python_path() -> String {
     env!("PYAPP__INSTALLATION_PYTHON_PATH").into()
 }
 
+fn installation_site_packages_path() -> String {
+    env!("PYAPP__INSTALLATION_SITE_PACKAGES_PATH").into()
+}
+
 pub fn exposed_command() -> String {
     env!("PYAPP__EXPOSED_COMMAND").into()
 }
 
 pub fn distribution_id() -> String {
     env!("PYAPP__DISTRIBUTION_ID").into()
+}
+
+pub fn python_isolation_flag() -> String {
+    env!("PYAPP__PYTHON_ISOLATION_FLAG").into()
 }
 
 pub fn distribution_source() -> String {
@@ -55,6 +63,10 @@ pub fn distribution_format() -> String {
 
 pub fn distribution_python_path() -> String {
     env!("PYAPP_DISTRIBUTION_PYTHON_PATH").into()
+}
+
+pub fn distribution_pip_available() -> bool {
+    env!("PYAPP_DISTRIBUTION_PIP_AVAILABLE") == "1"
 }
 
 pub fn project_name() -> String {
@@ -105,6 +117,10 @@ pub fn full_isolation() -> bool {
     env!("PYAPP_FULL_ISOLATION") == "1"
 }
 
+pub fn upgrade_virtualenv() -> bool {
+    env!("PYAPP_UPGRADE_VIRTUALENV") == "1"
+}
+
 pub fn skip_install() -> bool {
     env!("PYAPP_SKIP_INSTALL") == "1"
 }
@@ -119,6 +135,10 @@ pub fn metadata_template() -> String {
 
 pub fn python_path(installation_directory: &Path) -> PathBuf {
     installation_directory.join(installation_python_path())
+}
+
+pub fn site_packages_path(installation_directory: &Path) -> PathBuf {
+    installation_directory.join(installation_site_packages_path())
 }
 
 pub fn cache_directory() -> PathBuf {

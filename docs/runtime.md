@@ -42,7 +42,7 @@ flowchart TD
     MNGCMD -- No --> EXECUTE
     MNGCMD -- Yes --> MANAGE[[Run management command]]
     click DISTEMBEDDED href "../config/#distribution-embedding"
-    click FULLISOLATION href "../config/#isolation"
+    click FULLISOLATION href "../config/#full-isolation"
     click EXTERNALPIP href "../config/#externally-managed"
     click PROJEMBEDDED href "../config/#project-embedding"
     click DEPFILE href "../config/#dependency-file"
