@@ -7,11 +7,24 @@ use crate::terminal;
 
 pub fn unpack(format: String, archive: &PathBuf, destination: &PathBuf) -> Result<()> {
     match format.as_ref() {
+        "tar|bzip2" => unpack_tar_bzip2(archive, destination)?,
         "tar|gzip" => unpack_tar_gzip(archive, destination)?,
         "tar|zstd" => unpack_tar_zstd(archive, destination)?,
         "zip" => unpack_zip(archive, destination)?,
         _ => bail!("unsupported distribution format: {}", format),
     }
+
+    Ok(())
+}
+
+fn unpack_tar_bzip2(path: &PathBuf, destination: &PathBuf) -> Result<()> {
+    let bz = bzip2::read::BzDecoder::new(File::open(path)?);
+    let mut archive = tar::Archive::new(bz);
+
+    let spinner = terminal::spinner("Unpacking distribution (tar|bzip2)".to_string());
+    let result = archive.unpack(destination);
+    spinner.finish_and_clear();
+    result?;
 
     Ok(())
 }
