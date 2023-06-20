@@ -8,14 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Changed:***
+
+- Custom distributions should now define the relative path to the `site-packages` directory
+
 ***Added:***
 
-- Add support for distributions with `bzip2` compression
+- Add support for PyPy distributions
+- Add the `PYAPP_UPGRADE_VIRTUALENV` option to create virtual environments with `virtualenv` rather than the stdlib's `venv`
+- Add support for custom distributions with `bzip2` compression
 
 ***Fixed:***
 
 - Properly handle cases where temporary files are on different filesystems
 - Fix regression in the `metadata` management command on Windows
+- Improve error messages when running binaries that were misconfigured
 
 ## 0.8.0 - 2023-06-09
 

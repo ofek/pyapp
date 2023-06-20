@@ -48,9 +48,14 @@ impl Cli {
         let dependency_file = app::project_dependency_file();
         let (status, output) = if dependency_file.is_empty() {
             command.arg(app::project_name().as_str());
-            distribution::pip_install(command, wait_message)?
+            distribution::pip_install(command, wait_message, &installation_directory)?
         } else {
-            distribution::pip_install_dependency_file(&dependency_file, command, wait_message)?
+            distribution::pip_install_dependency_file(
+                &dependency_file,
+                command,
+                wait_message,
+                &installation_directory,
+            )?
         };
 
         if !status.success() {

@@ -68,6 +68,16 @@ Some distributions have [variants](https://gregoryszorc.com/docs/python-build-st
 | Linux | <ul><li><code>v1</code></li><li><code>v2</code></li><li><code>v3</code> (default)</li><li><code>v4</code></li></ul> |
 | Windows | <ul><li><code>shared</code> (default)</li><li><code>static</code></li></ul> |
 
+#### PyPy
+
+| ID |
+| --- |
+| `pypy2.7` |
+| `pypy3.9` |
+| `pypy3.10` |
+
+The source of distributions is the [PyPy](https://www.pypy.org) project.
+
 ### Custom
 
 You may explicitly set the `PYAPP_DISTRIBUTION_SOURCE` option which overrides the [known](#known) distribution settings. The source must be a URL that points to an archived version of the desired Python distribution.
@@ -89,6 +99,14 @@ The following formats are supported for the `PYAPP_DISTRIBUTION_FORMAT` option, 
 
 You may set the relative path to the Python executable after unpacking the archive with the `PYAPP_DISTRIBUTION_PYTHON_PATH` option. The default is `python.exe` on Windows and `bin/python3` on all other platforms.
 
+#### Site packages location
+
+You may set the relative path to the [`site-packages`](https://docs.python.org/3/library/site.html) directory after unpacking the archive with the `PYAPP_DISTRIBUTION_SITE_PACKAGES_PATH` option. The default is `Lib\site-packages` on Windows and `lib/python<ID>/site-packages` on all other platforms where `<ID>` is the [distribution ID](#known) is defined.
+
+#### pip availability
+
+You may indicate whether pip is already installed by setting the `PYAPP_DISTRIBUTION_PIP_AVAILABLE` option to `true` or `1`. This elides the check for installation when [upgraded virtual environments](#virtual-environments) are enabled.
+
 ### Embedding ### {: #distribution-embedding }
 
 You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime. When distribution embedding is enabled, you can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source.
@@ -104,7 +122,7 @@ You may set the `PYAPP_PIP_EXTERNAL` option to `true` or `1` to use the [standal
 By default, the latest version is used. You may use a specific `X.Y.Z` version by setting the `PYAPP_PIP_VERSION` option.
 
 !!! tip
-    This provides a significant installation speed up when [full isolation](#isolation) is not enabled.
+    This provides a significant installation speed up when [full isolation](#full-isolation) is not enabled.
 
 ### Extra arguments
 
@@ -114,9 +132,13 @@ You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the 
 
 You may set the `PYAPP_PIP_ALLOW_CONFIG` option to `true` or `1` to allow the use of environment variables and other configuration at runtime.
 
-## Isolation
+## Full isolation
 
 You may set the `PYAPP_FULL_ISOLATION` option to `true` or `1` to provide each installation with a full copy of the distribution rather than a virtual environment.
+
+## Virtual environments
+
+When [full isolation](#full-isolation) is not enabled, you may set the `PYAPP_UPGRADE_VIRTUALENV` option to `true` or `1` to create virtual environments with [virtualenv](https://github.com/pypa/virtualenv) rather than the standard library's `venv` module.
 
 ## Skipping project installation
 

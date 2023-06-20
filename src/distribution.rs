@@ -11,9 +11,7 @@ use crate::{app, compression, fs_utils, network, process};
 
 pub fn python_command(python: &PathBuf) -> Command {
     let mut command = Command::new(python);
-
-    // https://docs.python.org/3/using/cmdline.html#cmdoption-I
-    command.arg("-I");
+    command.arg(app::python_isolation_flag());
 
     command
 }
@@ -140,6 +138,10 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
                 err
             );
         })?;
+
+        if !app::skip_install() {
+            ensure_base_pip(installation_directory, installation_directory)?;
+        }
     } else {
         let unpacked_distribution = distributions_dir.join(format!("_{}", app::distribution_id()));
         if !unpacked_distribution.is_dir() {
@@ -160,18 +162,53 @@ pub fn materialize(installation_directory: &PathBuf) -> Result<()> {
 
         let mut command =
             python_command(&unpacked_distribution.join(app::distribution_python_path()));
-        command.args(["-m", "venv"]);
-        if app::pip_external() {
-            command.arg("--without-pip");
+
+        if app::upgrade_virtualenv() {
+            ensure_base_pip(&unpacked_distribution, installation_directory)?;
+
+            let mut upgrade_command =
+                python_command(&unpacked_distribution.join(app::distribution_python_path()));
+            upgrade_command.args([
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "--isolated",
+                "--disable-pip-version-check",
+                "--no-warn-script-location",
+                "virtualenv",
+            ]);
+            let (status, output) = run_setup_command(
+                upgrade_command,
+                "Upgrading virtualenv".to_string(),
+                installation_directory,
+            )?;
+            check_setup_status(status, output, installation_directory)?;
+
+            command.args(["-m", "virtualenv"]);
+            if app::pip_external() {
+                command.arg("--no-pip");
+            }
+        } else {
+            command.args(["-m", "venv"]);
+            if app::pip_external() {
+                command.arg("--without-pip");
+            }
         }
+
         command.arg(installation_directory.to_string_lossy().as_ref());
-        process::wait_for(command, "Creating virtual environment".to_string())?;
+        let (status, output) = run_setup_command(
+            command,
+            "Creating virtual environment".to_string(),
+            installation_directory,
+        )?;
+        check_setup_status(status, output, installation_directory)?;
     }
 
     Ok(())
 }
 
-fn install_project(installation_directory: &PathBuf) -> Result<()> {
+fn install_project(installation_directory: &Path) -> Result<()> {
     let install_target = format!("{} {}", app::project_name(), app::project_version());
     let binary_only = app::pip_extra_args().contains("--only-binary :all:")
         || app::pip_extra_args().contains("--only-binary=:all:");
@@ -199,7 +236,7 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
         } else {
             format!("Installing {}", install_target)
         };
-        pip_install(command, wait_message)?
+        pip_install(command, wait_message, installation_directory)
     } else {
         let wait_message = if binary_only {
             format!("Unpacking {}", install_target)
@@ -210,30 +247,35 @@ fn install_project(installation_directory: &PathBuf) -> Result<()> {
         let dependency_file = app::project_dependency_file();
         if dependency_file.is_empty() {
             command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
-            pip_install(command, wait_message)?
+            pip_install(command, wait_message, installation_directory)
         } else {
-            pip_install_dependency_file(&dependency_file, command, wait_message)?
+            pip_install_dependency_file(
+                &dependency_file,
+                command,
+                wait_message,
+                installation_directory,
+            )
         }
-    };
-
-    if !status.success() {
-        fs::remove_dir_all(installation_directory).ok();
-        println!("{}", output.trim_end());
-        exit(status.code().unwrap_or(1));
-    }
+    }?;
+    check_setup_status(status, output, installation_directory)?;
 
     Ok(())
 }
 
-pub fn pip_install(command: Command, wait_message: String) -> Result<(ExitStatus, String)> {
-    ensure_pip()?;
-    process::wait_for(command, wait_message)
+pub fn pip_install(
+    command: Command,
+    wait_message: String,
+    installation_directory: &Path,
+) -> Result<(ExitStatus, String)> {
+    ensure_external_pip()?;
+    run_setup_command(command, wait_message, installation_directory)
 }
 
 pub fn pip_install_dependency_file(
     dependency_file: &String,
     mut command: Command,
     wait_message: String,
+    installation_directory: &Path,
 ) -> Result<(ExitStatus, String)> {
     let dir = tempdir().with_context(|| "unable to create temporary directory")?;
     let file_name = app::project_dependency_file_name();
@@ -250,11 +292,27 @@ pub fn pip_install_dependency_file(
 
     command.args(["-r", temp_path.to_string_lossy().as_ref()]);
 
-    ensure_pip()?;
-    process::wait_for(command, wait_message)
+    ensure_external_pip()?;
+    run_setup_command(command, wait_message, installation_directory)
 }
 
-fn ensure_pip() -> Result<()> {
+fn ensure_base_pip(distribution_directory: &Path, installation_directory: &Path) -> Result<()> {
+    if app::distribution_pip_available() {
+        return Ok(());
+    }
+
+    let mut command = python_command(&distribution_directory.join(app::distribution_python_path()));
+    command.args(["-m", "ensurepip"]);
+
+    run_setup_command(
+        command,
+        "Validating pip".to_string(),
+        installation_directory,
+    )?;
+    Ok(())
+}
+
+fn ensure_external_pip() -> Result<()> {
     if !app::pip_external() {
         return Ok(());
     }
@@ -295,4 +353,33 @@ fn ensure_pip() -> Result<()> {
     )?;
 
     fs_utils::move_temp_file(&temp_path, &external_pip)
+}
+
+fn run_setup_command(
+    command: Command,
+    message: String,
+    installation_directory: &Path,
+) -> Result<(ExitStatus, String)> {
+    let (status, output) = process::wait_for(command, message).with_context(|| {
+        format!(
+            "could not run Python, verify distribution build metadata options: {}",
+            app::python_path(installation_directory).display()
+        )
+    })?;
+
+    Ok((status, output))
+}
+
+fn check_setup_status(
+    status: ExitStatus,
+    output: String,
+    installation_directory: &Path,
+) -> Result<()> {
+    if !status.success() {
+        fs::remove_dir_all(installation_directory).ok();
+        println!("{}", output.trim_end());
+        exit(status.code().unwrap_or(1));
+    }
+
+    Ok(())
 }

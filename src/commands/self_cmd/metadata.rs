@@ -17,30 +17,7 @@ impl Cli {
             return Ok(());
         }
 
-        let python = app::python_path(&installation_directory);
-        let site_packages = if cfg!(windows) {
-            (|| Some(python.parent()?.parent()?.join("Lib").join("site-packages")))()
-        } else {
-            (|| {
-                let lib_dir = python.parent()?.parent()?.join("lib");
-                let version_dir =
-                    fs::read_dir(lib_dir)
-                        .ok()?
-                        .filter_map(Result::ok)
-                        .find(|entry| {
-                            let file_name = entry.file_name().to_string_lossy().to_string();
-                            file_name.starts_with("python") || file_name.starts_with("pypy")
-                        })?;
-
-                Some(version_dir.path().join("site-packages"))
-            })()
-        };
-
-        let site_packages = if let Some(site_packages) = site_packages.filter(|p| p.is_dir()) {
-            site_packages
-        } else {
-            return Ok(());
-        };
+        let site_packages = app::site_packages_path(&installation_directory);
 
         let expected_prefix = format!("{}-", app::project_name().replace('-', "_"));
         let metadata_file = fs::read_dir(site_packages).ok().and_then(|entries| {
