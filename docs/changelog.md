@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.9.0 - 2023-06-21
+
 ***Changed:***
 
 - Custom distributions should now define the relative path to the `site-packages` directory
