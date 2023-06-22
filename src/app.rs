@@ -2,6 +2,7 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use directories::ProjectDirs;
 use once_cell::sync::OnceCell;
 
@@ -21,6 +22,15 @@ pub fn initialize() -> Result<()> {
         .expect("could not set platform directories");
 
     Ok(())
+}
+
+fn decode_option(encoded: &'static str) -> String {
+    String::from_utf8(
+        STANDARD_NO_PAD
+            .decode(encoded)
+            .unwrap_or_else(|_| panic!("{} is not valid base64", encoded)),
+    )
+    .unwrap_or_else(|_| panic!("{} is not valid UTF-8", encoded))
 }
 
 pub fn embedded_distribution() -> &'static [u8] {
@@ -78,7 +88,7 @@ pub fn project_version() -> String {
 }
 
 pub fn project_dependency_file() -> String {
-    env!("PYAPP_PROJECT_DEPENDENCY_FILE").into()
+    decode_option(env!("PYAPP_PROJECT_DEPENDENCY_FILE"))
 }
 
 pub fn project_dependency_file_name() -> String {
@@ -94,7 +104,7 @@ pub fn exec_module() -> String {
 }
 
 pub fn exec_code() -> String {
-    env!("PYAPP_EXEC_CODE").into()
+    decode_option(env!("PYAPP_EXEC_CODE"))
 }
 
 pub fn pip_extra_args() -> String {

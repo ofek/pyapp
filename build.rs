@@ -5,6 +5,7 @@ use std::hash::{Hash, Hasher};
 use std::io::Read;
 use std::path::PathBuf;
 
+use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use highway::PortableHash;
 use rand::distributions::{Alphanumeric, DistString};
 use regex::Regex;
@@ -349,10 +350,12 @@ fn set_project_dependency_file(dependency_file: &str) {
     }
 
     let file_name = path.file_name().unwrap().to_str().unwrap();
+    let contents = fs::read_to_string(dependency_file)
+        .unwrap_or_else(|_| panic!("\n\nFailed to read dependency file {dependency_file}\n\n"));
+
     set_runtime_variable(
         "PYAPP_PROJECT_DEPENDENCY_FILE",
-        fs::read_to_string(dependency_file)
-            .unwrap_or_else(|_| panic!("\n\nFailed to read dependency file {dependency_file}\n\n")),
+        STANDARD_NO_PAD.encode(contents.as_bytes()),
     );
     set_runtime_variable("PYAPP__PROJECT_DEPENDENCY_FILE_NAME", file_name);
 }
