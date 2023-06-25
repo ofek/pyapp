@@ -19,10 +19,25 @@ pub fn python_command(python: &PathBuf) -> Command {
 pub fn run_project() -> Result<()> {
     let mut command = python_command(&app::python_path());
 
-    if app::exec_module().is_empty() {
+    if !app::exec_code().is_empty() {
         command.args(["-c", app::exec_code().as_str()]);
-    } else {
+    } else if !app::exec_module().is_empty() {
         command.args(["-m", app::exec_module().as_str()]);
+    } else {
+        let script_path = app::exec_script_path();
+        if !script_path.is_file() {
+            let script_directory = script_path.parent().unwrap();
+            fs::create_dir_all(script_directory).with_context(|| {
+                format!(
+                    "unable to create script cache directory {}",
+                    &script_directory.display()
+                )
+            })?;
+            fs::write(&script_path, app::exec_script()).with_context(|| {
+                format!("unable to write project script {}", &script_path.display())
+            })?;
+        }
+        command.arg(script_path);
     }
     command.args(env::args().skip(1));
 
