@@ -12,12 +12,11 @@ pub struct Cli {}
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
-        let installation_directory = app::installation_directory();
-        if !installation_directory.is_dir() {
+        if !app::install_dir().is_dir() {
             return Ok(());
         }
 
-        let site_packages = app::site_packages_path(&installation_directory);
+        let site_packages = app::site_packages_path();
 
         let expected_prefix = format!("{}-", app::project_name().replace('-', "_"));
         let metadata_file = fs::read_dir(site_packages).ok().and_then(|entries| {

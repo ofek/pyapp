@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use clap::Args;
 
-use crate::{app, distribution, process};
+use crate::{distribution, process};
 
 /// Directly invoke pip with the installed Python
 #[derive(Args, Debug)]
@@ -13,10 +13,9 @@ pub struct Cli {
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
-        let installation_directory = app::installation_directory();
-        distribution::ensure_ready(&installation_directory)?;
+        distribution::ensure_ready()?;
 
-        let mut command = distribution::pip_base_command(&installation_directory);
+        let mut command = distribution::pip_base_command();
         command.args(self.args);
 
         process::exec(command)

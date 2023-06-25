@@ -26,19 +26,18 @@ impl Cli {
             exit(1);
         }
 
-        let installation_directory = app::installation_directory();
-        let existing_installation = installation_directory.is_dir();
+        let existing_installation = app::install_dir().is_dir();
         if !existing_installation {
-            distribution::materialize(&installation_directory)?;
+            distribution::materialize()?;
         } else if self.restore {
             let spinner = terminal::spinner("Removing installation".to_string());
-            let result = fs::remove_dir_all(&installation_directory);
+            let result = fs::remove_dir_all(app::install_dir());
             spinner.finish_and_clear();
             result?;
-            distribution::materialize(&installation_directory)?;
+            distribution::materialize()?;
         }
 
-        let mut command = distribution::pip_install_command(&installation_directory);
+        let mut command = distribution::pip_install_command();
         if self.pre {
             command.arg("--pre");
         }
@@ -48,19 +47,14 @@ impl Cli {
         let dependency_file = app::project_dependency_file();
         let (status, output) = if dependency_file.is_empty() {
             command.arg(app::project_name().as_str());
-            distribution::pip_install(command, wait_message, &installation_directory)?
+            distribution::pip_install(command, wait_message)?
         } else {
-            distribution::pip_install_dependency_file(
-                &dependency_file,
-                command,
-                wait_message,
-                &installation_directory,
-            )?
+            distribution::pip_install_dependency_file(&dependency_file, command, wait_message)?
         };
 
         if !status.success() {
             if !existing_installation {
-                fs::remove_dir_all(&installation_directory).ok();
+                fs::remove_dir_all(app::install_dir()).ok();
             }
             println!("{}", output.trim_end());
             exit(status.code().unwrap_or(1));

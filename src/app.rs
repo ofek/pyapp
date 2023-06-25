@@ -1,5 +1,5 @@
 use std::env;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
@@ -7,6 +7,7 @@ use directories::ProjectDirs;
 use once_cell::sync::OnceCell;
 
 static PLATFORM_DIRS: OnceCell<ProjectDirs> = OnceCell::new();
+static INSTALLATION_DIRECTORY: OnceCell<PathBuf> = OnceCell::new();
 
 fn platform_dirs() -> &'static ProjectDirs {
     PLATFORM_DIRS
@@ -14,12 +15,27 @@ fn platform_dirs() -> &'static ProjectDirs {
         .expect("platform directories are not initialized")
 }
 
+pub fn install_dir() -> &'static PathBuf {
+    INSTALLATION_DIRECTORY
+        .get()
+        .expect("installation directory is not initialized")
+}
+
 pub fn initialize() -> Result<()> {
-    let platform_dirs = ProjectDirs::from("", "", "pyapp")
+    let platform_directories = ProjectDirs::from("", "", "pyapp")
         .with_context(|| "unable to find platform directories")?;
     PLATFORM_DIRS
-        .set(platform_dirs)
+        .set(platform_directories)
         .expect("could not set platform directories");
+
+    let installation_directory = platform_dirs()
+        .data_local_dir()
+        .join(project_name())
+        .join(distribution_id())
+        .join(project_version());
+    INSTALLATION_DIRECTORY
+        .set(installation_directory)
+        .expect("could not set installation directory");
 
     Ok(())
 }
@@ -143,34 +159,24 @@ pub fn metadata_template() -> String {
     env!("PYAPP_METADATA_TEMPLATE").into()
 }
 
-pub fn python_path(installation_directory: &Path) -> PathBuf {
-    installation_directory.join(installation_python_path())
+pub fn python_path() -> PathBuf {
+    install_dir().join(installation_python_path())
 }
 
-pub fn site_packages_path(installation_directory: &Path) -> PathBuf {
-    installation_directory.join(installation_site_packages_path())
+pub fn site_packages_path() -> PathBuf {
+    install_dir().join(installation_site_packages_path())
 }
 
-pub fn cache_directory() -> PathBuf {
+pub fn cache_dir() -> PathBuf {
     platform_dirs().cache_dir().to_path_buf()
 }
 
-pub fn storage_directory() -> PathBuf {
-    platform_dirs().data_local_dir().join(project_name())
-}
-
-pub fn installation_directory() -> PathBuf {
-    storage_directory()
-        .join(distribution_id())
-        .join(project_version())
-}
-
 pub fn distributions_cache() -> PathBuf {
-    cache_directory().join("distributions")
+    cache_dir().join("distributions")
 }
 
 pub fn external_pip_cache() -> PathBuf {
-    cache_directory().join("pip")
+    cache_dir().join("pip")
 }
 
 pub fn external_pip_zipapp() -> PathBuf {

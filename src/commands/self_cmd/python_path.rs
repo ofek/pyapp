@@ -10,8 +10,7 @@ pub struct Cli {}
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
-        let installation_directory = app::installation_directory();
-        println!("{}", app::python_path(&installation_directory).display());
+        println!("{}", app::python_path().display());
 
         Ok(())
     }
