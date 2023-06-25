@@ -13,10 +13,9 @@ pub struct Cli {
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
-        let installation_directory = app::installation_directory();
-        distribution::ensure_ready(&installation_directory)?;
+        distribution::ensure_ready()?;
 
-        let mut command = distribution::python_command(&app::python_path(&installation_directory));
+        let mut command = distribution::python_command(&app::python_path());
         command.args(self.args);
 
         process::exec(command)

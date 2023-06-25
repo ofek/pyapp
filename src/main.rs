@@ -20,9 +20,8 @@ fn main() -> Result<()> {
     match env::args().nth(1).as_deref() {
         Some(env!("PYAPP_SELF_COMMAND")) => Cli::parse().exec(),
         _ => {
-            let installation_directory = app::installation_directory();
-            distribution::ensure_ready(&installation_directory)?;
-            distribution::run_project(&installation_directory)?;
+            distribution::ensure_ready()?;
+            distribution::run_project()?;
 
             Ok(())
         }

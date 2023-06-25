@@ -12,14 +12,13 @@ pub struct Cli {}
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
-        let installation_directory = app::installation_directory();
-        if installation_directory.is_dir() {
+        if app::install_dir().is_dir() {
             let spinner = terminal::spinner("Removing installation".to_string());
-            let result = fs::remove_dir_all(&installation_directory);
+            let result = fs::remove_dir_all(app::install_dir());
             spinner.finish_and_clear();
             result?;
         }
-        distribution::ensure_ready(&installation_directory)?;
+        distribution::ensure_ready()?;
 
         Ok(())
     }
