@@ -355,7 +355,7 @@ fn set_project_dependency_file(dependency_file: &str) {
 
     set_runtime_variable(
         "PYAPP_PROJECT_DEPENDENCY_FILE",
-        STANDARD_NO_PAD.encode(contents.as_bytes()),
+        STANDARD_NO_PAD.encode(contents),
     );
     set_runtime_variable("PYAPP__PROJECT_DEPENDENCY_FILE_NAME", file_name);
 }
@@ -672,7 +672,7 @@ fn set_execution_mode() {
             format!("import {module};{module}.{object}()"),
         );
     } else if !code.is_empty() {
-        set_runtime_variable(code_variable, &code);
+        set_runtime_variable(code_variable, STANDARD_NO_PAD.encode(&code));
     } else {
         set_runtime_variable(
             module_variable,
