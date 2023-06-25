@@ -28,11 +28,20 @@ pub fn initialize() -> Result<()> {
         .set(platform_directories)
         .expect("could not set platform directories");
 
-    let installation_directory = platform_dirs()
-        .data_local_dir()
-        .join(project_name())
-        .join(distribution_id())
-        .join(project_version());
+    let install_dir_override = env::var(format!(
+        "PYAPP_INSTALL_DIR_{}",
+        project_name().to_uppercase()
+    ))
+    .unwrap_or_default();
+    let installation_directory = if !install_dir_override.is_empty() {
+        PathBuf::from(install_dir_override)
+    } else {
+        platform_dirs()
+            .data_local_dir()
+            .join(project_name())
+            .join(distribution_id())
+            .join(project_version())
+    };
     INSTALLATION_DIRECTORY
         .set(installation_directory)
         .expect("could not set installation directory");

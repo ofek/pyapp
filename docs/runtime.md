@@ -68,6 +68,10 @@ To provide consistent behavior on each user's machine:
 
 A single environment variable called `PYAPP` is injected with the value of `1` ([by default](config.md#installation-indicator)) when running applications and may be used to detect this mode of installation versus others.
 
+## Location
+
+The default location of your application's installation differs based on the operating system and can be overridden at runtime with the `PYAPP_INSTALL_DIR_<PROJECT_NAME>` environment variable where `<PROJECT_NAME>` is the uppercased version of the [project name](config.md#project).
+
 ## Commands
 
 Built applications have a single top-level command group named `self` ([by default](config.md#management-command)) and all other invocations will be forwarded to your actual [execution logic](config.md#execution-mode).

@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add support for overriding the installation directory
+
 ***Fixed:***
 
 - Properly handle cases where options contain line feed characters
