@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.10.0 - 2023-06-26
+
 ***Added:***
 
 - Add `PYAPP_EXEC_SCRIPT` option for executing a project using a script
