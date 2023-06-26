@@ -132,6 +132,17 @@ pub fn exec_code() -> String {
     decode_option(env!("PYAPP_EXEC_CODE"))
 }
 
+pub fn exec_script() -> String {
+    decode_option(env!("PYAPP_EXEC_SCRIPT"))
+}
+
+pub fn exec_script_path() -> PathBuf {
+    cache_dir()
+        .join("scripts")
+        .join(env!("PYAPP__EXEC_SCRIPT_ID"))
+        .join(env!("PYAPP__EXEC_SCRIPT_NAME"))
+}
+
 pub fn pip_extra_args() -> String {
     env!("PYAPP_PIP_EXTRA_ARGS").into()
 }

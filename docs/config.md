@@ -40,6 +40,7 @@ The following options are mutually exclusive:
 | `PYAPP_EXEC_MODULE` | This is the name of the module to execute via `python -m <MODULE>` |
 | `PYAPP_EXEC_SPEC` | This is an [object reference](https://packaging.python.org/en/latest/specifications/entry-points/#data-model) to execute e.g. `pkg.foo:cli` |
 | `PYAPP_EXEC_CODE` | This is arbitrary code to run via `python -c <CODE>` (the spec option uses this internally) |
+| `PYAPP_EXEC_SCRIPT` | This is a path to a script to embed in the binary and run |
 
 If none are set then the `PYAPP_EXEC_MODULE` option will default to the value of `PYAPP_PROJECT_NAME` with hyphens replaced by underscores.
 

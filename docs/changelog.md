@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Added:***
 
+- Add `PYAPP_EXEC_SCRIPT` option for executing a project using a script
 - Add support for overriding the installation directory
 
 ***Fixed:***

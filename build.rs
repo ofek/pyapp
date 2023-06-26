@@ -651,17 +651,28 @@ fn set_execution_mode() {
     let code_variable = "PYAPP_EXEC_CODE";
     let code = env::var(code_variable).unwrap_or_default();
 
+    let script_variable = "PYAPP_EXEC_SCRIPT";
+    let script = env::var(script_variable).unwrap_or_default();
+
     // Set defaults
     set_runtime_variable(module_variable, "");
     set_runtime_variable(code_variable, "");
+    set_runtime_variable(script_variable, "");
+    set_runtime_variable("PYAPP__EXEC_SCRIPT_NAME", "");
+    set_runtime_variable("PYAPP__EXEC_SCRIPT_ID", "");
 
-    if [module.is_empty(), spec.is_empty(), code.is_empty()]
-        .iter()
-        .filter(|x| !(**x))
-        .count()
+    if [
+        module.is_empty(),
+        spec.is_empty(),
+        code.is_empty(),
+        script.is_empty(),
+    ]
+    .iter()
+    .filter(|x| !(**x))
+    .count()
         > 1
     {
-        panic!("\n\nThe {module_variable}, {spec_variable}, and {code_variable} options are mutually exclusive\n\n");
+        panic!("\n\nThe {module_variable}, {spec_variable}, {code_variable}, and {script_variable} options are mutually exclusive\n\n");
     } else if !module.is_empty() {
         set_runtime_variable(module_variable, &module);
     } else if !spec.is_empty() {
@@ -672,7 +683,22 @@ fn set_execution_mode() {
             format!("import {module};{module}.{object}()"),
         );
     } else if !code.is_empty() {
-        set_runtime_variable(code_variable, STANDARD_NO_PAD.encode(&code));
+        set_runtime_variable(code_variable, STANDARD_NO_PAD.encode(code));
+    } else if !script.is_empty() {
+        let path = PathBuf::from(&script);
+        if !path.is_file() {
+            panic!("\n\nScript is not a file: {script}\n\n");
+        }
+
+        let file_name = path.file_name().unwrap().to_str().unwrap();
+        let contents = fs::read_to_string(&path)
+            .unwrap_or_else(|_| panic!("\n\nFailed to read script: {script}\n\n"));
+        let mut hasher = PortableHash::default();
+        hasher.write(contents.as_bytes());
+
+        set_runtime_variable(script_variable, STANDARD_NO_PAD.encode(contents));
+        set_runtime_variable("PYAPP__EXEC_SCRIPT_NAME", file_name);
+        set_runtime_variable("PYAPP__EXEC_SCRIPT_ID", hasher.finish());
     } else {
         set_runtime_variable(
             module_variable,
