@@ -664,6 +664,7 @@ fn set_execution_mode() {
     // Set defaults
     set_runtime_variable(module_variable, "");
     set_runtime_variable(code_variable, "");
+    set_runtime_variable("PYAPP__EXEC_CODE_ENCODED", "0");
     set_runtime_variable(script_variable, "");
     set_runtime_variable("PYAPP__EXEC_SCRIPT_NAME", "");
     set_runtime_variable("PYAPP__EXEC_SCRIPT_ID", "");
@@ -691,6 +692,7 @@ fn set_execution_mode() {
         );
     } else if !code.is_empty() {
         set_runtime_variable(code_variable, STANDARD_NO_PAD.encode(code));
+        set_runtime_variable("PYAPP__EXEC_CODE_ENCODED", "1");
     } else if !script.is_empty() {
         let path = PathBuf::from(&script);
         if !path.is_file() {

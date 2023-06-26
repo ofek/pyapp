@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Fixed:***
+
+- Fix regression in the `PYAPP_EXEC_SPEC` option
+
 ## 0.10.0 - 2023-06-26
 
 ***Added:***

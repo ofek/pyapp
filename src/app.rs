@@ -129,7 +129,11 @@ pub fn exec_module() -> String {
 }
 
 pub fn exec_code() -> String {
-    decode_option(env!("PYAPP_EXEC_CODE"))
+    if env!("PYAPP__EXEC_CODE_ENCODED") == "1" {
+        decode_option(env!("PYAPP_EXEC_CODE"))
+    } else {
+        env!("PYAPP_EXEC_CODE").into()
+    }
 }
 
 pub fn exec_script() -> String {
