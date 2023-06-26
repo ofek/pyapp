@@ -438,31 +438,38 @@ fn set_distribution() {
     let embed_path = embed_file("distribution");
     let mut hasher = PortableHash::default();
 
-    let distribution_source = if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
-        let local_path = env::var("PYAPP_DISTRIBUTION_PATH").unwrap_or_default();
-        let distribution_source = if !local_path.is_empty() {
-            let path = PathBuf::from(&local_path);
-            if !path.is_file() {
-                panic!("\n\nDistribution path is not a file: {local_path}\n\n");
-            }
-            fs::copy(&local_path, &embed_path).unwrap_or_else(|_| {
-                panic!(
-                    "\n\nFailed to copy distribution's archive from {local_path} to {embed_path}\n\n",
-                    embed_path = embed_path.display()
-                )
-            });
+    let local_path = env::var("PYAPP_DISTRIBUTION_PATH").unwrap_or_default();
+    if !local_path.is_empty()
+        && !env::var("PYAPP_DISTRIBUTION_SOURCE")
+            .unwrap_or_default()
+            .is_empty()
+    {
+        panic!("\n\nBoth distribution path and source are set\n\n");
+    }
 
-            "".to_string()
-        } else {
-            let distribution_source = get_distribution_source();
-            let bytes = reqwest::blocking::get(&distribution_source)
-                .unwrap()
-                .bytes()
-                .unwrap();
-            fs::write(&embed_path, bytes).unwrap();
+    let distribution_source = if !local_path.is_empty() {
+        let path = PathBuf::from(&local_path);
+        if !path.is_file() {
+            panic!("\n\nDistribution path is not a file: {local_path}\n\n");
+        }
+        fs::copy(&local_path, &embed_path).unwrap_or_else(|_| {
+            panic!(
+                "\n\nFailed to copy distribution's archive from {local_path} to {embed_path}\n\n",
+                embed_path = embed_path.display()
+            )
+        });
 
-            distribution_source
-        };
+        let mut file = File::open(&embed_path).unwrap();
+        std::io::copy(&mut file, &mut hasher).unwrap();
+
+        "".to_string()
+    } else if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
+        let distribution_source = get_distribution_source();
+        let bytes = reqwest::blocking::get(&distribution_source)
+            .unwrap()
+            .bytes()
+            .unwrap();
+        fs::write(&embed_path, bytes).unwrap();
 
         let mut file = File::open(&embed_path).unwrap();
         std::io::copy(&mut file, &mut hasher).unwrap();

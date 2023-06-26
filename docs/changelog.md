@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Add `PYAPP_EXEC_SCRIPT` option for executing a project using a script
 - Add support for overriding the installation directory
+- Make the `PYAPP_DISTRIBUTION_PATH` option implicitly enable `PYAPP_DISTRIBUTION_EMBED`
 
 ***Fixed:***
 

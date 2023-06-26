@@ -110,7 +110,7 @@ You may indicate whether pip is already installed by setting the `PYAPP_DISTRIBU
 
 ### Embedding ### {: #distribution-embedding }
 
-You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime. When distribution embedding is enabled, you can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source.
+You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime. You can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source, which implicitly enables embedding.
 
 ## pip
 
@@ -127,7 +127,7 @@ By default, the latest version is used. You may use a specific `X.Y.Z` version b
 
 ### Extra arguments
 
-You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the [`pip install`](https://pip.pypa.io/en/stable/cli/pip_install/) command at runtime when installing or updating the project e.g. `--index-url URL --only-binary :all:`.
+You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the [`pip install`](https://pip.pypa.io/en/stable/cli/pip_install/) command at runtime when installing or updating the project e.g. `--only-binary :all: --index-url URL`.
 
 ### Allowing configuration
 

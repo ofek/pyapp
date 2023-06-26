@@ -46,6 +46,7 @@ nav:
   - Building: build.md
   - Configuration: config.md
   - Runtime behavior: runtime.md
+  - Examples: examples.md
   - Meta:
     - Users: users.md
     - Changelog: changelog.md
