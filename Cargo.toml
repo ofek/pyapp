@@ -36,6 +36,7 @@ zip = { version = "0.6.4", features = ["deflate"] }
 [profile.release]
 panic = "abort"
 strip = true
+codegen-units = 1
 
 [package.metadata.cross.build.env]
 passthrough = [
