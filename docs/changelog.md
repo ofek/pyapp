@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Update default distributions to 20230826
+- Build releases with codegen-units=1
+
 ## 0.10.1 - 2023-06-26
 
 ***Fixed:***
