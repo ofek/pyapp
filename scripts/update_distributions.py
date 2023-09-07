@@ -89,6 +89,8 @@ def main():
         # https://doc.rust-lang.org/std/env/consts/constant.ARCH.html
         if arch == 'i686':
             arch = 'x86'
+        elif arch == 'ppc64le':
+            arch = 'powerpc64'
 
         distribution = (minor_version_parts, os_name, arch, abi, variant)
         distributions[distribution].append(((version_parts, date), url))
