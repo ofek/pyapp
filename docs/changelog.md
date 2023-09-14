@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.11.1 - 2023-09-14
+
 ***Fixed:***
 
 - Fix the Python path for the `pypy2.7` distribution
