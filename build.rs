@@ -560,7 +560,7 @@ fn set_python_path(distribution_source: &str) {
         if on_windows {
             format!(r"{}\pypy.exe", directory)
         } else {
-            format!("{}/bin/pypy3", directory)
+            format!("{}/bin/pypy", directory)
         }
     } else if on_windows {
         "python.exe".to_string()
