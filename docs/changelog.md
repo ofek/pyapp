@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Update default distributions to 20231002, adding support for Python 3.12
+
 ## 0.11.1 - 2023-09-14
 
 ***Fixed:***
