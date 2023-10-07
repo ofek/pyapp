@@ -1,3 +1,5 @@
+#![allow(clippy::eq_op)]
+
 use std::env;
 use std::path::PathBuf;
 

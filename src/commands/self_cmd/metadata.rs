@@ -1,3 +1,5 @@
+#![allow(clippy::eq_op)]
+
 use std::fs;
 
 use anyhow::Result;
