@@ -1,3 +1,5 @@
+#![allow(clippy::eq_op)]
+
 use anyhow::{Context, Result};
 use clap::Args;
 
