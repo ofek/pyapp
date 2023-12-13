@@ -13,6 +13,14 @@ PyApp is a wrapper for Python applications that bootstrap themselves at runtime.
 
 <img src="https://raw.githubusercontent.com/ofek/pyapp/master/docs/assets/images/example.gif" alt="PyApp example workflow" role="img">
 
+```console
+export PYAPP_PROJECT_NAME=cowsay
+export PYAPP_PROJECT_VERSION=6.0
+cargo install pyapp --quiet --root out
+mv out/bin/pyapp cowsay && chmod +x cowsay
+./cowsay -t 'Hello, World!'
+```
+
 ## Features
 
 - Easily build standalone binaries for every platform
