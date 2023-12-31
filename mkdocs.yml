@@ -45,6 +45,7 @@ theme:
 
 nav:
   - About: index.md
+  - How-to: how-to.md
   - Building: build.md
   - Configuration: config.md
   - Runtime behavior: runtime.md
