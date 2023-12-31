@@ -3,7 +3,7 @@ use clap::{Args, Subcommand};
 
 /// Manage this application
 #[derive(Args, Debug)]
-#[command()]
+#[command(disable_help_flag = true)]
 pub struct Cli {
     #[command(subcommand)]
     command: Commands,
