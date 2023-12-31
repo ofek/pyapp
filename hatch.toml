@@ -1,21 +1,24 @@
 [envs.docs]
 detached = true
 dependencies = [
-  "mkdocs~=1.4.0",
-  "mkdocs-material~=9.1.16",
+  "mkdocs~=1.5.3",
+  "mkdocs-material~=9.5.1",
   # Plugins
-  "mkdocs-minify-plugin~=0.6.4",
-  "mkdocs-git-revision-date-localized-plugin~=1.2.0",
-  "mkdocs-glightbox~=0.3.4",
-  # https://github.com/jimporter/mike/issues/82#issuecomment-1172913929
-  "mike @ https://github.com/jimporter/mike/archive/392d57b8bb9d14bcedf2451a0dc302709f8055eb.zip",
+  "mkdocs-minify-plugin~=0.7.1",
+  "mkdocs-git-revision-date-localized-plugin~=1.2.1",
+  "mkdocs-glightbox~=0.3.5",
+  "mike~=2.0.0",
   # Extensions
-  "pymdown-extensions~=10.0.1",
+  "pymdown-extensions~=10.5.0",
   # Necessary for syntax highlighting in code blocks
-  "pygments~=2.15.1",
+  "pygments~=2.17.2",
   # Validation
   # https://github.com/linkchecker/linkchecker/pull/669#issuecomment-1267236287
   "linkchecker @ git+https://github.com/linkchecker/linkchecker.git@d9265bb71c2054bf57b8c5734a4825d62505c779",
+]
+[envs.docs.overrides]
+env.GITHUB_ACTIONS.env-vars = [
+  { key = "MKDOCS_IMAGE_PROCESSING", value = "true", if = ["true"] },
 ]
 [envs.docs.env-vars]
 SOURCE_DATE_EPOCH = "1580601600"

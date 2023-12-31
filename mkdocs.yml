@@ -36,6 +36,8 @@ theme:
   features:
     - content.action.edit
     - content.code.copy
+    - content.tabs.link
+    - content.tooltips
     - navigation.expand
     - navigation.footer
     - navigation.instant
@@ -61,6 +63,8 @@ plugins:
   git-revision-date-localized:
     strict: false
     type: date
+  # social:
+  #   enabled: !ENV [MKDOCS_IMAGE_PROCESSING, false]
 
 markdown_extensions:
   # Built-in
@@ -68,6 +72,7 @@ markdown_extensions:
   - markdown.extensions.admonition:
   - markdown.extensions.attr_list:
   - markdown.extensions.footnotes:
+  - markdown.extensions.md_in_html:
   - markdown.extensions.meta:
   - markdown.extensions.tables:
   - markdown.extensions.toc:
@@ -82,8 +87,8 @@ markdown_extensions:
   - pymdownx.emoji:
       # https://github.com/twitter/twemoji
       # https://raw.githubusercontent.com/facelessuser/pymdown-extensions/master/pymdownx/twemoji_db.py
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       guess_lang: false
       linenums_style: pymdownx-inline
@@ -117,6 +122,9 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde:
