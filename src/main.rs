@@ -17,13 +17,19 @@ use crate::commands::cli::Cli;
 fn main() -> Result<()> {
     app::initialize()?;
 
-    match env::args().nth(1).as_deref() {
-        Some(env!("PYAPP_SELF_COMMAND")) => Cli::parse().exec(),
-        _ => {
-            distribution::ensure_ready()?;
-            distribution::run_project()?;
+    if let Some(env!("PYAPP_SELF_COMMAND")) = env::args().nth(1).as_deref() {
+        match Cli::try_parse() {
+            Ok(cli) => return cli.exec(),
+            Err(err) => {
+                if !err.use_stderr() {
+                    err.exit();
+                }
+            }
+        };
+    };
 
-            Ok(())
-        }
-    }
+    distribution::ensure_ready()?;
+    distribution::run_project()?;
+
+    Ok(())
 }
