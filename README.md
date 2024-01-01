@@ -13,6 +13,8 @@ PyApp is a wrapper for Python applications that bootstrap themselves at runtime.
 
 <img src="https://raw.githubusercontent.com/ofek/pyapp/master/docs/assets/images/example.gif" alt="PyApp example workflow" role="img">
 
+See the [how-to](https://ofek.dev/pyapp/latest/how-to/) for a detailed example walkthrough.
+
 ## Features
 
 - Easily build standalone binaries for every platform
