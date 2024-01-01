@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Allow for forwarding of unknown management commands e.g. if apps have their own `self` commands
 
+***Fixed:***
+
+- Remove patch for powerpc64le now that the transitive dependency `ring` is fixed
+
 ## 0.12.0 - 2023-10-07
 
 ***Added:***
