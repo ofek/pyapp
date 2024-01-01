@@ -88,13 +88,6 @@ jobs:
       if: matrix.job.cross
       run: echo "CARGO=cross" >> $GITHUB_ENV
 
-    - name: Configure target
-      run: |-
-        config_file=".cargo/config_${{ matrix.job.target }}.toml"
-        if [[ -f "$config_file" ]]; then
-          mv "$config_file" .cargo/config.toml
-        fi
-
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
       with:
