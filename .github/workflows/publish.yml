@@ -21,10 +21,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Publish to crates.io
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-      run: cargo publish
+    # - name: Publish to crates.io
+    #   env:
+    #     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+    #   run: cargo publish
 
     - name: Create source archives
       run: |-

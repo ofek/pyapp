@@ -1,5 +1,5 @@
 site_name: PyApp
-site_description: Build self-bootstrapped Python applications
+site_description: Runtime installer for Python applications
 site_author: Ofek Lev
 site_url: https://ofek.dev/pyapp/
 repo_name: ofek/pyapp
