@@ -502,7 +502,7 @@ fn set_distribution() {
         let mut file = File::open(&embed_path).unwrap();
         std::io::copy(&mut file, &mut hasher).unwrap();
 
-        "".to_string()
+        local_path
     } else if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
         let distribution_source = get_distribution_source();
         let bytes = reqwest::blocking::get(&distribution_source)
@@ -678,6 +678,9 @@ fn set_distribution_pip_available(distribution_source: &str) {
         // Enable if a default source is used and known to have pip installed already
         || (!distribution_source.is_empty()
             && !distribution_source.starts_with(DEFAULT_PYPY_SOURCE)
+            && env::var("PYAPP_DISTRIBUTION_PATH")
+                .unwrap_or_default()
+                .is_empty()
             && env::var("PYAPP_DISTRIBUTION_SOURCE")
                 .unwrap_or_default()
                 .is_empty())
