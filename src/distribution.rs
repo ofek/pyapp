@@ -23,7 +23,7 @@ pub fn run_project() -> Result<()> {
         command.args(["-c", app::exec_code().as_str()]);
     } else if !app::exec_module().is_empty() {
         command.args(["-m", app::exec_module().as_str()]);
-    } else {
+    } else if !app::exec_script().is_empty() {
         let script_path = app::exec_script_path();
         if !script_path.is_file() {
             let script_directory = script_path.parent().unwrap();
@@ -38,6 +38,27 @@ pub fn run_project() -> Result<()> {
             })?;
         }
         command.arg(script_path);
+    } else {
+        let notebook_path = app::exec_notebook_path();
+        if !notebook_path.is_file() {
+            let notebook_directory = notebook_path.parent().unwrap();
+            fs::create_dir_all(notebook_directory).with_context(|| {
+                format!(
+                    "unable to create notebook cache directory {}",
+                    &notebook_directory.display()
+                )
+            })?;
+            fs::write(&notebook_path, app::exec_notebook()).with_context(|| {
+                format!(
+                    "unable to write project notebook {}",
+                    &notebook_path.display()
+                )
+            })?;
+        }
+        command
+            .arg("-m")
+            .arg("notebook")
+            .arg(notebook_path.to_str().unwrap());
     }
     command.args(env::args().skip(1));
 
