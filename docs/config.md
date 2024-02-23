@@ -135,6 +135,10 @@ You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the 
 
 You may set the `PYAPP_PIP_ALLOW_CONFIG` option to `true` or `1` to allow the use of environment variables and other configuration at runtime.
 
+### Extra/optional dependencies
+
+You may set the `PYAPP_PIP_OPTIONAL_DEPS` option to provide [extra/optional dependencies](https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras) that would usually be passed to `pip` within square brackets after the package name e.g. `foo[bar]`. In this example, you could set `PYAPP_PIP_OPTIONAL_DEPS` to `bar`.
+
 ## Full isolation
 
 You may set the `PYAPP_FULL_ISOLATION` option to `true` or `1` to provide each installation with a full copy of the distribution rather than a virtual environment.

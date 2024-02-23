@@ -160,6 +160,10 @@ pub fn exec_notebook_path() -> PathBuf {
         .join(env!("PYAPP__EXEC_NOTEBOOK_NAME"))
 }
 
+pub fn pip_optional_deps() -> String {
+    env!("PYAPP_PIP_OPTIONAL_DEPS").into()
+}
+
 pub fn pip_extra_args() -> String {
     env!("PYAPP_PIP_EXTRA_ARGS").into()
 }
