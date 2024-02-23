@@ -820,7 +820,7 @@ fn set_pip_version() {
 }
 
 fn set_pip_optional_deps() {
-    let variable = "PYAPP_PIP_OPTIONAL_DEPS";
+    let variable = "PYAPP_PROJECT_FEATURES";
     set_runtime_variable(variable, env::var(variable).unwrap_or_default());
 }
 

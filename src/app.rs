@@ -161,7 +161,7 @@ pub fn exec_notebook_path() -> PathBuf {
 }
 
 pub fn pip_optional_deps() -> String {
-    env!("PYAPP_PIP_OPTIONAL_DEPS").into()
+    env!("PYAPP_PROJECT_FEATURES").into()
 }
 
 pub fn pip_extra_args() -> String {

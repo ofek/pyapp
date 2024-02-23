@@ -137,7 +137,7 @@ You may set the `PYAPP_PIP_ALLOW_CONFIG` option to `true` or `1` to allow the us
 
 ### Extra/optional dependencies
 
-You may set the `PYAPP_PIP_OPTIONAL_DEPS` option to provide [extra/optional dependencies](https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras) that would usually be passed to `pip` within square brackets after the package name e.g. `foo[bar]`. In this example, you could set `PYAPP_PIP_OPTIONAL_DEPS` to `bar`.
+You may set the `PYAPP_PROJECT_FEATURES` option to provide [extra/optional dependencies](https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras) that would usually be passed to `pip` within square brackets after the package name e.g. `foo[bar]`. In this example, you could set `PYAPP_PROJECT_FEATURES` to `bar`.
 
 ## Full isolation
 
