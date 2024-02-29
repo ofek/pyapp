@@ -325,6 +325,9 @@ fn get_distribution_source() -> String {
             } else if selected_platform == "linux" {
                 abi = "gnu".to_string();
             }
+        } else if &abi == "gnu" && selected_platform == "windows" {
+            // On Windows Mingw-w64 uses `gnu` tag. force it to use msvc.
+            abi = "msvc".to_string();
         };
         abi
     };
