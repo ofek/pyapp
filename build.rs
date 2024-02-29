@@ -572,6 +572,11 @@ fn set_python_path(distribution_source: &str) {
     let python_path = env::var(distribution_variable).unwrap_or_default();
     let relative_path = if !python_path.is_empty() {
         python_path
+    } else if !env::var("PYAPP_DISTRIBUTION_PATH")
+        .unwrap_or_default()
+        .is_empty()
+    {
+        panic!("\n\nThe following option must be set when embedding a custom distribution: {distribution_variable}\n\n");
     } else if distribution_source.starts_with(DEFAULT_CPYTHON_SOURCE) {
         if get_python_version() == "3.7" {
             if on_windows {
@@ -678,9 +683,6 @@ fn set_distribution_pip_available(distribution_source: &str) {
         // Enable if a default source is used and known to have pip installed already
         || (!distribution_source.is_empty()
             && !distribution_source.starts_with(DEFAULT_PYPY_SOURCE)
-            && env::var("PYAPP_DISTRIBUTION_PATH")
-                .unwrap_or_default()
-                .is_empty()
             && env::var("PYAPP_DISTRIBUTION_SOURCE")
                 .unwrap_or_default()
                 .is_empty())

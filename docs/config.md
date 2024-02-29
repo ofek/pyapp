@@ -110,7 +110,9 @@ You may indicate whether pip is already installed by setting the `PYAPP_DISTRIBU
 
 ### Embedding ### {: #distribution-embedding }
 
-You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime. You can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source, which implicitly enables embedding. The local archive file should from [python-build-standalone](https://github.com/indygreg/python-build-standalone). Don't forget to update [`PYAPP_DISTRIBUTION_PYTHON_PATH`](#python-location) as needed.
+You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the distribution in the executable at build time to avoid fetching it at runtime.
+
+You can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source, which implicitly enables embedding. The local archive should be similar to the [default distributions](#python-distribution) in that they should be a Python interpreter ready for use.
 
 ## pip
 
