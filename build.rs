@@ -709,6 +709,9 @@ fn set_execution_mode() {
     let script_variable = "PYAPP_EXEC_SCRIPT";
     let script = env::var(script_variable).unwrap_or_default();
 
+    let notebook_variable = "PYAPP_EXEC_NOTEBOOK";
+    let notebook = env::var(notebook_variable).unwrap_or_default();
+
     // Set defaults
     set_runtime_variable(module_variable, "");
     set_runtime_variable(code_variable, "");
@@ -716,19 +719,23 @@ fn set_execution_mode() {
     set_runtime_variable(script_variable, "");
     set_runtime_variable("PYAPP__EXEC_SCRIPT_NAME", "");
     set_runtime_variable("PYAPP__EXEC_SCRIPT_ID", "");
+    set_runtime_variable(notebook_variable, "");
+    set_runtime_variable("PYAPP__EXEC_NOTEBOOK_NAME", "");
+    set_runtime_variable("PYAPP__EXEC_NOTEBOOK_ID", "");
 
     if [
         module.is_empty(),
         spec.is_empty(),
         code.is_empty(),
         script.is_empty(),
+        notebook.is_empty(),
     ]
     .iter()
     .filter(|x| !(**x))
     .count()
         > 1
     {
-        panic!("\n\nThe {module_variable}, {spec_variable}, {code_variable}, and {script_variable} options are mutually exclusive\n\n");
+        panic!("\n\nThe {module_variable}, {spec_variable}, {code_variable}, {script_variable}, and {notebook_variable} options are mutually exclusive\n\n");
     } else if !module.is_empty() {
         set_runtime_variable(module_variable, &module);
     } else if !spec.is_empty() {
@@ -756,6 +763,21 @@ fn set_execution_mode() {
         set_runtime_variable(script_variable, STANDARD_NO_PAD.encode(contents));
         set_runtime_variable("PYAPP__EXEC_SCRIPT_NAME", file_name);
         set_runtime_variable("PYAPP__EXEC_SCRIPT_ID", hasher.finish());
+    } else if !notebook.is_empty() {
+        let path = PathBuf::from(&notebook);
+        if !path.is_file() {
+            panic!("\n\nNotebook is not a file: {notebook}\n\n");
+        }
+
+        let file_name = path.file_name().unwrap().to_str().unwrap();
+        let contents = fs::read_to_string(&path)
+            .unwrap_or_else(|_| panic!("\n\nFailed to read notebook: {notebook}\n\n"));
+        let mut hasher = PortableHash::default();
+        hasher.write(contents.as_bytes());
+
+        set_runtime_variable(notebook_variable, STANDARD_NO_PAD.encode(contents));
+        set_runtime_variable("PYAPP__EXEC_NOTEBOOK_NAME", file_name);
+        set_runtime_variable("PYAPP__EXEC_NOTEBOOK_ID", hasher.finish());
     } else {
         set_runtime_variable(
             module_variable,

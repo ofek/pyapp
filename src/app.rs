@@ -149,6 +149,17 @@ pub fn exec_script_path() -> PathBuf {
         .join(env!("PYAPP__EXEC_SCRIPT_NAME"))
 }
 
+pub fn exec_notebook() -> String {
+    decode_option(env!("PYAPP_EXEC_NOTEBOOK"))
+}
+
+pub fn exec_notebook_path() -> PathBuf {
+    cache_dir()
+        .join("notebooks")
+        .join(env!("PYAPP__EXEC_NOTEBOOK_ID"))
+        .join(env!("PYAPP__EXEC_NOTEBOOK_NAME"))
+}
+
 pub fn pip_extra_args() -> String {
     env!("PYAPP_PIP_EXTRA_ARGS").into()
 }
