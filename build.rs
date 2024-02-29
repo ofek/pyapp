@@ -505,7 +505,7 @@ fn set_distribution() {
         let mut file = File::open(&embed_path).unwrap();
         std::io::copy(&mut file, &mut hasher).unwrap();
 
-        "".to_string()
+        local_path
     } else if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
         let distribution_source = get_distribution_source();
         let bytes = reqwest::blocking::get(&distribution_source)
@@ -575,6 +575,11 @@ fn set_python_path(distribution_source: &str) {
     let python_path = env::var(distribution_variable).unwrap_or_default();
     let relative_path = if !python_path.is_empty() {
         python_path
+    } else if !env::var("PYAPP_DISTRIBUTION_PATH")
+        .unwrap_or_default()
+        .is_empty()
+    {
+        panic!("\n\nThe following option must be set when embedding a custom distribution: {distribution_variable}\n\n");
     } else if distribution_source.starts_with(DEFAULT_CPYTHON_SOURCE) {
         if get_python_version() == "3.7" {
             if on_windows {
