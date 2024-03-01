@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Added:***
 
 - Update default distributions to 20240224
+- Update default Python version to 3.12
 - Statically link the C runtime on Windows
 - Add `PYAPP_PROJECT_FEATURES` option for selecting extras
 - Add new execution mode option `PYAPP_EXEC_NOTEBOOK` for running Jupyter notebooks

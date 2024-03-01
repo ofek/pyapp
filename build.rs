@@ -10,7 +10,7 @@ use highway::PortableHash;
 use rand::distributions::{Alphanumeric, DistString};
 use regex::Regex;
 
-const DEFAULT_PYTHON_VERSION: &str = "3.11";
+const DEFAULT_PYTHON_VERSION: &str = "3.12";
 const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|bzip2", "tar|gzip", "tar|zstd", "zip"];
 const DEFAULT_CPYTHON_SOURCE: &str =
     "https://github.com/indygreg/python-build-standalone/releases/download/";
@@ -287,7 +287,12 @@ fn truncate_embed_file(path: &PathBuf) {
 }
 
 fn get_python_version() -> String {
-    env::var("PYAPP_PYTHON_VERSION").unwrap_or(DEFAULT_PYTHON_VERSION.to_string())
+    let python_version = env::var("PYAPP_PYTHON_VERSION").unwrap_or_default();
+    if !python_version.is_empty() {
+        return python_version;
+    };
+
+    DEFAULT_PYTHON_VERSION.to_string()
 }
 
 fn get_distribution_source() -> String {
