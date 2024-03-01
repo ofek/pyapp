@@ -259,7 +259,9 @@ fn install_project() -> Result<()> {
             )
         })?;
 
-        command.arg(temp_path.to_string_lossy().as_ref());
+        command.arg(apply_project_features(
+            temp_path.to_string_lossy().as_ref().to_string(),
+        ));
 
         let wait_message = if binary_only && file_name.ends_with(".whl") {
             format!("Unpacking {}", install_target)
@@ -276,7 +278,11 @@ fn install_project() -> Result<()> {
 
         let dependency_file = app::project_dependency_file();
         if dependency_file.is_empty() {
-            command.arg(format!("{}=={}", app::project_name(), app::project_version()).as_str());
+            command.arg(format!(
+                "{}=={}",
+                apply_project_features(app::project_name()),
+                app::project_version()
+            ));
             pip_install(command, wait_message)
         } else {
             pip_install_dependency_file(&dependency_file, command, wait_message)
@@ -390,4 +396,12 @@ fn check_setup_status(status: ExitStatus, output: String) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn apply_project_features(install_target: String) -> String {
+    if app::pip_project_features().is_empty() {
+        install_target
+    } else {
+        format!("{install_target}[{}]", app::pip_project_features())
+    }
 }
