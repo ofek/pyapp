@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Properly resolve correct default distributions on MinGW-w64
 - Fix embedding custom distributions
+- Ignore nonexistent variant options for 3.7 distributions
 
 ## 0.14.0 - 2024-01-21
 

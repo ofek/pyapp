@@ -316,7 +316,10 @@ fn get_distribution_source() -> String {
         if variant.is_empty() {
             if selected_platform == "windows" {
                 variant = "shared".to_string();
-            } else if selected_platform == "linux" && selected_arch == "x86_64" {
+            } else if selected_platform == "linux"
+                && selected_arch == "x86_64"
+                && selected_python_version != "3.7"
+            {
                 variant = "v3".to_string();
             }
         };
