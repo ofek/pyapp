@@ -42,6 +42,7 @@ jobs:
         - target: i686-unknown-linux-gnu
           os: ubuntu-22.04
           cross: true
+          python_version: "3.11"
         - target: powerpc64le-unknown-linux-gnu
           os: ubuntu-22.04
           cross: true
@@ -63,6 +64,7 @@ jobs:
       CARGO_BUILD_TARGET: "${{ matrix.job.target }}"
       PYAPP_PROJECT_NAME: cowsay
       PYAPP_PROJECT_VERSION: "5.0.0"
+      PYAPP_PYTHON_VERSION: "${{ matrix.job.python_version }}"
 
     steps:
     - name: Checkout code
