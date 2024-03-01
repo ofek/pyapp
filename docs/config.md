@@ -135,9 +135,11 @@ You may set the `PYAPP_PIP_EXTRA_ARGS` option to provide extra arguments to the 
 
 You may set the `PYAPP_PIP_ALLOW_CONFIG` option to `true` or `1` to allow the use of environment variables and other configuration at runtime.
 
-### Extra/optional dependencies
+### Features (extras) ### {: #project-features }
 
-You may set the `PYAPP_PROJECT_FEATURES` option to provide [extra/optional dependencies](https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras) that would usually be passed to `pip` within square brackets after the package name e.g. `foo[bar]`. In this example, you could set `PYAPP_PROJECT_FEATURES` to `bar`.
+You may set the `PYAPP_PROJECT_FEATURES` option to select [optional dependency groups](https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras) that would usually be passed to installers within square brackets after the package name e.g. `pkg[foo,bar]`. In that example, you would set `PYAPP_PROJECT_FEATURES` to `foo,bar`.
+
+This also works when [embedding the project](#project-embedding).
 
 ## Full isolation
 

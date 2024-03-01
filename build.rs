@@ -819,7 +819,7 @@ fn set_pip_version() {
     set_runtime_variable(variable, env::var(variable).unwrap_or("latest".to_string()));
 }
 
-fn set_pip_optional_deps() {
+fn set_pip_project_features() {
     let variable = "PYAPP_PROJECT_FEATURES";
     set_runtime_variable(variable, env::var(variable).unwrap_or_default());
 }
@@ -924,7 +924,7 @@ fn main() {
     set_upgrade_virtualenv();
     set_pip_external();
     set_pip_version();
-    set_pip_optional_deps();
+    set_pip_project_features();
     set_pip_extra_args();
     set_pip_allow_config();
     set_skip_install();
