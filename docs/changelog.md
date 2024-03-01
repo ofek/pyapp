@@ -11,6 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Added:***
 
 - Update default distributions to 20240224
+- Statically link the C runtime on Windows
+- Add `PYAPP_PROJECT_FEATURES` option for selecting extras
+- Add new execution mode option `PYAPP_EXEC_NOTEBOOK` for running Jupyter notebooks
+
+***Fixed:***
+
+- Properly resolve correct default distributions on MinGW-w64
+- Fix embedding custom distributions
 
 ## 0.14.0 - 2024-01-21
 

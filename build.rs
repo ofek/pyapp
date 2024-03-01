@@ -325,8 +325,8 @@ fn get_distribution_source() -> String {
             } else if selected_platform == "linux" {
                 abi = "gnu".to_string();
             }
+        // Force MinGW-w64 to use msvc
         } else if &abi == "gnu" && selected_platform == "windows" {
-            // On Windows Mingw-w64 uses `gnu` tag. force it to use msvc.
             abi = "msvc".to_string();
         };
         abi
@@ -686,6 +686,9 @@ fn set_distribution_pip_available(distribution_source: &str) {
         // Enable if a default source is used and known to have pip installed already
         || (!distribution_source.is_empty()
             && !distribution_source.starts_with(DEFAULT_PYPY_SOURCE)
+            && env::var("PYAPP_DISTRIBUTION_PATH")
+                .unwrap_or_default()
+                .is_empty()
             && env::var("PYAPP_DISTRIBUTION_SOURCE")
                 .unwrap_or_default()
                 .is_empty())
