@@ -369,7 +369,7 @@ fn get_distribution_source() -> String {
 
 fn set_project_from_metadata(metadata: &str, file_name: &str) {
     for item in ["Name", "Version"] {
-        match Regex::new(&format!("(?m)^{item}: (.+)$"))
+        match Regex::new(&format!(r"(?m)^{item}: (\S+)"))
             .unwrap()
             .captures(metadata)
         {
