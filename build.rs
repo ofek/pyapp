@@ -627,6 +627,13 @@ fn set_python_path(distribution_source: &str) {
     } else {
         set_runtime_variable(installation_variable, "bin/python3");
     };
+
+    let variable_is_gui = "PYAPP_IS_GUI";
+    if is_enabled(variable_is_gui) {
+        set_runtime_variable(variable_is_gui, "1");
+    } else {
+        set_runtime_variable(variable_is_gui, "0");
+    }
 }
 
 fn set_site_packages_path(distribution_source: &str) {

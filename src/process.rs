@@ -9,6 +9,9 @@ use anyhow::Result;
 
 use crate::terminal;
 
+#[cfg(windows)]
+use crate::app;
+
 pub fn wait_for(mut command: Command, message: String) -> Result<(ExitStatus, String)> {
     let (mut reader, writer_stdout) = os_pipe::pipe()?;
     let writer_stderr = writer_stdout.try_clone()?;
@@ -37,6 +40,20 @@ pub fn exec(mut command: Command) -> Result<()> {
 
 #[cfg(windows)]
 pub fn exec(mut command: Command) -> Result<()> {
-    let status = command.status()?;
-    exit(status.code().unwrap_or(1));
+    if app::app_is_gui() {
+        let mut child = command.spawn()?;
+        match child.try_wait() {
+            Ok(Some(status)) => {
+                exit(status.code().unwrap_or(1));
+            }
+            Ok(None) => {
+                // The child is still running
+                Ok(())
+            }
+            Err(e) => Err(e.into()),
+        }
+    } else {
+        let status = command.status()?;
+        exit(status.code().unwrap_or(1));
+    }
 }

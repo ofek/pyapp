@@ -51,6 +51,12 @@ The following options are mutually exclusive:
 
 If none are set then the `PYAPP_EXEC_MODULE` option will default to the value of `PYAPP_PROJECT_NAME` with hyphens replaced by underscores.
 
+## Graphical user interface (GUI)
+
+If you are packaging for windows on windows and your python execution calls a GUI, you can set `PYAPP_IS_GUI` to `true` or `1`. This will use `pythonw.exe` instead of `python.exe` to execute the application. If a GUI is run with `python.exe` on Windows, a console window will appear alongside the GUI. Details can be found [here](https://docs.python.org/3/using/windows.html#python-application).
+
+Even when you set `PYAPP_IS_GUI` to `1`, you can still run the application from the command line. Furthermore, PyApp specific functions (e.g., installation and setup) will still display a console window with status messages. Note however that running a GUI application with `pythonw.exe` means that all `stdout` and `stderr` output will be discarded. 
+
 ## Python distribution
 
 ### Known
