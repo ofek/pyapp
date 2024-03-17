@@ -53,9 +53,18 @@ If none are set then the `PYAPP_EXEC_MODULE` option will default to the value of
 
 ## Graphical user interface (GUI)
 
-If you are packaging for windows on windows and your python execution calls a GUI, you can set `PYAPP_IS_GUI` to `true` or `1`. This will use `pythonw.exe` instead of `python.exe` to execute the application. If a GUI is run with `python.exe` on Windows, a console window will appear alongside the GUI. Details can be found [here](https://docs.python.org/3/using/windows.html#python-application).
+If you are packaging a GUI, you can set  `PYAPP_IS_GUI` to `true` or `1`. 
 
-Even when you set `PYAPP_IS_GUI` to `1`, you can still run the application from the command line. Furthermore, PyApp specific functions (e.g., installation and setup) will still display a console window with status messages. Note however that running a GUI application with `pythonw.exe` means that all `stdout` and `stderr` output will be discarded. 
+On windows, this will use `pythonw.exe` instead of `python.exe` to execute the application, which avoids a console window from appearing.
+Note that running a GUI application with `pythonw.exe` means that all `stdout` and `stderr` output from your GUI will be discarded. 
+
+On unix-like systems, `python` will be used for the execution. 
+PyApp will run your GUI by spawning a new process, such that the console window that calls the command terminates after successful spawning. 
+
+!!!note
+    On macos, the console by default does not automatically close when processes have terminated. Thus, the console will stay open after the GUI is started, however, can be closed manually without interferring with the GUI. The default console behavior can be changed in the user settings to close after the last process terminated successfully, see, e.g., [here](https://stackoverflow.com/questions/5560167/osx-how-to-auto-close-terminal-window-after-the-exit-command-executed).
+
+Even when you set `PYAPP_IS_GUI` to `1`, you can still run the application from the command line. Furthermore, PyApp specific functions (e.g., installation and setup) will still display a console window with status messages. 
 
 ## Python distribution
 

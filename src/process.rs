@@ -1,16 +1,13 @@
 use std::io::Read;
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
-#[cfg(windows)]
+// #[cfg(windows)]
 use std::process::exit;
 use std::process::{Command, ExitStatus};
 
 use anyhow::Result;
 
-use crate::terminal;
-
-#[cfg(windows)]
-use crate::app;
+use crate::{app, terminal};
 
 pub fn wait_for(mut command: Command, message: String) -> Result<(ExitStatus, String)> {
     let (mut reader, writer_stdout) = os_pipe::pipe()?;
@@ -35,25 +32,28 @@ pub fn wait_for(mut command: Command, message: String) -> Result<(ExitStatus, St
 
 #[cfg(unix)]
 pub fn exec(mut command: Command) -> Result<()> {
-    Err(command.exec().into())
+    if app::app_is_gui() {
+        exec_gui(command)
+    } else {
+        Err(command.exec().into())
+    }
 }
 
 #[cfg(windows)]
 pub fn exec(mut command: Command) -> Result<()> {
     if app::app_is_gui() {
-        let mut child = command.spawn()?;
-        match child.try_wait() {
-            Ok(Some(status)) => {
-                exit(status.code().unwrap_or(1));
-            }
-            Ok(None) => {
-                // The child is still running
-                Ok(())
-            }
-            Err(e) => Err(e.into()),
-        }
+        exec_gui(command)
     } else {
         let status = command.status()?;
         exit(status.code().unwrap_or(1));
+    }
+}
+
+fn exec_gui(mut command: Command) -> Result<()> {
+    let mut child = command.spawn()?;
+    match child.try_wait() {
+        Ok(Some(status)) => exit(status.code().unwrap_or(1)),
+        Ok(None) => Ok(()), // The child is still running
+        Err(e) => Err(e.into()),
     }
 }

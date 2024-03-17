@@ -186,7 +186,6 @@ pub fn pip_external() -> bool {
     env!("PYAPP_PIP_EXTERNAL") == "1"
 }
 
-#[cfg(windows)]
 pub fn app_is_gui() -> bool {
     env!("PYAPP_IS_GUI") == "1"
 }
