@@ -627,13 +627,6 @@ fn set_python_path(distribution_source: &str) {
     } else {
         set_runtime_variable(installation_variable, "bin/python3");
     };
-
-    let variable_is_gui = "PYAPP_IS_GUI";
-    if is_enabled(variable_is_gui) {
-        set_runtime_variable(variable_is_gui, "1");
-    } else {
-        set_runtime_variable(variable_is_gui, "0");
-    }
 }
 
 fn set_site_packages_path(distribution_source: &str) {
@@ -805,6 +798,15 @@ fn set_execution_mode() {
     }
 }
 
+fn set_is_gui() {
+    let variable = "PYAPP_IS_GUI";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
 fn set_isolation_mode() {
     let variable = "PYAPP_FULL_ISOLATION";
     if is_enabled(variable) {
@@ -938,6 +940,7 @@ fn main() {
     set_project();
     set_distribution();
     set_execution_mode();
+    set_is_gui();
     set_isolation_mode();
     set_upgrade_virtualenv();
     set_pip_external();
