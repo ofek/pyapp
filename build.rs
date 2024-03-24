@@ -798,6 +798,15 @@ fn set_execution_mode() {
     }
 }
 
+fn set_is_gui() {
+    let variable = "PYAPP_IS_GUI";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
 fn set_isolation_mode() {
     let variable = "PYAPP_FULL_ISOLATION";
     if is_enabled(variable) {
@@ -931,6 +940,7 @@ fn main() {
     set_project();
     set_distribution();
     set_execution_mode();
+    set_is_gui();
     set_isolation_mode();
     set_upgrade_virtualenv();
     set_pip_external();

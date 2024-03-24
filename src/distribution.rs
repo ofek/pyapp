@@ -19,6 +19,13 @@ pub fn python_command(python: &PathBuf) -> Command {
 pub fn run_project() -> Result<()> {
     let mut command = python_command(&app::python_path());
 
+    #[cfg(windows)]
+    {
+        if app::is_gui() {
+            command = python_command(&app::pythonw_path());
+        }
+    }
+
     if !app::exec_code().is_empty() {
         command.args(["-c", app::exec_code().as_str()]);
     } else if !app::exec_module().is_empty() {

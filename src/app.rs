@@ -74,6 +74,12 @@ fn installation_python_path() -> String {
     env!("PYAPP__INSTALLATION_PYTHON_PATH").into()
 }
 
+#[cfg(windows)]
+fn installation_pythonw_path() -> String {
+    let python_path: String = env!("PYAPP__INSTALLATION_PYTHON_PATH").into();
+    python_path.replace("python.exe", "pythonw.exe")
+}
+
 fn installation_site_packages_path() -> String {
     env!("PYAPP__INSTALLATION_SITE_PACKAGES_PATH").into()
 }
@@ -180,6 +186,10 @@ pub fn pip_external() -> bool {
     env!("PYAPP_PIP_EXTERNAL") == "1"
 }
 
+pub fn is_gui() -> bool {
+    env!("PYAPP_IS_GUI") == "1"
+}
+
 pub fn full_isolation() -> bool {
     env!("PYAPP_FULL_ISOLATION") == "1"
 }
@@ -202,6 +212,11 @@ pub fn metadata_template() -> String {
 
 pub fn python_path() -> PathBuf {
     install_dir().join(installation_python_path())
+}
+
+#[cfg(windows)]
+pub fn pythonw_path() -> PathBuf {
+    install_dir().join(installation_pythonw_path())
 }
 
 pub fn site_packages_path() -> PathBuf {

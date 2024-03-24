@@ -51,6 +51,19 @@ The following options are mutually exclusive:
 
 If none are set then the `PYAPP_EXEC_MODULE` option will default to the value of `PYAPP_PROJECT_NAME` with hyphens replaced by underscores.
 
+### GUI
+
+If you are packaging a graphical user interface (GUI), you can set  `PYAPP_IS_GUI` to `true` or `1`.
+
+On Windows, this will use `pythonw.exe` instead of `python.exe` to execute [the application](https://docs.python.org/3/using/windows.html#python-application), which avoids a console window from appearing. Running a GUI application with `pythonw.exe` means that all `stdout` and `stderr` output from your GUI will be discarded.
+
+Otherwise, the application will execute as usual. PyApp will run your GUI by spawning a new process, such that the console window that runs the application terminates after successful spawning.
+
+Even when `PYAPP_IS_GUI` is enabled you can still run the application from the command line. Furthermore, PyApp-specific logic (e.g. installation and setup) will still display a console window with status messages.
+
+!!! note
+    On macOS, the console by default does not automatically close when processes have terminated (however it can be closed manually without interferring with the GUI). The default console behavior [can be changed](https://stackoverflow.com/questions/5560167/osx-how-to-auto-close-terminal-window-after-the-exit-command-executed) in the user settings to close after the last process terminates successfully.
+
 ## Python distribution
 
 ### Known
