@@ -31,7 +31,7 @@ pub fn wait_for(mut command: Command, message: String) -> Result<(ExitStatus, St
 
 #[cfg(unix)]
 pub fn exec(mut command: Command) -> Result<()> {
-    if app::app_is_gui() {
+    if app::is_gui() {
         exec_gui(command)
     } else {
         Err(command.exec().into())
