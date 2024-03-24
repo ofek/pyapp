@@ -21,7 +21,7 @@ pub fn run_project() -> Result<()> {
 
     #[cfg(windows)]
     {
-        if app::app_is_gui() {
+        if app::is_gui() {
             command = python_command(&app::pythonw_path());
         }
     }

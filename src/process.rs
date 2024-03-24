@@ -1,7 +1,6 @@
 use std::io::Read;
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
-// #[cfg(windows)]
 use std::process::exit;
 use std::process::{Command, ExitStatus};
 
@@ -41,7 +40,7 @@ pub fn exec(mut command: Command) -> Result<()> {
 
 #[cfg(windows)]
 pub fn exec(mut command: Command) -> Result<()> {
-    if app::app_is_gui() {
+    if app::is_gui() {
         exec_gui(command)
     } else {
         let status = command.status()?;
