@@ -9,7 +9,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.71"
-base64 = "0.21.2"
+base64 = "0.22.0"
 bzip2 = "0.4.4"
 clap = { version = "4.2.5", features = ["derive"] }
 directories = "5.0.0"
@@ -24,7 +24,7 @@ zip = { version = "0.6.4", features = ["deflate"] }
 zstd = "0.13.0"
 
 [build-dependencies]
-base64 = "0.21.2"
+base64 = "0.22.0"
 flate2 = "1.0.26"
 highway = "1.0.0"
 rand = "0.8.5"
