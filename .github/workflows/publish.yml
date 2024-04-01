@@ -32,7 +32,7 @@ jobs:
         git archive --prefix pyapp-${{ github.ref_name }}/ -o source.zip HEAD
 
     - name: Add source archives to current release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: |-
           source.tar.gz
