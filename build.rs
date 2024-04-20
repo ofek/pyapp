@@ -309,13 +309,12 @@ fn get_distribution_source() -> String {
     let selected_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
     let selected_variant = {
         let mut variant = env::var("PYAPP_DISTRIBUTION_VARIANT").unwrap_or_default();
-        if variant.is_empty() {
-            if selected_platform == "linux"
-                && selected_arch == "x86_64"
-                && selected_python_version != "3.7"
-            {
-                variant = "v3".to_string();
-            }
+        if variant.is_empty()
+            && selected_platform == "linux"
+            && selected_arch == "x86_64"
+            && selected_python_version != "3.7"
+        {
+            variant = "v3".to_string();
         };
         variant
     };
@@ -852,6 +851,47 @@ fn set_pip_allow_config() {
     }
 }
 
+fn set_uv_enabled() {
+    let variable = "PYAPP_UV_ENABLED";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
+fn set_uv_only_bootstrap() {
+    let variable = "PYAPP_UV_ONLY_BOOTSTRAP";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
+    } else {
+        set_runtime_variable(variable, "0");
+    }
+}
+
+fn set_uv_version() {
+    let variable = "PYAPP_UV_VERSION";
+    let version = env::var(variable).unwrap_or("any".to_string());
+    set_runtime_variable(variable, version);
+
+    let artifact_name = if !is_enabled("PYAPP_UV_ENABLED") {
+        "".to_string()
+    } else if env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
+        // Force MinGW-w64 to use msvc
+        if env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default() == "gnu" {
+            format!(
+                "uv-{}-pc-windows-msvc.zip",
+                env::var("CARGO_CFG_TARGET_ARCH").unwrap()
+            )
+        } else {
+            format!("uv-{}.zip", env::var("TARGET").unwrap())
+        }
+    } else {
+        format!("uv-{}.tar.gz", env::var("TARGET").unwrap())
+    };
+    set_runtime_variable("PYAPP__UV_ARTIFACT_NAME", artifact_name);
+}
+
 fn set_skip_install() {
     let variable = "PYAPP_SKIP_INSTALL";
     if is_enabled(variable) {
@@ -942,6 +982,9 @@ fn main() {
     set_pip_project_features();
     set_pip_extra_args();
     set_pip_allow_config();
+    set_uv_enabled();
+    set_uv_only_bootstrap();
+    set_uv_version();
     set_skip_install();
     set_indicator();
     set_self_command();

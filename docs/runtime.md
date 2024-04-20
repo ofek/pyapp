@@ -21,8 +21,17 @@ flowchart TD
     DISTEMBEDDED -- Yes --> DISTEXTRACT[[Cache from embedded data]]
     DISTSOURCE --> FULLISOLATION
     DISTEXTRACT --> FULLISOLATION
-    FULLISOLATION -- No --> VENV[[Create virtual environment]]
+    FULLISOLATION -- No --> UVENABLED([UV enabled])
+    UVENABLED -- No --> VENV[[Create virtual environment]]
+    UVENABLED -- Yes --> UVCACHED([UV cached])
+    UVCACHED -- No --> DOWNLOADUV[[Download UV]]
+    UVCACHED -- Yes --> VENV
+    DOWNLOADUV --> VENV
     FULLISOLATION -- Yes --> UNPACK[[Unpack distribution directly]]
+    UNPACK --> UVENABLEDUNPACK([UV enabled])
+    UVENABLEDUNPACK -- No --> EXTERNALPIP[[External pip]]
+    UVENABLEDUNPACK -- Yes --> UVCACHEDUNPACK([UV cached])
+    UVCACHEDUNPACK -- No --> DOWNLOADUVUNPACK[[Download UV]]
     EXTERNALPIP([External pip]) -- No --> PROJEMBEDDED([Project embedded])
     EXTERNALPIP -- Yes --> PIPCACHED([pip cached])
     PIPCACHED -- No --> DOWNLOADPIP[[Download pip]]
@@ -32,17 +41,20 @@ flowchart TD
     PROJEMBEDDED -- Yes --> PROJEMBED[[Install from embedded data]]
     DEPFILE -- No --> SINGLEPROJECT[[Install single project]]
     DEPFILE -- Yes --> DEPFILEINSTALL[[Install from dependency file]]
+    UVCACHEDUNPACK -- Yes --> PROJEMBEDDED
+    DOWNLOADUVUNPACK --> PROJEMBEDDED
+    VENV --> EXTERNALPIP
     SINGLEPROJECT --> MNG
     DEPFILEINSTALL --> MNG
     PROJEMBED --> MNG
-    VENV --> EXTERNALPIP
-    UNPACK --> EXTERNALPIP
     MNG -- No --> EXECUTE[[Execute project]]
     MNG -- Yes --> MNGCMD([Command invoked])
     MNGCMD -- No --> EXECUTE
     MNGCMD -- Yes --> MANAGE[[Run management command]]
     click DISTEMBEDDED href "../config/#distribution-embedding"
     click FULLISOLATION href "../config/#full-isolation"
+    click UVENABLED href "../config/#uv"
+    click UVENABLEDUNPACK href "../config/#uv"
     click EXTERNALPIP href "../config/#externally-managed"
     click PROJEMBEDDED href "../config/#project-embedding"
     click DEPFILE href "../config/#dependency-file"
