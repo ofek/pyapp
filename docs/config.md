@@ -88,7 +88,6 @@ Some distributions have [variants](https://gregoryszorc.com/docs/python-build-st
 | Platform | Options |
 | --- | --- |
 | Linux | <ul><li><code>v1</code></li><li><code>v2</code></li><li><code>v3</code> (default)</li><li><code>v4</code></li></ul> |
-| Windows | <ul><li><code>shared</code> (default)</li><li><code>static</code></li></ul> |
 
 #### PyPy
 

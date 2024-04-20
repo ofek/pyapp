@@ -1,3 +1,8 @@
+# /// script
+# dependencies = [
+#   "httpx",
+# ]
+# ///
 import os
 from collections import defaultdict
 from pathlib import Path
@@ -68,11 +73,9 @@ def main():
         if 'windows' in platform:
             os_name = 'windows'
 
-            platform, _, variant = platform.rpartition('-')
-            if variant not in ('shared', 'static'):
-                raise ValueError(f'unknown Windows variant: {variant}')
-
             _, _, abi = platform.rpartition('-')
+            if abi in ('shared', 'static'):
+                continue
         elif 'apple' in platform:
             os_name = 'macos'
         elif 'linux' in platform:
