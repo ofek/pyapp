@@ -23,10 +23,6 @@ tempfile = "3.5.0"
 zip = { version = "0.6.4", features = ["deflate"] }
 zstd = "0.13.0"
 
-# https://github.com/rust-lang/cc-rs/blob/1.0.95/Cargo.toml#L23
-# https://github.com/rust-lang/jobserver-rs/pull/88
-cc = "=1.0.94"
-
 [build-dependencies]
 base64 = "0.22.0"
 flate2 = "1.0.26"
