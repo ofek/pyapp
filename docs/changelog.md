@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Update default distributions to 20240415
+
 ## 0.16.0 - 2024-03-24
 
 ***Added:***
