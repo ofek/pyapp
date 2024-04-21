@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Fixed:***
+
+- Fix resolution for legacy 3.7 builds
+
 ## 0.17.0 - 2024-04-21
 
 ***Added:***
