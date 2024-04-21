@@ -26,7 +26,7 @@ In order to [build](build.md) applications with PyApp, you must first download t
 
 ## Configuration
 
-You must [configure](config.md) the binaries PyApp produces with environment variables. There are [many ways](examples.md) to configure applications but here we will define a single package to install from PyPI at a specific version:
+You must [configure](config/project.md) the binaries PyApp produces with environment variables. There are [many ways](examples.md) to configure applications but here we will define a single package to install from PyPI at a specific version:
 
 | Option | Value |
 | --- | --- |
