@@ -51,42 +51,38 @@ flowchart TD
     MNG -- Yes --> MNGCMD([Command invoked])
     MNGCMD -- No --> EXECUTE
     MNGCMD -- Yes --> MANAGE[[Run management command]]
-    click DISTEMBEDDED href "../config/#distribution-embedding"
-    click FULLISOLATION href "../config/#full-isolation"
-    click UVENABLED href "../config/#uv"
-    click UVENABLEDUNPACK href "../config/#uv"
-    click EXTERNALPIP href "../config/#externally-managed"
-    click PROJEMBEDDED href "../config/#project-embedding"
-    click DEPFILE href "../config/#dependency-file"
-    click SINGLEPROJECT href "../config/#package-index"
-    click DEPFILEINSTALL href "../config/#dependency-file"
-    click PROJEMBED href "../config/#project-embedding"
-    click MNG href "../config/#management-command"
-    click MNGCMD href "../config/#management-command"
+    click DISTEMBEDDED href "../config/distribution/#embedding"
+    click FULLISOLATION href "../config/distribution/#full-isolation"
+    click UVENABLED href "../config/installation/#uv"
+    click UVENABLEDUNPACK href "../config/installation/#uv"
+    click EXTERNALPIP href "../config/installation/#externally-managed"
+    click PROJEMBEDDED href "../config/project/#embedding"
+    click DEPFILE href "../config/project/#dependency-file"
+    click SINGLEPROJECT href "../config/project/#identifier"
+    click DEPFILEINSTALL href "../config/project/#dependency-file"
+    click PROJEMBED href "../config/project/#embedding"
+    click MNG href "../config/cli/#management-command"
+    click MNGCMD href "../config/cli/#management-command"
     click MANAGE href "#commands"
-    click EXECUTE href "../config/#execution-mode"
+    click EXECUTE href "../config/project/#execution-mode"
 ```
 
 ## Execution
 
-Projects are [executed](config.md#execution-mode) using [`execvp`](https://linux.die.net/man/3/execvp) on non-Windows systems, replacing the process.
+Projects are [executed](config/project.md#execution-mode) using [`execvp`](https://linux.die.net/man/3/execvp) on non-Windows systems, replacing the process.
 
 To provide consistent behavior on each user's machine:
 
 - Python runs projects in [isolated mode](https://docs.python.org/3/using/cmdline.html#cmdoption-I)
-- When installing or upgrading projects, [pip](https://github.com/pypa/pip) uses [isolation](https://pip.pypa.io/en/stable/cli/pip/#cmdoption-isolated) ([by default](config.md#allowing-configuration))
+- When installing or upgrading projects, [pip](https://github.com/pypa/pip) uses [isolation](https://pip.pypa.io/en/stable/cli/pip/#cmdoption-isolated) ([by default](config/installation.md#allowing-configuration))
 
 ## Detection
 
-A single environment variable called `PYAPP` is injected with the value of `1` ([by default](config.md#installation-indicator)) when running applications and may be used to detect this mode of installation versus others.
-
-## Location
-
-The default location of your application's installation differs based on the operating system and can be overridden at runtime with the `PYAPP_INSTALL_DIR_<PROJECT_NAME>` environment variable where `<PROJECT_NAME>` is the uppercased version of the [project name](config.md#project).
+A single environment variable called `PYAPP` is injected with the value of `1` ([by default](config/cli.md#installation-indicator)) when running applications and may be used to detect this mode of installation versus others.
 
 ## Commands
 
-Built applications have a single top-level command group named `self` ([by default](config.md#management-command)) and all other invocations will be forwarded to your actual [execution logic](config.md#execution-mode).
+Built applications have a single top-level command group named `self` ([by default](config/cli.md#management-command)) and all other invocations will be forwarded to your actual [execution logic](config/project.md#execution-mode).
 
 ### Default
 
@@ -118,7 +114,7 @@ These commands are hidden by default and each can be individually exposed by set
 <EXE> self metadata
 ```
 
-This displays [customized](config.md#metadata-template) output based on a template.
+This displays [customized](config/cli.md#metadata-template) output based on a template.
 
 #### pip
 

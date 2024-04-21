@@ -2,7 +2,7 @@
 
 -----
 
-Before building your application, you must configure your [project](config.md#project) at the very least.
+Before building your application, you must configure your [project](config/project.md) at the very least.
 
 After you have done that, your application can be built using a [local copy](#local-repository) of this repository or via [installation](#installation) with Cargo.
 
@@ -49,4 +49,4 @@ Specific versions may be chosen with the `--version` flag.
 
 Configuration for [cross](https://github.com/cross-rs/cross) is validated by CI to ensure all known environment variable options are passed through to the containers.
 
-When embedding the [project](config.md#project-embedding) or the [distribution](config.md#distribution-embedding) using a local path, you must use the [local repository](#local-repository) way of building and ensure that the configured files to embed reside within the repository and the options refer to relative paths.
+When embedding the [project](config/project.md#embedding) or the [distribution](config/distribution.md#embedding) using a local path, you must use the [local repository](#local-repository) way of building and ensure that the configured files to embed reside within the repository and the options refer to relative paths.

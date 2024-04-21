@@ -26,7 +26,7 @@ The following examples do not illustrate every possible combination of options b
 | `PYAPP_PROJECT_DEPENDENCY_FILE` | `./requirements.txt` |
 
 !!! note
-    The [default execution](config.md#execution-mode) will be `python -m proj` at runtime.
+    The [default execution](config/project.md#execution-mode) will be `python -m proj` at runtime.
 
 ## Dependency file with script
 

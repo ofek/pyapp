@@ -2,14 +2,15 @@
 detached = true
 dependencies = [
   "mkdocs~=1.5.3",
-  "mkdocs-material~=9.5.1",
+  "mkdocs-material~=9.5.18",
   # Plugins
-  "mkdocs-minify-plugin~=0.7.1",
-  "mkdocs-git-revision-date-localized-plugin~=1.2.1",
-  "mkdocs-glightbox~=0.3.5",
+  "mkdocs-minify-plugin~=0.8.0",
+  "mkdocs-git-revision-date-localized-plugin~=1.2.4",
+  "mkdocs-glightbox~=0.3.7",
+  "mkdocs-redirects~=1.2.1",
   "mike~=2.0.0",
   # Extensions
-  "pymdown-extensions~=10.5.0",
+  "pymdown-extensions~=10.8.0",
   # Necessary for syntax highlighting in code blocks
   "pygments~=2.17.2",
   # Validation

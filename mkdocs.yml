@@ -47,9 +47,13 @@ nav:
   - About: index.md
   - How-to: how-to.md
   - Building: build.md
-  - Configuration: config.md
   - Runtime behavior: runtime.md
   - Examples: examples.md
+  - Configuration:
+    - Project: config/project.md
+    - Python distribution: config/distribution.md
+    - Installation: config/installation.md
+    - CLI: config/cli.md
   - Meta:
     - Users: users.md
     - Changelog: changelog.md
@@ -64,6 +68,9 @@ plugins:
   git-revision-date-localized:
     strict: false
     type: date
+  redirects:
+    redirect_maps:
+      config.md: config/project.md
   # social:
   #   enabled: !ENV [MKDOCS_IMAGE_PROCESSING, false]
 
