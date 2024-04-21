@@ -9,9 +9,35 @@ use tempfile::tempdir;
 
 use crate::{app, compression, fs_utils, network, process};
 
+fn apply_env_vars(command: &mut Command) {
+    if !app::full_isolation() {
+        command.env("VIRTUAL_ENV", app::python_path().parent().unwrap());
+    }
+
+    if !app::pass_location() {
+        command.env("PYAPP", "1");
+    } else if let Ok(exe_path) = env::current_exe() {
+        command.env("PYAPP", exe_path);
+    } else {
+        command.env("PYAPP", "");
+    }
+
+    if !app::exposed_command().is_empty() {
+        command.env("PYAPP_COMMAND_NAME", app::exposed_command());
+    }
+}
+
 pub fn python_command(python: &PathBuf) -> Command {
     let mut command = Command::new(python);
+    apply_env_vars(&mut command);
     command.arg(app::python_isolation_flag());
+
+    command
+}
+
+fn uv_command() -> Command {
+    let mut command = Command::new(app::managed_uv());
+    apply_env_vars(&mut command);
 
     command
 }
@@ -26,6 +52,7 @@ pub fn run_project() -> Result<()> {
         }
     }
 
+    apply_env_vars(&mut command);
     if !app::exec_code().is_empty() {
         command.args(["-c", app::exec_code().as_str()]);
     } else if !app::exec_module().is_empty() {
@@ -69,18 +96,6 @@ pub fn run_project() -> Result<()> {
     }
     command.args(env::args().skip(1));
 
-    if !app::pass_location() {
-        command.env("PYAPP", "1");
-    } else if let Ok(exe_path) = env::current_exe() {
-        command.env("PYAPP", exe_path);
-    } else {
-        command.env("PYAPP", "");
-    }
-
-    if !app::exposed_command().is_empty() {
-        command.env("PYAPP_COMMAND_NAME", app::exposed_command());
-    }
-
     process::exec(command)
         .with_context(|| "project execution failed, consider restoring from scratch")
 }
@@ -98,27 +113,45 @@ pub fn ensure_ready() -> Result<()> {
 }
 
 pub fn pip_base_command() -> Command {
-    let mut command = python_command(&app::python_path());
-    if app::pip_external() {
-        let external_pip = app::external_pip_zipapp();
-        command.arg(external_pip.to_string_lossy().as_ref());
+    if app::uv_as_installer() {
+        let mut command = uv_command();
+        command.arg("pip");
+        command
     } else {
-        command.args(["-m", "pip"]);
+        let mut command = python_command(&app::python_path());
+        if app::pip_external() {
+            let external_pip = app::external_pip_zipapp();
+            command.arg(external_pip.to_string_lossy().as_ref());
+        } else {
+            command.args(["-m", "pip"]);
+        }
+        command
     }
-
-    command
 }
 
 pub fn pip_install_command() -> Command {
     let mut command = pip_base_command();
 
-    command.args([
-        "install",
-        "--disable-pip-version-check",
-        "--no-warn-script-location",
-    ]);
-    if !app::pip_allow_config() {
-        command.arg("--isolated");
+    if app::uv_as_installer() {
+        command.arg("install");
+        if app::full_isolation() {
+            command.args([
+                "--python",
+                app::install_dir()
+                    .join(app::distribution_python_path())
+                    .to_string_lossy()
+                    .as_ref(),
+            ]);
+        }
+    } else {
+        command.args([
+            "install",
+            "--disable-pip-version-check",
+            "--no-warn-script-location",
+        ]);
+        if !app::pip_allow_config() {
+            command.arg("--isolated");
+        }
     }
     command.args(
         app::pip_extra_args()
@@ -203,38 +236,50 @@ pub fn materialize() -> Result<()> {
             })?;
         }
 
-        let mut command =
-            python_command(&unpacked_distribution.join(app::distribution_python_path()));
-
-        if app::upgrade_virtualenv() {
-            ensure_base_pip(&unpacked_distribution)?;
-
-            let mut upgrade_command =
-                python_command(&unpacked_distribution.join(app::distribution_python_path()));
-            upgrade_command.args([
-                "-m",
-                "pip",
-                "install",
-                "--upgrade",
-                "--isolated",
-                "--disable-pip-version-check",
-                "--no-warn-script-location",
-                "virtualenv",
-            ]);
-            let (status, output) =
-                run_setup_command(upgrade_command, "Upgrading virtualenv".to_string())?;
-            check_setup_status(status, output)?;
-
-            command.args(["-m", "virtualenv"]);
-            if app::pip_external() {
-                command.arg("--no-pip");
+        let python_path = unpacked_distribution.join(app::distribution_python_path());
+        let mut command = if app::uv_enabled() {
+            ensure_uv_available()?;
+            let mut command = uv_command();
+            command.args(["venv", "--python", &python_path.to_string_lossy().as_ref()]);
+            if app::uv_only_bootstrap() {
+                command.arg("--seed");
             }
+
+            command
         } else {
-            command.args(["-m", "venv"]);
-            if app::pip_external() {
-                command.arg("--without-pip");
+            let mut command = python_command(&python_path);
+            if app::upgrade_virtualenv() {
+                ensure_base_pip(&unpacked_distribution)?;
+
+                let mut upgrade_command =
+                    python_command(&unpacked_distribution.join(app::distribution_python_path()));
+                upgrade_command.args([
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    "--isolated",
+                    "--disable-pip-version-check",
+                    "--no-warn-script-location",
+                    "virtualenv",
+                ]);
+                let (status, output) =
+                    run_setup_command(upgrade_command, "Upgrading virtualenv".to_string())?;
+                check_setup_status(status, output)?;
+
+                command.args(["-m", "virtualenv"]);
+                if app::pip_external() {
+                    command.arg("--no-pip");
+                }
+            } else {
+                command.args(["-m", "venv"]);
+                if app::pip_external() {
+                    command.arg("--without-pip");
+                }
             }
-        }
+
+            command
+        };
 
         command.arg(app::install_dir().to_string_lossy().as_ref());
         let (status, output) =
@@ -301,7 +346,7 @@ fn install_project() -> Result<()> {
 }
 
 pub fn pip_install(command: Command, wait_message: String) -> Result<(ExitStatus, String)> {
-    ensure_external_pip()?;
+    ensure_installer_available()?;
     run_setup_command(command, wait_message)
 }
 
@@ -325,12 +370,12 @@ pub fn pip_install_dependency_file(
 
     command.args(["-r", temp_path.to_string_lossy().as_ref()]);
 
-    ensure_external_pip()?;
+    ensure_installer_available()?;
     run_setup_command(command, wait_message)
 }
 
 fn ensure_base_pip(distribution_directory: &Path) -> Result<()> {
-    if app::distribution_pip_available() {
+    if app::distribution_pip_available() || app::uv_enabled() {
         return Ok(());
     }
 
@@ -341,54 +386,101 @@ fn ensure_base_pip(distribution_directory: &Path) -> Result<()> {
     Ok(())
 }
 
-fn ensure_external_pip() -> Result<()> {
-    if !app::pip_external() {
+fn ensure_installer_available() -> Result<()> {
+    if app::uv_as_installer() {
+        ensure_uv_available()?;
+    } else if app::pip_external() {
+        let external_pip = app::external_pip_zipapp();
+        if external_pip.is_file() {
+            return Ok(());
+        }
+
+        let external_pip_cache = app::external_pip_cache();
+        fs::create_dir_all(&external_pip_cache).with_context(|| {
+            format!(
+                "unable to create distribution cache {}",
+                &external_pip_cache.display()
+            )
+        })?;
+
+        let dir = tempdir().with_context(|| "unable to create temporary directory")?;
+        let temp_path = dir.path().join("pip.pyz");
+
+        let mut f = fs::File::create(&temp_path).with_context(|| {
+            format!("unable to create temporary file: {}", &temp_path.display())
+        })?;
+
+        let pip_version = app::pip_version();
+        let url = if pip_version == "latest" {
+            "https://bootstrap.pypa.io/pip/pip.pyz".to_string()
+        } else {
+            format!(
+                "https://bootstrap.pypa.io/pip/pip.pyz#/pip-{}.pyz",
+                app::pip_version()
+            )
+        };
+
+        network::download(
+            &url,
+            &mut f,
+            external_pip.file_name().unwrap().to_str().unwrap(),
+        )?;
+
+        fs_utils::move_temp_file(&temp_path, &external_pip)?;
+    }
+
+    Ok(())
+}
+
+fn ensure_uv_available() -> Result<()> {
+    let managed_uv = app::managed_uv();
+    if managed_uv.is_file() {
         return Ok(());
     }
 
-    let external_pip = app::external_pip_zipapp();
-    if external_pip.is_file() {
-        return Ok(());
-    }
-
-    let external_pip_cache = app::external_pip_cache();
-    fs::create_dir_all(&external_pip_cache).with_context(|| {
-        format!(
-            "unable to create distribution cache {}",
-            &external_pip_cache.display()
-        )
-    })?;
+    let managed_uv_cache = app::managed_uv_cache();
+    fs::create_dir_all(&managed_uv_cache)
+        .with_context(|| format!("unable to create UV cache {}", &managed_uv_cache.display()))?;
 
     let dir = tempdir().with_context(|| "unable to create temporary directory")?;
-    let temp_path = dir.path().join("pip.pyz");
+    let artifact_name = app::uv_artifact_name();
+    let temp_path = dir.path().join(&artifact_name);
 
     let mut f = fs::File::create(&temp_path)
         .with_context(|| format!("unable to create temporary file: {}", &temp_path.display()))?;
 
-    let pip_version = app::pip_version();
-    let url = if pip_version == "latest" {
-        "https://bootstrap.pypa.io/pip/pip.pyz".to_string()
+    let uv_version = app::uv_version();
+    let url = if uv_version == "any" {
+        format!(
+            "https://github.com/astral-sh/uv/releases/latest/download/{}",
+            &artifact_name,
+        )
     } else {
         format!(
-            "https://bootstrap.pypa.io/pip/pip.pyz#/pip-{}.pyz",
-            app::pip_version()
+            "https://github.com/astral-sh/uv/releases/download/{}/{}",
+            &uv_version, &artifact_name,
         )
     };
 
     network::download(
         &url,
         &mut f,
-        external_pip.file_name().unwrap().to_str().unwrap(),
+        managed_uv.file_name().unwrap().to_str().unwrap(),
     )?;
 
-    fs_utils::move_temp_file(&temp_path, &external_pip)
+    if artifact_name.ends_with(".zip") {
+        compression::unpack_zip(&temp_path, &managed_uv_cache, "Unpacking UV".to_string())
+    } else {
+        compression::unpack_tar_gzip(&temp_path, &managed_uv_cache, "Unpacking UV".to_string())
+    }
 }
 
 fn run_setup_command(command: Command, message: String) -> Result<(ExitStatus, String)> {
+    let program = command.get_program().to_string_lossy().to_string();
     let (status, output) = process::wait_for(command, message).with_context(|| {
         format!(
-            "could not run Python, verify distribution build metadata options: {}",
-            app::python_path().display()
+            "could not run program, verify distribution build metadata options: {}",
+            &program
         )
     })?;
 

@@ -6,22 +6,23 @@ use anyhow::{bail, Result};
 use crate::terminal;
 
 pub fn unpack(format: String, archive: &PathBuf, destination: &PathBuf) -> Result<()> {
+    let wait_message = format!("Unpacking distribution ({})", format);
     match format.as_ref() {
-        "tar|bzip2" => unpack_tar_bzip2(archive, destination)?,
-        "tar|gzip" => unpack_tar_gzip(archive, destination)?,
-        "tar|zstd" => unpack_tar_zstd(archive, destination)?,
-        "zip" => unpack_zip(archive, destination)?,
+        "tar|bzip2" => unpack_tar_bzip2(archive, destination, wait_message)?,
+        "tar|gzip" => unpack_tar_gzip(archive, destination, wait_message)?,
+        "tar|zstd" => unpack_tar_zstd(archive, destination, wait_message)?,
+        "zip" => unpack_zip(archive, destination, wait_message)?,
         _ => bail!("unsupported distribution format: {}", format),
     }
 
     Ok(())
 }
 
-fn unpack_tar_bzip2(path: &PathBuf, destination: &PathBuf) -> Result<()> {
+fn unpack_tar_bzip2(path: &PathBuf, destination: &PathBuf, wait_message: String) -> Result<()> {
     let bz = bzip2::read::BzDecoder::new(File::open(path)?);
     let mut archive = tar::Archive::new(bz);
 
-    let spinner = terminal::spinner("Unpacking distribution (tar|bzip2)".to_string());
+    let spinner = terminal::spinner(wait_message);
     let result = archive.unpack(destination);
     spinner.finish_and_clear();
     result?;
@@ -29,11 +30,11 @@ fn unpack_tar_bzip2(path: &PathBuf, destination: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-fn unpack_tar_gzip(path: &PathBuf, destination: &PathBuf) -> Result<()> {
+pub fn unpack_tar_gzip(path: &PathBuf, destination: &PathBuf, wait_message: String) -> Result<()> {
     let gz = flate2::read::GzDecoder::new(File::open(path)?);
     let mut archive = tar::Archive::new(gz);
 
-    let spinner = terminal::spinner("Unpacking distribution (tar|gzip)".to_string());
+    let spinner = terminal::spinner(wait_message);
     let result = archive.unpack(destination);
     spinner.finish_and_clear();
     result?;
@@ -41,11 +42,11 @@ fn unpack_tar_gzip(path: &PathBuf, destination: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-fn unpack_tar_zstd(path: &PathBuf, destination: &PathBuf) -> Result<()> {
+fn unpack_tar_zstd(path: &PathBuf, destination: &PathBuf, wait_message: String) -> Result<()> {
     let zst = zstd::stream::read::Decoder::new(File::open(path)?)?;
     let mut archive = tar::Archive::new(zst);
 
-    let spinner = terminal::spinner("Unpacking distribution (tar|zstd)".to_string());
+    let spinner = terminal::spinner(wait_message);
     let result = archive.unpack(destination);
     spinner.finish_and_clear();
     result?;
@@ -53,10 +54,10 @@ fn unpack_tar_zstd(path: &PathBuf, destination: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-fn unpack_zip(path: &PathBuf, destination: &PathBuf) -> Result<()> {
+pub fn unpack_zip(path: &PathBuf, destination: &PathBuf, wait_message: String) -> Result<()> {
     let mut archive = zip::ZipArchive::new(File::open(path)?)?;
 
-    let spinner = terminal::spinner("Unpacking distribution (zip)".to_string());
+    let spinner = terminal::spinner(wait_message);
     let result = archive.extract(destination);
     spinner.finish_and_clear();
     result?;

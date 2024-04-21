@@ -134,6 +134,20 @@ You may set the `PYAPP_DISTRIBUTION_EMBED` option to `true` or `1` to embed the 
 
 You can set the `PYAPP_DISTRIBUTION_PATH` option to use a local path rather than fetching the source, which implicitly enables embedding. The local archive should be similar to the [default distributions](#python-distribution) in that there should be a Python interpreter ready for use.
 
+## UV
+
+You may set the `PYAPP_UV_ENABLED` option to `true` or `1` to use [UV](https://github.com/astral-sh/uv) for virtual environment creation and project installation.
+
+### Version ### {: #uv-version }
+
+You may use a specific `X.Y.Z` version by setting the `PYAPP_UV_VERSION` option.
+
+By default, a version of UV that has already been downloaded by a PyApp application is used. If UV has not yet been downloaded then the latest version is used.
+
+### Only bootstrap
+
+You may set the `PYAPP_UV_ONLY_BOOTSTRAP` option to `true` or `1` to only use UV for virtual environment creation and continue using pip for project installation.
+
 ## pip
 
 These options have no effect when the project installation is [disabled](#skipping-project-installation).

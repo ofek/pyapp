@@ -186,6 +186,26 @@ pub fn pip_external() -> bool {
     env!("PYAPP_PIP_EXTERNAL") == "1"
 }
 
+pub fn uv_enabled() -> bool {
+    env!("PYAPP_UV_ENABLED") == "1"
+}
+
+pub fn uv_only_bootstrap() -> bool {
+    env!("PYAPP_UV_ONLY_BOOTSTRAP") == "1"
+}
+
+pub fn uv_version() -> String {
+    env!("PYAPP_UV_VERSION").into()
+}
+
+pub fn uv_artifact_name() -> String {
+    env!("PYAPP__UV_ARTIFACT_NAME").into()
+}
+
+pub fn uv_as_installer() -> bool {
+    uv_enabled() && !uv_only_bootstrap()
+}
+
 pub fn is_gui() -> bool {
     env!("PYAPP_IS_GUI") == "1"
 }
@@ -235,6 +255,10 @@ pub fn external_pip_cache() -> PathBuf {
     cache_dir().join("pip")
 }
 
+pub fn managed_uv_cache() -> PathBuf {
+    cache_dir().join("uv").join(uv_version())
+}
+
 pub fn external_pip_zipapp() -> PathBuf {
     let pip_version = pip_version();
     let filename = if pip_version == "latest" {
@@ -243,4 +267,14 @@ pub fn external_pip_zipapp() -> PathBuf {
         format!("pip-{}.pyz", pip_version)
     };
     external_pip_cache().join(filename)
+}
+
+pub fn managed_uv() -> PathBuf {
+    let uv_artifact_name = uv_artifact_name();
+    let filename = if uv_artifact_name.ends_with(".zip") {
+        "uv.exe".to_string()
+    } else {
+        "uv".to_string()
+    };
+    managed_uv_cache().join(filename)
 }
