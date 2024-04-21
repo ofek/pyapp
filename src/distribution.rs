@@ -9,9 +9,41 @@ use tempfile::tempdir;
 
 use crate::{app, compression, fs_utils, network, process};
 
+#[cfg(windows)]
+const PATH_SEPARATOR: char = ';';
+
+#[cfg(not(windows))]
+const PATH_SEPARATOR: char = ':';
+
 fn apply_env_vars(command: &mut Command) {
+    let python_path = app::python_path();
+    let python_dir = python_path.parent().unwrap();
+    let exe_paths = if app::full_isolation() && cfg!(windows) {
+        format!(
+            "{}{}{}",
+            python_dir.to_string_lossy(),
+            PATH_SEPARATOR,
+            python_dir.join("Scripts").to_string_lossy(),
+        )
+    } else {
+        format!("{}", python_dir.to_string_lossy())
+    };
+    match env::var_os("PATH") {
+        Some(path) => {
+            command.env(
+                "PATH",
+                format!("{}{}{}", exe_paths, PATH_SEPARATOR, path.to_string_lossy()),
+            );
+        }
+        None => {
+            command.env("PATH", exe_paths);
+        }
+    }
+
     if !app::full_isolation() {
-        command.env("VIRTUAL_ENV", app::python_path().parent().unwrap());
+        command.env("VIRTUAL_ENV", python_dir);
+    } else if app::uv_as_installer() {
+        command.env("UV_SYSTEM_PYTHON", "true");
     }
 
     if !app::pass_location() {
@@ -134,15 +166,6 @@ pub fn pip_install_command() -> Command {
 
     if app::uv_as_installer() {
         command.arg("install");
-        if app::full_isolation() {
-            command.args([
-                "--python",
-                app::install_dir()
-                    .join(app::distribution_python_path())
-                    .to_string_lossy()
-                    .as_ref(),
-            ]);
-        }
     } else {
         command.args([
             "install",
