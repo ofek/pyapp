@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Added:***
 
 - Update default distributions to 20240415
+- Support using UV for virtual environment creation and project installation
+
+***Fixed:***
+
+- The PATH environment variable is now updated to include the installation's directory of executables
 
 ## 0.16.0 - 2024-03-24
 
