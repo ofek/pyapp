@@ -8,14 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.17.0 - 2024-04-21
+
 ***Added:***
 
-- Update default distributions to 20240415
 - Support using UV for virtual environment creation and project installation
+- The PATH environment variable is now updated to include the installation's directory of executables
+- Update default distributions to 20240415
 
 ***Fixed:***
 
-- The PATH environment variable is now updated to include the installation's directory of executables
+- Dependencies are now locked
 
 ## 0.16.0 - 2024-03-24
 
