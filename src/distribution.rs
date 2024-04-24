@@ -1,7 +1,8 @@
 use std::env;
+use std::ffi::OsStr;
 use std::fs;
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::{exit, Command, ExitStatus};
 
 use anyhow::{bail, Context, Result};
@@ -41,7 +42,7 @@ fn apply_env_vars(command: &mut Command) {
     }
 
     if !app::full_isolation() {
-        command.env("VIRTUAL_ENV", python_dir);
+        command.env("VIRTUAL_ENV", python_dir.parent().unwrap());
     } else if app::uv_as_installer() {
         command.env("UV_SYSTEM_PYTHON", "true");
     }
@@ -59,7 +60,7 @@ fn apply_env_vars(command: &mut Command) {
     }
 }
 
-pub fn python_command(python: &PathBuf) -> Command {
+pub fn python_command(python: &impl AsRef<OsStr>) -> Command {
     let mut command = Command::new(python);
     apply_env_vars(&mut command);
     command.arg(app::python_isolation_flag());
@@ -485,17 +486,33 @@ fn ensure_uv_available() -> Result<()> {
         )
     };
 
-    network::download(
-        &url,
-        &mut f,
-        managed_uv.file_name().unwrap().to_str().unwrap(),
-    )?;
+    network::download(&url, &mut f, "UV")?;
 
     if artifact_name.ends_with(".zip") {
-        compression::unpack_zip(&temp_path, &managed_uv_cache, "Unpacking UV".to_string())
+        compression::unpack_zip(temp_path, dir.path(), "Unpacking UV".to_string())
     } else {
-        compression::unpack_tar_gzip(&temp_path, &managed_uv_cache, "Unpacking UV".to_string())
+        compression::unpack_tar_gzip(temp_path, dir.path(), "Unpacking UV".to_string())
     }
+    .or_else(|err| {
+        bail!("unable to unpack to {}\n{}", dir.path().display(), err);
+    })?;
+
+    let uv_file_name = managed_uv.file_name().unwrap();
+    let mut binary_path = dir.path().join(uv_file_name);
+
+    // Binary is nested in a directory with the same name as the artifact stem
+    if !binary_path.is_file() {
+        binary_path = dir
+            .path()
+            .join(
+                artifact_name
+                    .trim_end_matches(".zip")
+                    .trim_end_matches(".tar.gz"),
+            )
+            .join(uv_file_name);
+    }
+
+    fs_utils::move_temp_file(&binary_path, &managed_uv)
 }
 
 fn run_setup_command(command: Command, message: String) -> Result<(ExitStatus, String)> {
