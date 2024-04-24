@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.19.0 - 2024-04-24
+
 ***Added:***
 
 - Add `remove` management command
