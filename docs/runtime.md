@@ -88,13 +88,21 @@ Built applications have a single top-level command group named `self` ([by defau
 
 These commands are always exposed.
 
+#### Remove
+
+```
+<EXE> self remove
+```
+
+This will wipe the installation.
+
 #### Restore
 
 ```
 <EXE> self restore
 ```
 
-This will wipe the installation and start fresh.
+This will wipe the installation and then reinstall.
 
 #### Update
 
