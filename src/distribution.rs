@@ -270,7 +270,7 @@ pub fn materialize() -> Result<()> {
         let mut command = if app::uv_enabled() {
             ensure_uv_available()?;
             let mut command = uv_command();
-            command.args(["venv", "--python", &python_path.to_string_lossy().as_ref()]);
+            command.args(["venv", "--python", python_path.to_string_lossy().as_ref()]);
             if app::uv_only_bootstrap() {
                 command.arg("--seed");
             }
