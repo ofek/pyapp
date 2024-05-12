@@ -6,6 +6,7 @@ use std::path::Path;
 use std::process::{exit, Command, ExitStatus};
 
 use anyhow::{bail, Context, Result};
+use fs4::FileExt;
 use tempfile::tempdir;
 
 use crate::{app, compression, fs_utils, network, process};
@@ -134,6 +135,9 @@ pub fn run_project() -> Result<()> {
 }
 
 pub fn ensure_ready() -> Result<()> {
+    let lock_path = app::installation_lock();
+    let lock_file = fs_utils::acquire_lock(&lock_path)?;
+
     if !app::install_dir().is_dir() {
         materialize()?;
 
@@ -142,7 +146,9 @@ pub fn ensure_ready() -> Result<()> {
         }
     }
 
-    Ok(())
+    lock_file
+        .unlock()
+        .with_context(|| format!("unable to release lock file {}", lock_path.display()))
 }
 
 pub fn pip_base_command() -> Command {
@@ -415,8 +421,13 @@ pub fn ensure_installer_available() -> Result<()> {
         ensure_uv_available()?;
     } else if app::pip_external() {
         let external_pip = app::external_pip_zipapp();
+        let lock_path =
+            app::installer_lock("pip", external_pip.file_name().unwrap().to_str().unwrap());
+        let lock_file = fs_utils::acquire_lock(&lock_path)?;
         if external_pip.is_file() {
-            return Ok(());
+            return lock_file
+                .unlock()
+                .with_context(|| format!("unable to release lock file {}", lock_path.display()));
         }
 
         let external_pip_cache = app::external_pip_cache();
@@ -451,15 +462,25 @@ pub fn ensure_installer_available() -> Result<()> {
         )?;
 
         fs_utils::move_temp_file(&temp_path, &external_pip)?;
+
+        lock_file
+            .unlock()
+            .with_context(|| format!("unable to release lock file {}", lock_path.display()))?;
     }
 
     Ok(())
 }
 
 fn ensure_uv_available() -> Result<()> {
+    let uv_version = app::uv_version();
+    let lock_path = app::installer_lock("uv", &uv_version);
+    let lock_file = fs_utils::acquire_lock(&lock_path)?;
+
     let managed_uv = app::managed_uv();
     if managed_uv.is_file() {
-        return Ok(());
+        return lock_file
+            .unlock()
+            .with_context(|| format!("unable to release lock file {}", lock_path.display()));
     }
 
     let managed_uv_cache = app::managed_uv_cache();
@@ -473,7 +494,6 @@ fn ensure_uv_available() -> Result<()> {
     let mut f = fs::File::create(&temp_path)
         .with_context(|| format!("unable to create temporary file: {}", &temp_path.display()))?;
 
-    let uv_version = app::uv_version();
     let url = if uv_version == "any" {
         format!(
             "https://github.com/astral-sh/uv/releases/latest/download/{}",
@@ -512,7 +532,11 @@ fn ensure_uv_available() -> Result<()> {
             .join(uv_file_name);
     }
 
-    fs_utils::move_temp_file(&binary_path, &managed_uv)
+    fs_utils::move_temp_file(&binary_path, &managed_uv)?;
+
+    lock_file
+        .unlock()
+        .with_context(|| format!("unable to release lock file {}", lock_path.display()))
 }
 
 fn run_setup_command(command: Command, message: String) -> Result<(ExitStatus, String)> {
