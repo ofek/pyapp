@@ -21,6 +21,9 @@ os_pipe = "1.1.4"
 reqwest = { version = "0.12", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.38"
 tempfile = "3.5.0"
+# Remove dependence on CMake by avoiding libz-ng-sys, see:
+# https://github.com/rust-lang/libz-sys/pull/174
+zip = { version = "1.2.3", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
 zstd = "0.13.0"
 
 [build-dependencies]
@@ -31,16 +34,8 @@ rand = "0.8.5"
 regex = "1.8.1"
 reqwest = { version = "0.12", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.38"
-
-# Avoid libz-ng-sys on PowerPC https://github.com/rust-lang/libz-sys/issues/183#issuecomment-2106318961
-[target.'cfg(not(target_arch = "powerpc64"))'.dependencies]
-zip = "1.2.3"
-[target.'cfg(not(target_arch = "powerpc64"))'.build-dependencies]
-zip = "1.2.3"
-
-[target.'cfg(target_arch = "powerpc64")'.dependencies]
-zip = { version = "1.2.3", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
-[target.'cfg(target_arch = "powerpc64")'.build-dependencies]
+# Remove dependence on CMake by avoiding libz-ng-sys, see:
+# https://github.com/rust-lang/libz-sys/pull/174
 zip = { version = "1.2.3", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
 
 [profile.release]
