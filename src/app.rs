@@ -278,3 +278,18 @@ pub fn managed_uv() -> PathBuf {
     };
     managed_uv_cache().join(filename)
 }
+
+pub fn installation_lock() -> PathBuf {
+    cache_dir().join("locks").join(format!(
+        "installation-{}-{}-{}",
+        project_name(),
+        distribution_id(),
+        project_version()
+    ))
+}
+
+pub fn installer_lock(name: &str, id: &str) -> PathBuf {
+    cache_dir()
+        .join("locks")
+        .join(format!("installer-{}-{}", name, id))
+}

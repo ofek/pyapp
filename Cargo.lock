@@ -411,6 +411,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs4"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73969b81e8bc90a3828d913dd3973d80771bfb9d7fbe1a78a79122aad456af15"
+dependencies = [
+ "rustix",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "futures-channel"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -905,6 +915,7 @@ dependencies = [
  "clap",
  "directories",
  "flate2",
+ "fs4",
  "highway",
  "indicatif",
  "once_cell",

@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Fixed:***
 
+- Bootstrapping is now safe across multiple processes (a shared resource message is displayed if another process is already bootstrapping)
 - The `pip` management command is now resilient to cache removal
 - Management commands now properly support the `-h`/`--help` flag
 
