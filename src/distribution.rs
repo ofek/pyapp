@@ -410,7 +410,7 @@ fn ensure_base_pip(distribution_directory: &Path) -> Result<()> {
     Ok(())
 }
 
-fn ensure_installer_available() -> Result<()> {
+pub fn ensure_installer_available() -> Result<()> {
     if app::uv_as_installer() {
         ensure_uv_available()?;
     } else if app::pip_external() {

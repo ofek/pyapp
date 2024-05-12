@@ -3,7 +3,7 @@ use std::fmt::Display;
 use std::fs::{self, File};
 use std::hash::{Hash, Hasher};
 use std::io::Read;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use highway::PortableHash;
@@ -926,6 +926,23 @@ fn set_self_command() {
     }
 }
 
+fn set_exposed_command(path: &Path, command_name: &str, indicator: &Regex) {
+    if !path.is_file() {
+        return;
+    }
+
+    let command_path = path.to_str().unwrap();
+    let command_source = fs::read_to_string(command_path).unwrap();
+    if indicator.is_match(&command_source) {
+        let variable = format!("PYAPP_EXPOSE_{}", command_name.to_uppercase());
+        if is_enabled(&variable) {
+            set_runtime_variable(&variable, "1");
+        } else {
+            set_runtime_variable(&variable, "0");
+        }
+    }
+}
+
 fn set_exposed_commands() {
     let indicator = Regex::new(r"(?m)^#\[command\(hide = env!").unwrap();
     let commands_dir: PathBuf = [
@@ -937,24 +954,23 @@ fn set_exposed_commands() {
     .iter()
     .collect();
 
-    for entry in fs::read_dir(commands_dir).unwrap() {
+    for entry in fs::read_dir(&commands_dir).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
+        set_exposed_command(
+            &path,
+            path.file_stem().unwrap().to_str().unwrap(),
+            &indicator,
+        );
+    }
 
-        let command_name = path.file_stem().unwrap().to_str().unwrap();
-        let command_path = path.to_str().unwrap();
-        let command_source = fs::read_to_string(command_path).unwrap();
-        if indicator.is_match(&command_source) {
-            let variable = format!("PYAPP_EXPOSE_{}", command_name.to_uppercase());
-            if is_enabled(&variable) {
-                set_runtime_variable(&variable, "1");
-            } else {
-                set_runtime_variable(&variable, "0");
-            }
-        }
+    let command_groups = ["cache"];
+    for command_group in command_groups {
+        set_exposed_command(
+            &commands_dir.join(command_group).join("cli.rs"),
+            command_group,
+            &indicator,
+        );
     }
 }
 

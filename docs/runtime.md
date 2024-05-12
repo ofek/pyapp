@@ -116,6 +116,14 @@ This will update the project to the latest available version in the currently us
 
 These commands are hidden by default and each can be individually exposed by setting its corresponding `PYAPP_EXPOSE_<COMMAND>` option (e.g. `PYAPP_EXPOSE_METADATA`) to `true` or `1`.
 
+#### Cache
+
+```
+<EXE> self cache [dist|pip|uv]
+```
+
+This is the command group for managing the cache. Each subcommand has a `-r`/`--remove` flag to remove the cached asset. Not passing that flag will display the location instead.
+
 #### Metadata
 
 ```

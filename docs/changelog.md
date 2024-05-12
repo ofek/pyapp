@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `cache` management command
+
+***Fixed:***
+
+- The `pip` management command is now resilient to cache removal
+- Management commands now properly support the `-h`/`--help` flag
+
 ## 0.19.0 - 2024-04-24
 
 ***Added:***
