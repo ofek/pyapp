@@ -3,7 +3,7 @@ use clap::{Args, Subcommand};
 
 /// Manage this application
 #[derive(Args, Debug)]
-#[command(disable_help_flag = true)]
+#[command()]
 pub struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -11,6 +11,7 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Cache(super::cache::cli::Cli),
     Metadata(super::metadata::Cli),
     Pip(super::pip::Cli),
     Python(super::python::Cli),
@@ -23,6 +24,7 @@ enum Commands {
 impl Cli {
     pub fn exec(self) -> Result<()> {
         match self.command {
+            Commands::Cache(cli) => cli.exec(),
             Commands::Metadata(cli) => cli.exec(),
             Commands::Pip(cli) => cli.exec(),
             Commands::Python(cli) => cli.exec(),

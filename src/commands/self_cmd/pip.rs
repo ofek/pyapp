@@ -16,6 +16,7 @@ pub struct Cli {
 impl Cli {
     pub fn exec(self) -> Result<()> {
         distribution::ensure_ready()?;
+        distribution::ensure_installer_available()?;
 
         let mut command = distribution::pip_base_command();
         command.args(self.args);

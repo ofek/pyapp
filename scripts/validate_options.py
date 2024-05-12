@@ -14,9 +14,16 @@ def main():
     available_options = set(re.findall(r'"(PYAPP_[^_].+?)"', Path('build.rs').read_text('utf-8')))
     available_options -= IGNORED
 
+    root_commands = Path('src/commands/self_cmd')
     expose_option = re.compile(r'^#\[command\(hide = env!\("(PYAPP_EXPOSE_.+?)"\)', re.MULTILINE)
-    for entry in Path('src/commands/self_cmd').iterdir():
+    for entry in root_commands.iterdir():
         if entry.is_file() and (match := expose_option.search(entry.read_text('utf-8'))):
+            available_options.add(match.group(1))
+
+    command_groups = ['cache']
+    for command_group in command_groups:
+        path = root_commands / command_group / 'cli.rs'
+        if match := expose_option.search(path.read_text('utf-8')):
             available_options.add(match.group(1))
 
     expected_options = sorted(available_options)
