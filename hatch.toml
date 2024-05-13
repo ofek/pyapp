@@ -1,5 +1,6 @@
 [envs.docs]
 detached = true
+installer = "uv"
 dependencies = [
   "mkdocs~=1.5.3",
   "mkdocs-material~=9.5.18",
