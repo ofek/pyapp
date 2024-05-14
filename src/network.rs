@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 
 use crate::terminal;
 
@@ -15,5 +15,9 @@ pub fn download(url: &String, writer: impl Write, description: &str) -> Result<(
     response.copy_to(&mut pb.wrap_write(writer))?;
     pb.finish_and_clear();
 
-    Ok(())
+    if response.status().is_success() {
+        Ok(())
+    } else {
+        bail!("download failed: {}, {}", response.status(), url)
+    }
 }
