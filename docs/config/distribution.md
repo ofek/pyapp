@@ -60,6 +60,10 @@ You may set the relative path to the Python executable after unpacking the archi
 
 You may set the relative path to the [`site-packages`](https://docs.python.org/3/library/site.html) directory after unpacking the archive with the `PYAPP_DISTRIBUTION_SITE_PACKAGES_PATH` option. The default is `Lib\site-packages` on Windows and `lib/python<ID>/site-packages` on all other platforms where `<ID>` is the defined [distribution ID](#known).
 
+### Path prefix
+
+If the [Python executable](#python-location) and the [`site-packages` directory](#site-packages-location) are at the default locations but nested under top-level directories, you may set the `PYAPP_DISTRIBUTION_PATH_PREFIX` option to the common prefix of the two paths to avoid having to manually set those options.
+
 ### pip availability
 
 You may indicate whether pip is already installed by setting the `PYAPP_DISTRIBUTION_PIP_AVAILABLE` option to `true` or `1`. This elides the check for installation when [upgraded virtual environments](installation.md#virtual-environments) are enabled.

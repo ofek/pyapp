@@ -263,6 +263,23 @@ fn normalize_project_name(name: &String) -> String {
         .to_lowercase()
 }
 
+fn normalize_relative_path(path: &String) -> String {
+    if env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
+        path.replace('/', "\\")
+            .strip_prefix('\\')
+            .unwrap_or(path)
+            .strip_suffix('\\')
+            .unwrap_or(path)
+            .to_string()
+    } else {
+        path.strip_prefix('/')
+            .unwrap_or(path)
+            .strip_suffix('/')
+            .unwrap_or(path)
+            .to_string()
+    }
+}
+
 fn embed_file(name: &str) -> PathBuf {
     [
         env::var("CARGO_MANIFEST_DIR").unwrap().as_str(),
@@ -572,8 +589,8 @@ fn set_python_path(distribution_source: &str) {
     let distribution_variable = "PYAPP_DISTRIBUTION_PYTHON_PATH";
     let on_windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
     let python_path = env::var(distribution_variable).unwrap_or_default();
-    let relative_path = if !python_path.is_empty() {
-        python_path
+    let mut relative_path = if !python_path.is_empty() {
+        normalize_relative_path(&python_path)
     } else if !env::var("PYAPP_DISTRIBUTION_PATH")
         .unwrap_or_default()
         .is_empty()
@@ -608,6 +625,11 @@ fn set_python_path(distribution_source: &str) {
     } else {
         "bin/python3".to_string()
     };
+
+    let path_prefix = env::var("PYAPP_DISTRIBUTION_PATH_PREFIX").unwrap_or_default();
+    if !path_prefix.is_empty() {
+        relative_path = normalize_relative_path(&path_prefix);
+    }
     set_runtime_variable(distribution_variable, &relative_path);
 
     let installation_variable = "PYAPP__INSTALLATION_PYTHON_PATH";
@@ -625,8 +647,8 @@ fn set_site_packages_path(distribution_source: &str) {
     let on_windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
     let python_version = get_python_version();
     let site_packages_path = env::var(distribution_variable).unwrap_or_default();
-    let relative_path = if !site_packages_path.is_empty() {
-        site_packages_path
+    let mut relative_path = if !site_packages_path.is_empty() {
+        normalize_relative_path(&site_packages_path)
     } else if distribution_source.starts_with(DEFAULT_CPYTHON_SOURCE) {
         if python_version == "3.7" {
             if on_windows {
@@ -662,6 +684,11 @@ fn set_site_packages_path(distribution_source: &str) {
     } else {
         format!("lib/python{}/site-packages", python_version)
     };
+
+    let path_prefix = env::var("PYAPP_DISTRIBUTION_PATH_PREFIX").unwrap_or_default();
+    if !path_prefix.is_empty() {
+        relative_path = normalize_relative_path(&path_prefix);
+    }
     set_runtime_variable(distribution_variable, &relative_path);
 
     let installation_variable = "PYAPP__INSTALLATION_SITE_PACKAGES_PATH";

@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Added:***
 
+- Add `PYAPP_DISTRIBUTION_PATH_PREFIX` option for easier configuring of custom distribution internal paths
 - Add `PYAPP_ALLOW_UPDATES` option for enabling the `update` management command when project installation is skipped
 
 ***Fixed:***
