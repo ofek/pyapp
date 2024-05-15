@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.21.0 - 2024-05-15
+
 ***Added:***
 
 - Add `PYAPP_DISTRIBUTION_PATH_PREFIX` option for easier configuring of custom distribution internal paths
