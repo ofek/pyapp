@@ -628,7 +628,19 @@ fn set_python_path(distribution_source: &str) {
 
     let path_prefix = env::var("PYAPP_DISTRIBUTION_PATH_PREFIX").unwrap_or_default();
     if !path_prefix.is_empty() {
-        relative_path = normalize_relative_path(&path_prefix);
+        if on_windows {
+            relative_path = format!(
+                r"{}\{}",
+                normalize_relative_path(&path_prefix),
+                relative_path
+            );
+        } else {
+            relative_path = format!(
+                "{}/{}",
+                normalize_relative_path(&path_prefix),
+                relative_path
+            );
+        }
     }
     set_runtime_variable(distribution_variable, &relative_path);
 
@@ -687,7 +699,19 @@ fn set_site_packages_path(distribution_source: &str) {
 
     let path_prefix = env::var("PYAPP_DISTRIBUTION_PATH_PREFIX").unwrap_or_default();
     if !path_prefix.is_empty() {
-        relative_path = normalize_relative_path(&path_prefix);
+        if on_windows {
+            relative_path = format!(
+                r"{}\{}",
+                normalize_relative_path(&path_prefix),
+                relative_path
+            );
+        } else {
+            relative_path = format!(
+                "{}/{}",
+                normalize_relative_path(&path_prefix),
+                relative_path
+            );
+        }
     }
     set_runtime_variable(distribution_variable, &relative_path);
 
