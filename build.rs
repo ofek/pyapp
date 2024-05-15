@@ -894,6 +894,21 @@ fn set_skip_install() {
     let variable = "PYAPP_SKIP_INSTALL";
     if is_enabled(variable) {
         set_runtime_variable(variable, "1");
+        if is_enabled("PYAPP_ALLOW_UPDATES") {
+            set_runtime_variable("PYAPP_EXPOSE_UPDATE", "1");
+        } else {
+            set_runtime_variable("PYAPP_EXPOSE_UPDATE", "0");
+        }
+    } else {
+        set_runtime_variable(variable, "0");
+        set_runtime_variable("PYAPP_EXPOSE_UPDATE", "1");
+    }
+}
+
+fn set_allow_updates() {
+    let variable = "PYAPP_ALLOW_UPDATES";
+    if is_enabled(variable) {
+        set_runtime_variable(variable, "1");
     } else {
         set_runtime_variable(variable, "0");
     }
@@ -999,9 +1014,12 @@ fn main() {
     set_uv_enabled();
     set_uv_only_bootstrap();
     set_uv_version();
-    set_skip_install();
+    set_allow_updates();
     set_indicator();
     set_self_command();
     set_exposed_commands();
     set_metadata_template();
+
+    // This must come last because it might override a command exposure
+    set_skip_install();
 }

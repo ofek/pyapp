@@ -222,6 +222,10 @@ pub fn skip_install() -> bool {
     env!("PYAPP_SKIP_INSTALL") == "1"
 }
 
+pub fn allow_updates() -> bool {
+    env!("PYAPP_ALLOW_UPDATES") == "1"
+}
+
 pub fn pass_location() -> bool {
     env!("PYAPP_PASS_LOCATION") == "1"
 }

@@ -8,7 +8,7 @@ use crate::{app, distribution, terminal};
 
 /// Install the latest version
 #[derive(Args, Debug)]
-#[command()]
+#[command(hide = env!("PYAPP_EXPOSE_UPDATE") == "0")]
 pub struct Cli {
     /// Allow pre-release and development versions
     #[arg(long)]
@@ -21,7 +21,7 @@ pub struct Cli {
 
 impl Cli {
     pub fn exec(self) -> Result<()> {
-        if app::skip_install() {
+        if app::skip_install() && !app::allow_updates() {
             println!("Cannot update as installation is disabled");
             exit(1);
         }

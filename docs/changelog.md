@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `PYAPP_ALLOW_UPDATES` option for enabling the `update` management command when project installation is skipped
+
+***Fixed:***
+
+- Properly hide the `update` management command when skipping project installation
+
 ## 0.20.1 - 2024-05-14
 
 ***Fixed:***

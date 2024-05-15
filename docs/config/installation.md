@@ -50,3 +50,5 @@ The default location of your application's installation differs based on the ope
 ## Skipping installation
 
 You may set the `PYAPP_SKIP_INSTALL` option to `true` or `1` to skip installing the project in the distribution. This allows for entirely predefined distributions and thus no network calls at runtime if used in conjunction with [distribution embedding](distribution.md#embedding).
+
+When project installation is skipped, the `update` command will not be available. You may set the `PYAPP_ALLOW_UPDATES` option to `true` or `1` to expose the command anyway. Be sure to set the appropriate [project options](project.md) as configuring a prebuilt distribution does not require those.
