@@ -114,7 +114,7 @@ This will update the project to the latest available version in the currently us
 
 ### Optional
 
-These commands are hidden by default and each can be individually exposed by setting its corresponding `PYAPP_EXPOSE_<COMMAND>` option (e.g. `PYAPP_EXPOSE_METADATA`) to `true` or `1`.
+These commands are hidden by default and each can be individually exposed by setting its corresponding `PYAPP_EXPOSE_<COMMAND>` option (e.g. `PYAPP_EXPOSE_METADATA`) to `true` or `1`. You can enable all of them at once setting the `PYAPP_EXPOSE_ALL_COMMANDS` option to `true` or `1`. 
 
 #### Cache
 
