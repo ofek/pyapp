@@ -1006,7 +1006,7 @@ fn set_exposed_command(path: &Path, command_name: &str, indicator: &Regex) {
     if indicator.is_match(&command_source) {
         let variable = format!("PYAPP_EXPOSE_{}", command_name.to_uppercase());
         if is_enabled(&variable)
-            || (!is_explicitly_disabled(&variable) && is_enabled("PYAPP_EXPOSE_ALL_COMMANDS"))
+            || (is_enabled("PYAPP_EXPOSE_ALL_COMMANDS") && !is_explicitly_disabled(&variable))
         {
             set_runtime_variable(&variable, "1");
         } else {
