@@ -8,23 +8,23 @@ license = "Apache-2.0 OR MIT"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.71"
+anyhow = "1.0.86"
 base64 = "0.22.1"
 bzip2 = "0.4.4"
-clap = { version = "4.2.5", features = ["derive"] }
-directories = "5.0.0"
+clap = { version = "4.5.4", features = ["derive"] }
+directories = "5.0.1"
 flate2 = "1.0.30"
-fs4 = { version = "0.8", features = ["sync"] }
-indicatif = { version = "0.17.3", features = ["improved_unicode"] }
-once_cell = "1.17.1"
-os_pipe = "1.1.4"
-reqwest = { version = "0.12", features = ["blocking", "rustls-tls"], default-features = false }
-tar = "0.4.38"
-tempfile = "3.5.0"
+fs4 = { version = "0.8.3", features = ["sync"] }
+indicatif = { version = "0.17.8", features = ["improved_unicode"] }
+once_cell = "1.19.0"
+os_pipe = "1.1.5"
+reqwest = { version = "0.12.4", features = ["blocking", "rustls-tls"], default-features = false }
+tar = "0.4.40"
+tempfile = "3.10.1"
 # Remove dependence on CMake by avoiding libz-ng-sys, see:
 # https://github.com/rust-lang/libz-sys/pull/174
-zip = { version = "1.2.3", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
-zstd = "0.13.0"
+zip = { version = "2.1.0", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
+zstd = "0.13.1"
 
 [build-dependencies]
 base64 = "0.22.1"
@@ -32,11 +32,11 @@ flate2 = "1.0.30"
 highway = "1.0.0"
 rand = "0.8.5"
 regex = "1.8.1"
-reqwest = { version = "0.12", features = ["blocking", "rustls-tls"], default-features = false }
-tar = "0.4.38"
+reqwest = { version = "0.12.4", features = ["blocking", "rustls-tls"], default-features = false }
+tar = "0.4.40"
 # Remove dependence on CMake by avoiding libz-ng-sys, see:
 # https://github.com/rust-lang/libz-sys/pull/174
-zip = { version = "1.2.3", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
+zip = { version = "2.1.0", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
 
 [profile.release]
 panic = "abort"
