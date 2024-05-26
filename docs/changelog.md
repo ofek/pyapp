@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Added:***
 
+- Add `PYAPP_EXPOSE_ALL_COMMANDS` option
 - Update dependencies
 
 ## 0.21.1 - 2024-05-15
