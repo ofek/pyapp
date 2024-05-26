@@ -21,9 +21,7 @@ os_pipe = "1.1.5"
 reqwest = { version = "0.12.4", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.40"
 tempfile = "3.10.1"
-# Remove dependence on CMake by avoiding libz-ng-sys, see:
-# https://github.com/rust-lang/libz-sys/pull/174
-zip = { version = "2.1.0", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
+zip = "2.1.0"
 zstd = "0.13.1"
 
 [build-dependencies]
@@ -34,9 +32,7 @@ rand = "0.8.5"
 regex = "1.8.1"
 reqwest = { version = "0.12.4", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.40"
-# Remove dependence on CMake by avoiding libz-ng-sys, see:
-# https://github.com/rust-lang/libz-sys/pull/174
-zip = { version = "2.1.0", features = ["aes-crypto", "bzip2", "deflate", "deflate64", "deflate-zopfli", "lzma", "time", "zstd"], default-features = false }
+zip = "2.1.0"
 
 [profile.release]
 panic = "abort"
