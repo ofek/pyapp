@@ -23,8 +23,6 @@ tar = "0.4.40"
 tempfile = "3.10.1"
 zip = "2.1.0"
 zstd = "0.13.1"
-# Use the fastest implementation (libz-ng) but remove dependence on CMake
-libz-sys = { version = "1.1.18", features = ["zlib-ng-no-cmake-experimental-community-maintained"], default-features = false }
 
 [build-dependencies]
 base64 = "0.22.1"
@@ -35,8 +33,6 @@ regex = "1.8.1"
 reqwest = { version = "0.12.4", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.40"
 zip = "2.1.0"
-# Use the fastest implementation (libz-ng) but remove dependence on CMake
-libz-sys = { version = "1.1.18", features = ["zlib-ng-no-cmake-experimental-community-maintained"], default-features = false }
 
 [profile.release]
 panic = "abort"
