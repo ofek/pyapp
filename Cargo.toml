@@ -29,7 +29,7 @@ base64 = "0.22.1"
 flate2 = "1.0.30"
 highway = "1.0.0"
 rand = "0.8.5"
-regex = "1.8.1"
+regex = "1.10.5"
 reqwest = { version = "0.12.4", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.40"
 zip = "2.1.1"
