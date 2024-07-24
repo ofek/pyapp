@@ -310,13 +310,35 @@ fn get_python_version() -> String {
     DEFAULT_PYTHON_VERSION.to_string()
 }
 
+fn get_custom_source(name: &str) -> Option<String> {
+    let name = name.to_uppercase().replace(".", "_");
+    let variable_name = format!("PYAPP_DISTRIBUTION_SOURCE_{}", name);
+    if let Ok(value) = env::var(variable_name) {
+        if !value.is_empty() {
+            return Some(value);
+        }
+    }
+    None
+}
+
 fn get_distribution_source() -> String {
+    let selected_python_version = get_python_version();
+
+    // Return custom source if specified for this version
+    if let Some(custom_source) = get_custom_source(&selected_python_version) {
+        dbg!(
+            "Using custom source for version {}: {}",
+            &selected_python_version,
+            &custom_source
+        );
+        return custom_source;
+    }
+
+    // Otherwise, check if there is a global custom source
     let distribution_source = env::var("PYAPP_DISTRIBUTION_SOURCE").unwrap_or_default();
     if !distribution_source.is_empty() {
         return distribution_source;
     };
-
-    let selected_python_version = get_python_version();
 
     // https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
     let selected_platform = match env::var("CARGO_CFG_TARGET_OS").unwrap().as_str() {
@@ -922,6 +944,11 @@ fn set_uv_only_bootstrap() {
     }
 }
 
+fn set_uv_custom_source() {
+    let variable = "PYAPP_UV_CUSTOM_SOURCE";
+    set_runtime_variable(variable, env::var(variable).unwrap_or_default());
+}
+
 fn set_uv_version() {
     let variable = "PYAPP_UV_VERSION";
     let version = env::var(variable).unwrap_or("any".to_string());
@@ -1070,6 +1097,7 @@ fn main() {
     set_pip_allow_config();
     set_uv_enabled();
     set_uv_only_bootstrap();
+    set_uv_custom_source();
     set_uv_version();
     set_allow_updates();
     set_indicator();

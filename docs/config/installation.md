@@ -14,6 +14,12 @@ You may use a specific `X.Y.Z` version by setting the `PYAPP_UV_VERSION` option.
 
 By default, a version of UV that has already been downloaded by a PyApp application is used. If UV has not yet been downloaded then the latest version is used.
 
+### Source
+
+You may explicitly set the `PYAPP_UV_SOURCE` option in order to download your own UV release archive.
+
+The value must end with the archive's real file extension, which is used to determine the extraction method.
+
 ### Only bootstrap
 
 You may set the `PYAPP_UV_ONLY_BOOTSTRAP` option to `true` or `1` to only use UV for virtual environment creation and continue using pip for project installation.

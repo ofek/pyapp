@@ -14,3 +14,7 @@ The following is not intended to be a complete enumeration. Be sure to view the 
 | [Litestar](https://github.com/litestar-org/litestar-fullstack/blob/dc72eee78173790c3e91b0c095ac9e70ba91bedd/scripts/post-builds.py)
 | [Preservation Workbench](https://github.com/Preservation-Workbench/PWCode/blob/e7777806be35bd60ca8c33e677ffd77e38b277d0/build/make.sh)
 | [tidal-wave](https://github.com/ebb-earl-co/tidal-wave/blob/6358ede21adb715a053b1e6cc73968933c3bed05/BUILDME.md#pyapp-created-binaries)
+
+## Industry
+
+- [Amadeus](https://amadeus.com) <sup>\[[1](https://github.com/ofek/pyapp/pull/147)|[2](https://github.com/AmadeusITGroup/pyapp)\]</sup>

@@ -488,13 +488,20 @@ fn ensure_uv_available() -> Result<()> {
         .with_context(|| format!("unable to create UV cache {}", &managed_uv_cache.display()))?;
 
     let dir = tempdir().with_context(|| "unable to create temporary directory")?;
-    let artifact_name = app::uv_artifact_name();
+
+    let artifact_name: String = if app::uv_custom_source().is_empty() {
+        app::uv_artifact_name()
+    } else {
+        app::uv_custom_source_artifact_name()
+    };
     let temp_path = dir.path().join(&artifact_name);
 
     let mut f = fs::File::create(&temp_path)
         .with_context(|| format!("unable to create temporary file: {}", &temp_path.display()))?;
 
-    let url = if uv_version == "any" {
+    let url = if !app::uv_custom_source().is_empty() {
+        app::uv_custom_source()
+    } else if uv_version == "any" {
         format!(
             "https://github.com/astral-sh/uv/releases/latest/download/{}",
             &artifact_name,
@@ -505,7 +512,6 @@ fn ensure_uv_available() -> Result<()> {
             &uv_version, &artifact_name,
         )
     };
-
     network::download(&url, &mut f, "UV")?;
 
     if artifact_name.ends_with(".zip") {

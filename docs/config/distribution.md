@@ -41,6 +41,12 @@ You may explicitly set the `PYAPP_DISTRIBUTION_SOURCE` option which overrides th
 
 Setting this manually may require you to define extra metadata about the distribution that is required for correct [runtime behavior](../runtime.md).
 
+### Version
+
+For greater granularity, you may set the `PYAPP_DISTRIBUTION_SOURCE_<NAME>` option. The source is also the URL to the distribution's archive.
+
+The placeholder `<NAME>` is the uppercased version of the distribution name with periods replaced by underscores e.g. `pypy3.10` would become `PYPY3_10`.
+
 ### Format
 
 The following formats are supported for the `PYAPP_DISTRIBUTION_FORMAT` option, with the default chosen based on the ending of the source URL:

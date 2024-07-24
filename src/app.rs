@@ -7,6 +7,7 @@ use anyhow::{Context, Result};
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use directories::ProjectDirs;
 use once_cell::sync::OnceCell;
+use reqwest::Url;
 
 static PLATFORM_DIRS: OnceCell<ProjectDirs> = OnceCell::new();
 static INSTALLATION_DIRECTORY: OnceCell<PathBuf> = OnceCell::new();
@@ -204,6 +205,29 @@ pub fn uv_artifact_name() -> String {
 
 pub fn uv_as_installer() -> bool {
     uv_enabled() && !uv_only_bootstrap()
+}
+
+pub fn uv_custom_source() -> String {
+    env!("PYAPP_UV_CUSTOM_SOURCE").into()
+}
+
+pub fn uv_custom_source_artifact_name() -> String {
+    let custom_source = uv_custom_source();
+
+    let parsed =
+        Url::parse(&custom_source).expect(&format!("unable to parse url: {}", &custom_source));
+
+    // Try to find artifact name from URL path
+    if let Some(segments) = parsed.path_segments() {
+        if let Some(segment) = segments.last() {
+            return segment.into();
+        }
+    }
+
+    panic!(
+        "unable to determine artifact name from url: {}",
+        &custom_source
+    );
 }
 
 pub fn is_gui() -> bool {
