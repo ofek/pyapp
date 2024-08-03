@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Add `PYAPP_UV_SOURCE` option
+
 ## 0.22.0 - 2024-05-26
 
 ***Added:***

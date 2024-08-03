@@ -18,6 +18,12 @@ By default, a version of UV that has already been downloaded by a PyApp applicat
 
 You may set the `PYAPP_UV_ONLY_BOOTSTRAP` option to `true` or `1` to only use UV for virtual environment creation and continue using pip for project installation.
 
+### Source
+
+You may explicitly set the `PYAPP_UV_SOURCE` option in order to download your own UV release archive. This takes precedence over any defined [version](#uv-version).
+
+The value must end with the archive's real file extension, which is used to determine the extraction method.
+
 ## pip
 
 These options have no effect when UV is [enabled](#uv).
