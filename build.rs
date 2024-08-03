@@ -239,6 +239,19 @@ fn check_environment_variable(name: &str) -> String {
     value
 }
 
+fn filename_from_url(url: &str) -> String {
+    let parsed =
+        reqwest::Url::parse(url).unwrap_or_else(|_| panic!("unable to parse URL: {}", &url));
+
+    if let Some(segments) = parsed.path_segments() {
+        if let Some(segment) = segments.last() {
+            return segment.into();
+        }
+    }
+
+    panic!("unable to determine artifact name from URL: {}", &url);
+}
+
 fn is_enabled(name: &str) -> bool {
     ["true", "1"].contains(&env::var(name).unwrap_or_default().as_str())
 }
@@ -944,32 +957,51 @@ fn set_uv_only_bootstrap() {
     }
 }
 
-fn set_uv_custom_source() {
-    let variable = "PYAPP_UV_CUSTOM_SOURCE";
-    set_runtime_variable(variable, env::var(variable).unwrap_or_default());
-}
+fn set_uv_source() {
+    let source_variable = "PYAPP_UV_SOURCE";
+    let mut source = env::var(source_variable).unwrap_or_default();
 
-fn set_uv_version() {
-    let variable = "PYAPP_UV_VERSION";
-    let version = env::var(variable).unwrap_or("any".to_string());
-    set_runtime_variable(variable, version);
+    if !source.is_empty() {
+        set_runtime_variable("PYAPP__UV_ARTIFACT_NAME", filename_from_url(&source));
 
-    let artifact_name = if !is_enabled("PYAPP_UV_ENABLED") {
-        "".to_string()
-    } else if env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
-        // Force MinGW-w64 to use msvc
-        if env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default() == "gnu" {
+        let mut hasher = PortableHash::default();
+        source.hash(&mut hasher);
+        set_runtime_variable("PYAPP__UV_VERSION", hasher.finish());
+    } else {
+        let version_variable = "PYAPP_UV_VERSION";
+        let version = env::var(version_variable).unwrap_or("any".to_string());
+
+        let artifact_name = if !is_enabled("PYAPP_UV_ENABLED") {
+            "".to_string()
+        } else if env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
+            // Force MinGW-w64 to use msvc
+            if env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default() == "gnu" {
+                format!(
+                    "uv-{}-pc-windows-msvc.zip",
+                    env::var("CARGO_CFG_TARGET_ARCH").unwrap()
+                )
+            } else {
+                format!("uv-{}.zip", env::var("TARGET").unwrap())
+            }
+        } else {
+            format!("uv-{}.tar.gz", env::var("TARGET").unwrap())
+        };
+
+        source = if version == "any" {
             format!(
-                "uv-{}-pc-windows-msvc.zip",
-                env::var("CARGO_CFG_TARGET_ARCH").unwrap()
+                "https://github.com/astral-sh/uv/releases/latest/download/{}",
+                &artifact_name,
             )
         } else {
-            format!("uv-{}.zip", env::var("TARGET").unwrap())
-        }
-    } else {
-        format!("uv-{}.tar.gz", env::var("TARGET").unwrap())
-    };
-    set_runtime_variable("PYAPP__UV_ARTIFACT_NAME", artifact_name);
+            format!(
+                "https://github.com/astral-sh/uv/releases/download/{}/{}",
+                &version, &artifact_name,
+            )
+        };
+        set_runtime_variable("PYAPP__UV_ARTIFACT_NAME", artifact_name);
+        set_runtime_variable("PYAPP__UV_VERSION", &version);
+    }
+    set_runtime_variable(source_variable, &source);
 }
 
 fn set_skip_install() {
@@ -1097,8 +1129,7 @@ fn main() {
     set_pip_allow_config();
     set_uv_enabled();
     set_uv_only_bootstrap();
-    set_uv_custom_source();
-    set_uv_version();
+    set_uv_source();
     set_allow_updates();
     set_indicator();
     set_self_command();
