@@ -194,8 +194,12 @@ pub fn uv_only_bootstrap() -> bool {
     env!("PYAPP_UV_ONLY_BOOTSTRAP") == "1"
 }
 
+pub fn uv_source() -> String {
+    env!("PYAPP_UV_SOURCE").into()
+}
+
 pub fn uv_version() -> String {
-    env!("PYAPP_UV_VERSION").into()
+    env!("PYAPP__UV_VERSION").into()
 }
 
 pub fn uv_artifact_name() -> String {

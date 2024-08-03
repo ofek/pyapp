@@ -494,19 +494,7 @@ fn ensure_uv_available() -> Result<()> {
     let mut f = fs::File::create(&temp_path)
         .with_context(|| format!("unable to create temporary file: {}", &temp_path.display()))?;
 
-    let url = if uv_version == "any" {
-        format!(
-            "https://github.com/astral-sh/uv/releases/latest/download/{}",
-            &artifact_name,
-        )
-    } else {
-        format!(
-            "https://github.com/astral-sh/uv/releases/download/{}/{}",
-            &uv_version, &artifact_name,
-        )
-    };
-
-    network::download(&url, &mut f, "UV")?;
+    network::download(&app::uv_source(), &mut f, "UV")?;
 
     if artifact_name.ends_with(".zip") {
         compression::unpack_zip(temp_path, dir.path(), "Unpacking UV".to_string())
