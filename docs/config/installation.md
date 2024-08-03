@@ -20,7 +20,7 @@ You may set the `PYAPP_UV_ONLY_BOOTSTRAP` option to `true` or `1` to only use UV
 
 ### Source
 
-You may explicitly set the `PYAPP_UV_SOURCE` option in order to download your own UV release archive.
+You may explicitly set the `PYAPP_UV_SOURCE` option in order to download your own UV release archive. This takes precedence over any defined [version](#uv-version).
 
 The value must end with the archive's real file extension, which is used to determine the extraction method.
 
