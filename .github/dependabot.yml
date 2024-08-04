@@ -4,8 +4,16 @@ updates:
   directory: /
   schedule:
     interval: monthly
+  groups:
+    all:
+      patterns:
+      - "*"
 
 - package-ecosystem: cargo
   directory: /
   schedule:
     interval: monthly
+  groups:
+    all:
+      patterns:
+      - "*"
