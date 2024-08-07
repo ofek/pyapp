@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
-use fs4::FileExt;
+use fs4::fs_std::FileExt;
 
 use crate::terminal;
 

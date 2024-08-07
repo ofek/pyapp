@@ -6,7 +6,7 @@ use std::path::Path;
 use std::process::{exit, Command, ExitStatus};
 
 use anyhow::{bail, Context, Result};
-use fs4::FileExt;
+use fs4::fs_std::FileExt;
 use tempfile::tempdir;
 
 use crate::{app, compression, fs_utils, network, process};
