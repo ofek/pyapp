@@ -9,6 +9,7 @@ use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use highway::PortableHash;
 use rand::distributions::{Alphanumeric, DistString};
 use regex::Regex;
+use ureq;
 
 const DEFAULT_PYTHON_VERSION: &str = "3.12";
 const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|bzip2", "tar|gzip", "tar|zstd", "zip"];
@@ -240,16 +241,18 @@ fn check_environment_variable(name: &str) -> String {
 }
 
 fn filename_from_url(url: &str) -> String {
-    let parsed =
-        reqwest::Url::parse(url).unwrap_or_else(|_| panic!("unable to parse URL: {}", &url));
+    let parsed = ureq::get(url)
+        .request_url()
+        .unwrap_or_else(|_| panic!("unable to parse URL: {}", &url));
+    let path = parsed.path();
 
-    if let Some(segments) = parsed.path_segments() {
-        if let Some(segment) = segments.last() {
-            return segment.into();
-        }
+    if let Some(segment) = path.rsplit_once("/") {
+        segment.1.into()
+    } else if !path.is_empty() {
+        path.into()
+    } else {
+        panic!("unable to determine artifact name from URL: {}", &url);
     }
-
-    panic!("unable to determine artifact name from URL: {}", &url);
 }
 
 fn is_enabled(name: &str) -> bool {
@@ -541,12 +544,17 @@ fn set_distribution() {
         local_path
     } else if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
         let distribution_source = get_distribution_source();
-        let bytes = reqwest::blocking::get(&distribution_source)
-            .unwrap()
-            .bytes()
-            .unwrap();
-        fs::write(&embed_path, bytes).unwrap();
 
+        let download = ureq::get(&distribution_source).call().unwrap();
+        let download_size: usize = download
+            .header("Content-Length")
+            .unwrap_or("0")
+            .parse()
+            .unwrap_or(0);
+        let mut bytes: Vec<u8> = Vec::with_capacity(download_size);
+        download.into_reader().read_to_end(&mut bytes).unwrap();
+
+        fs::write(&embed_path, bytes).unwrap();
         let mut file = File::open(&embed_path).unwrap();
         std::io::copy(&mut file, &mut hasher).unwrap();
 
