@@ -4,11 +4,15 @@ use std::fs::{self, File};
 use std::hash::{Hash, Hasher};
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::time::Duration;
 
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use highway::PortableHash;
 use rand::distributions::{Alphanumeric, DistString};
 use regex::Regex;
+use reqwest::{blocking::Client, Url};
+use rustls::crypto::ring;
 
 const DEFAULT_PYTHON_VERSION: &str = "3.13";
 const KNOWN_DISTRIBUTION_FORMATS: &[&str] = &["tar|bzip2", "tar|gzip", "tar|zstd", "zip"];
@@ -284,6 +288,17 @@ const DEFAULT_PYPY_DISTRIBUTIONS: &[(&str, &str, &str, &str, &str)] = &[
         "https://downloads.python.org/pypy/pypy2.7-v7.3.15-macos_x86_64.tar.bz2"),
 ];
 
+fn http_client() -> Client {
+    Client::builder()
+        .timeout(Duration::from_secs(30))
+        .use_preconfigured_tls(
+            rustls_platform_verifier::tls_config_with_provider(Arc::new(ring::default_provider()))
+                .unwrap_or_else(|_| panic!("unable to create TLS configuration")),
+        )
+        .build()
+        .unwrap()
+}
+
 fn set_runtime_variable(name: &str, value: impl Display) {
     println!("cargo:rustc-env={}={}", name, value)
 }
@@ -297,8 +312,7 @@ fn check_environment_variable(name: &str) -> String {
 }
 
 fn filename_from_url(url: &str) -> String {
-    let parsed =
-        reqwest::Url::parse(url).unwrap_or_else(|_| panic!("unable to parse URL: {}", &url));
+    let parsed = Url::parse(url).unwrap_or_else(|_| panic!("unable to parse URL: {}", &url));
 
     if let Some(segments) = parsed.path_segments() {
         if let Some(segment) = segments.last() {
@@ -609,13 +623,15 @@ fn set_distribution() {
         local_path
     } else if is_enabled("PYAPP_DISTRIBUTION_EMBED") {
         let distribution_source = get_distribution_source();
-        let bytes = reqwest::blocking::get(&distribution_source)
-            .unwrap()
-            .bytes()
-            .unwrap();
-        fs::write(&embed_path, bytes).unwrap();
+        let mut response = http_client()
+            .get(&distribution_source)
+            .send()
+            .unwrap_or_else(|_| {
+                panic!("\n\nFailed to download embedded distribution source: {distribution_source}\n\n")
+            });
 
         let mut file = File::open(&embed_path).unwrap();
+        response.copy_to(&mut file).unwrap();
         std::io::copy(&mut file, &mut hasher).unwrap();
 
         distribution_source

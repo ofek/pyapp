@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ***Changed:***
 
 - The `PYAPP_DISTRIBUTION_VARIANT` has been renamed to `PYAPP_DISTRIBUTION_VARIANT_CPU` although the former is still supported for backwards compatibility
+- HTTPS requests now use the operating system's certificate verification functionality
 
 ***Added:***
 
