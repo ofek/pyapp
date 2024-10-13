@@ -3,56 +3,45 @@
     <url>
          <loc>https://ofek.dev/pyapp/latest/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/build/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/changelog/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/examples/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/how-to/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/runtime/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/users/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/config/cli/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/config/distribution/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/config/installation/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://ofek.dev/pyapp/latest/config/project/</loc>
          <lastmod>2020-02-02</lastmod>
-         <changefreq>daily</changefreq>
     </url>
 </urlset>
