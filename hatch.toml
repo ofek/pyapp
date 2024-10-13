@@ -2,18 +2,18 @@
 detached = true
 installer = "uv"
 dependencies = [
-  "mkdocs~=1.6.0",
-  "mkdocs-material~=9.5.22",
+  "mkdocs~=1.6.1",
+  "mkdocs-material~=9.5.40",
   # Plugins
   "mkdocs-minify-plugin~=0.8.0",
-  "mkdocs-git-revision-date-localized-plugin~=1.2.4",
-  "mkdocs-glightbox~=0.3.7",
+  "mkdocs-git-revision-date-localized-plugin~=1.2.9",
+  "mkdocs-glightbox~=0.4.0",
   "mkdocs-redirects~=1.2.1",
-  "mike~=2.0.0",
+  "mike~=2.1.3",
   # Extensions
-  "pymdown-extensions~=10.8.0",
+  "pymdown-extensions~=10.11.2",
   # Necessary for syntax highlighting in code blocks
-  "pygments~=2.17.2",
+  "pygments~=2.18.0",
   # Validation
   # https://github.com/linkchecker/linkchecker/pull/669#issuecomment-1267236287
   "linkchecker @ git+https://github.com/linkchecker/linkchecker.git@d9265bb71c2054bf57b8c5734a4825d62505c779",

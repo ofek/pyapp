@@ -12,17 +12,19 @@ Follow [the instructions](https://www.rust-lang.org/tools/install) to install Ru
 
 In order to [build](build.md) applications with PyApp, you must first download the source code. Here we will download the latest release.
 
-=== "Linux/macOS"
-    1. `curl https://github.com/ofek/pyapp/releases/latest/download/source.tar.gz -Lo pyapp-source.tar.gz`
-    2. `tar -xzf pyapp-source.tar.gz`
-    3. `mv pyapp-v* pyapp-latest`
-    4. `cd pyapp-latest`
+/// tab | Linux/macOS
+1. `curl https://github.com/ofek/pyapp/releases/latest/download/source.tar.gz -Lo pyapp-source.tar.gz`
+2. `tar -xzf pyapp-source.tar.gz`
+3. `mv pyapp-v* pyapp-latest`
+4. `cd pyapp-latest`
+///
 
-=== "Windows"
-    1. `Invoke-WebRequest https://github.com/ofek/pyapp/releases/latest/download/source.zip -OutFile pyapp-source.zip`
-    2. `7z x pyapp-source.zip`
-    3. `mv pyapp-v* pyapp-latest`
-    4. `cd pyapp-latest`
+/// tab | Windows
+1. `Invoke-WebRequest https://github.com/ofek/pyapp/releases/latest/download/source.zip -OutFile pyapp-source.zip`
+2. `7z x pyapp-source.zip`
+3. `mv pyapp-v* pyapp-latest`
+4. `cd pyapp-latest`
+///
 
 ## Configuration
 
@@ -47,15 +49,17 @@ The executable will be located at `target/release/pyapp.exe` if on Windows or `t
 
 Be sure to rename the binary to the name of the application (and make it executable on non-Windows systems):
 
-=== "Linux/macOS"
-    ```
-    mv target/release/pyapp cowsay && chmod +x cowsay
-    ```
+/// tab | Linux/macOS
+```
+mv target/release/pyapp cowsay && chmod +x cowsay
+```
+///
 
-=== "Windows"
-    ```
-    mv target\release\pyapp.exe cowsay
-    ```
+/// tab | Windows
+```
+mv target\release\pyapp.exe cowsay
+```
+///
 
 ## Runtime
 
