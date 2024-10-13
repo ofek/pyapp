@@ -16,14 +16,18 @@ Setting the `PYAPP_PYTHON_VERSION` option will determine the distribution used a
 | `3.10` |
 | `3.11` |
 | `3.12` |
+| `3.13` |
 
 The source for pre-built distributions is the [python-build-standalone](https://github.com/indygreg/python-build-standalone) project.
 
-Some distributions have [variants](https://gregoryszorc.com/docs/python-build-standalone/main/running.html) that may be configured with the `PYAPP_DISTRIBUTION_VARIANT` option:
+#### Variants
 
-| Platform | Options |
-| --- | --- |
-| Linux | <ul><li><code>v1</code></li><li><code>v2</code></li><li><code>v3</code> (default)</li><li><code>v4</code></li></ul> |
+Some distributions have [variants](https://gregoryszorc.com/docs/python-build-standalone/main/running.html) that may be configured. Options may be combined.
+
+| Option | Platforms | Allowed values |
+| --- | --- | --- |
+| `PYAPP_DISTRIBUTION_VARIANT_CPU` | <ul><li>Linux</li></ul> | <ul><li><code>v1</code></li><li><code>v2</code></li><li><code>v3</code> (default)</li><li><code>v4</code></li></ul> |
+| `PYAPP_DISTRIBUTION_VARIANT_GIL` | <ul><li>Linux</li><li>Windows</li><li>macOS</li></ul> | <ul><li><code>freethreaded</code></li></ul> |
 
 ### PyPy
 
