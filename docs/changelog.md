@@ -8,8 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Changed:***
+
+- The `PYAPP_DISTRIBUTION_VARIANT` has been renamed to `PYAPP_DISTRIBUTION_VARIANT_CPU` although the former is still supported for backwards compatibility
+
 ***Added:***
 
+- Support Python 3.13 and set as the default version
+- Add `PYAPP_DISTRIBUTION_VARIANT_GIL` option (Python 3.13+)
 - Update dependencies
 
 ## 0.23.0 - 2024-08-03
