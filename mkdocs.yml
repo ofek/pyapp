@@ -89,6 +89,11 @@ markdown_extensions:
   - pymdownx.arithmatex:
   - pymdownx.betterem:
       smart_enable: all
+  - pymdownx.blocks.tab:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.caret:
   - pymdownx.critic:
   - pymdownx.details:
@@ -128,11 +133,6 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.blocks.tab:
-      alternate_style: true
-      slugify: !!python/object/apply:pymdownx.slugs.slugify
-        kwds:
-          case: lower
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde:
