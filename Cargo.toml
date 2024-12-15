@@ -37,6 +37,7 @@ zip = "2.2.1"
 [profile.release]
 panic = "abort"
 strip = true
+lto = true
 codegen-units = 1
 
 [package.metadata.cross.build.env]
