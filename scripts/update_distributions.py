@@ -12,7 +12,7 @@ from pathlib import Path
 import httpx
 from packaging.version import Version
 
-RELEASES_URL = 'https://api.github.com/repos/indygreg/python-build-standalone/releases'
+RELEASES_URL = 'https://api.github.com/repos/astral-sh/python-build-standalone/releases'
 PLATFORMS = ('linux', 'windows', 'macos')
 
 
@@ -34,6 +34,12 @@ def get_assets():
     while True:
         response = httpx.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page})
         releases = response.json()
+        if not response.is_success:
+            import json
+
+            formatted = json.dumps(releases, indent=2)
+            raise httpx.NetworkError(formatted)
+
         if not releases:
             break
 
