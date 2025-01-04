@@ -8,9 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## 0.26.0 - 2025-01-04
+
 ***Added:***
 
 - Update default CPython distributions to 20241219
+- Update dependencies
 
 ## 0.25.0 - 2024-12-15
 

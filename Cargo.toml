@@ -1,6 +1,6 @@
 [package]
 name = "pyapp"
-version = "0.25.0"
+version = "0.26.0"
 description = "Runtime installer for Python applications"
 repository = "https://github.com/ofek/pyapp"
 documentation = "https://ofek.dev/pyapp/"
