@@ -337,7 +337,7 @@ fn normalize_project_name(name: &String) -> String {
         .to_lowercase()
 }
 
-fn normalize_relative_path(path: &String) -> String {
+fn normalize_relative_path(path: &str) -> String {
     if env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
         path.replace('/', "\\")
             .strip_prefix('\\')
