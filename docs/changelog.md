@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Update dependencies
+
+***Fixed:***
+
+- Fix compiler warnings on newer versions of Rust for use of the `FileExt` trait provided by the `fs4` crate
+
 ## 0.26.0 - 2025-01-04
 
 ***Added:***
