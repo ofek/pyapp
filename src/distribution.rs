@@ -146,8 +146,7 @@ pub fn ensure_ready() -> Result<()> {
         }
     }
 
-    lock_file
-        .unlock()
+    FileExt::unlock(&lock_file)
         .with_context(|| format!("unable to release lock file {}", lock_path.display()))
 }
 
@@ -425,8 +424,7 @@ pub fn ensure_installer_available() -> Result<()> {
             app::installer_lock("pip", external_pip.file_name().unwrap().to_str().unwrap());
         let lock_file = fs_utils::acquire_lock(&lock_path)?;
         if external_pip.is_file() {
-            return lock_file
-                .unlock()
+            return FileExt::unlock(&lock_file)
                 .with_context(|| format!("unable to release lock file {}", lock_path.display()));
         }
 
@@ -463,8 +461,7 @@ pub fn ensure_installer_available() -> Result<()> {
 
         fs_utils::move_temp_file(&temp_path, &external_pip)?;
 
-        lock_file
-            .unlock()
+        FileExt::unlock(&lock_file)
             .with_context(|| format!("unable to release lock file {}", lock_path.display()))?;
     }
 
@@ -478,8 +475,7 @@ fn ensure_uv_available() -> Result<()> {
 
     let managed_uv = app::managed_uv();
     if managed_uv.is_file() {
-        return lock_file
-            .unlock()
+        return FileExt::unlock(&lock_file)
             .with_context(|| format!("unable to release lock file {}", lock_path.display()));
     }
 
@@ -522,8 +518,7 @@ fn ensure_uv_available() -> Result<()> {
 
     fs_utils::move_temp_file(&binary_path, &managed_uv)?;
 
-    lock_file
-        .unlock()
+    FileExt::unlock(&lock_file)
         .with_context(|| format!("unable to release lock file {}", lock_path.display()))
 }
 
