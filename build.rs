@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 
 use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use highway::PortableHash;
-use rand::distributions::{Alphanumeric, DistString};
+use rand::distr::{Alphanumeric, SampleString};
 use regex::Regex;
 
 const DEFAULT_PYTHON_VERSION: &str = "3.13";
@@ -1087,10 +1087,7 @@ fn set_self_command() {
     let variable = "PYAPP_SELF_COMMAND";
     let command_name = env::var(variable).unwrap_or_default();
     if command_name == "none" {
-        set_runtime_variable(
-            variable,
-            Alphanumeric.sample_string(&mut rand::thread_rng(), 16),
-        );
+        set_runtime_variable(variable, Alphanumeric.sample_string(&mut rand::rng(), 16));
         set_runtime_variable("PYAPP__EXPOSED_COMMAND", "");
     } else if !command_name.is_empty() {
         set_runtime_variable(variable, &command_name);
