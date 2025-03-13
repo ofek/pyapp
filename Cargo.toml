@@ -13,7 +13,7 @@ base64 = "0.22.1"
 bzip2 = "0.5.2"
 clap = { version = "4.5.31", features = ["derive"] }
 directories = "6.0.0"
-flate2 = "1.1.0"
+flate2 = { version = "1.1.0", features = ["zlib-rs"], default-features = false }
 fs4 = { version = "0.13.0", features = ["sync"] }
 indicatif = { version = "0.17.11", features = ["improved_unicode"] }
 once_cell = "1.20.2"
@@ -26,7 +26,7 @@ zstd = "0.13.2"
 
 [build-dependencies]
 base64 = "0.22.1"
-flate2 = "1.1.0"
+flate2 = { version = "1.1.0", features = ["zlib-rs"], default-features = false }
 highway = "1.3.0"
 rand = "0.9.0"
 regex = "1.11.1"
