@@ -21,7 +21,7 @@ os_pipe = "1.2.1"
 reqwest = { version = "0.12.12", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.43"
 tempfile = "3.16.0"
-zip = "2.2.3"
+zip = "2.4.2"
 zstd = "0.13.2"
 
 [build-dependencies]
@@ -32,7 +32,7 @@ rand = "0.9.0"
 regex = "1.11.1"
 reqwest = { version = "0.12.12", features = ["blocking", "rustls-tls"], default-features = false }
 tar = "0.4.43"
-zip = "2.2.3"
+zip = "2.4.2"
 
 [profile.release]
 panic = "abort"
