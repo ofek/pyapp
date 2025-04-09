@@ -11,6 +11,7 @@ The following is not intended to be a complete enumeration. Be sure to view the 
 | [Hatch](https://github.com/pypa/hatch/blob/c4bb4b489c4c2eb2cf8b1ea64b06a63f165c843e/.github/workflows/build-hatch.yml#L101)
 | [instawow](https://github.com/layday/instawow/blob/ad0ca23352b9c4647b55ffd5b90151bf30d571f7/noxfile.py#L184)
 | [Litestar](https://github.com/litestar-org/litestar-fullstack/blob/dc72eee78173790c3e91b0c095ac9e70ba91bedd/scripts/post-builds.py)
+| [pdm](https://github.com/pdm-project/pdm/pull/3436)
 | [Plutus Terminal](https://github.com/plutus-terminal/plutus-terminal/blob/65d1d34f94764bf7ce1383d836780cf8f0f02f4c/.github/workflows/release.yml#L90)
 | [Preservation Workbench](https://github.com/Preservation-Workbench/PWCode/blob/e7777806be35bd60ca8c33e677ffd77e38b277d0/build/make.sh)
 | [tidal-wave](https://github.com/ebb-earl-co/tidal-wave/blob/6358ede21adb715a053b1e6cc73968933c3bed05/BUILDME.md#pyapp-created-binaries)
