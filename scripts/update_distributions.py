@@ -32,7 +32,8 @@ def get_assets():
 
     page = 1
     while True:
-        response = httpx.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page})
+        print(f'Fetching page {page}...')
+        response = httpx.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page, 'per_page': 5})
         releases = response.json()
         if not response.is_success:
             import json

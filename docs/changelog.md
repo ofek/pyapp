@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ***Added:***
 
+- Update default CPython distributions to 20250712
 - Switch to `zlib-rs` for handling `.tar.gz` distributions
 - Update dependencies
 
