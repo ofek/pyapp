@@ -97,7 +97,7 @@ def main():
         version = Version(raw_version)
 
         # Skip prereleases for now
-        if version.pre is not None:
+        if version.pre is not None and version.pre[0] != 'rc':
             continue
 
         variant_start = 3 if 'apple' in remaining else 4

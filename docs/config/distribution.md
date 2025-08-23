@@ -17,6 +17,7 @@ Setting the `PYAPP_PYTHON_VERSION` option will determine the distribution used a
 | `3.11` |
 | `3.12` |
 | `3.13` |
+| `3.14` |
 
 The source for pre-built distributions is the [python-build-standalone](https://github.com/astral-sh/python-build-standalone) project.
 
