@@ -542,21 +542,22 @@ fn get_distribution_source() -> String {
     };
     let selected_variant_cpu = {
         let legacy_variant = env::var("PYAPP_DISTRIBUTION_VARIANT").unwrap_or_default();
-        let mut variant = env::var("PYAPP_DISTRIBUTION_VARIANT_CPU").unwrap_or_default();
+        let variant = env::var("PYAPP_DISTRIBUTION_VARIANT_CPU").unwrap_or_default();
+
+        let is_linux_x86_64 = selected_platform == "linux" && selected_arch == "x86_64";
+
         if !legacy_variant.is_empty() {
-            if !variant.is_empty() {
+            if is_linux_x86_64 && !variant.is_empty() {
                 panic!("\n\nBoth PYAPP_DISTRIBUTION_VARIANT and PYAPP_DISTRIBUTION_VARIANT_CPU are set\n\n");
             }
-            return legacy_variant;
-        };
-        if variant.is_empty()
-            && selected_platform == "linux"
-            && selected_arch == "x86_64"
-            && selected_python_version != "3.7"
-        {
-            variant = "v3".to_string();
-        };
-        variant
+            legacy_variant
+        } else if !is_linux_x86_64 {
+            String::new()
+        } else if variant.is_empty() && selected_python_version != "3.7" {
+            "v3".to_string()
+        } else {
+            variant
+        }
     };
     let selected_variant_gil = env::var("PYAPP_DISTRIBUTION_VARIANT_GIL").unwrap_or_default();
 
