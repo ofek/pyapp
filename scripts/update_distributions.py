@@ -141,7 +141,7 @@ def main():
             arch = 'powerpc64'
 
         distribution = (minor_version_parts, os_name, arch, abi, variant_cpu, variant_gil)
-        distributions[distribution].append((((version.major, Version.minor, version.micro), date), url))
+        distributions[distribution].append((((version.major, version.minor, version.micro), date), url))
 
     flattened_distributions = defaultdict(list)
     for (

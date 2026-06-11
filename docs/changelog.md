@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Update default CPython distributions to 20260414
+
+***Fixed:***
+
+- Update default Python version to 3.14
+- Fix version parsing typo in the distribution update script
+
 ## 0.29.0 - 2025-10-15
 
 ***Added:***
