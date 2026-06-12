@@ -36,6 +36,7 @@ def get_assets():
 
     progress = Progress()
     task = progress.add_task("Updating distributions...")
+    progress.start()
     for page in count(1):
         response = httpx2.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page, 'per_page': 5})
         releases = response.json()
@@ -49,7 +50,6 @@ def get_assets():
             query = parse_qs(urlparse(last_link['url']).query)
             if last_page := next(iter(query.get('page', ())), None):
                 progress.update(task, total=int(last_page))
-                progress.start()
 
         if not releases:
             break
