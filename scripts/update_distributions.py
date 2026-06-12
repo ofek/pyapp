@@ -2,11 +2,10 @@
 # dependencies = [
 #   "httpx2",
 #   "packaging",
-#   "tqdm",
+#   "rich",
 # ]
 # ///
 import os
-import atexit
 from collections import defaultdict
 from contextlib import suppress
 from itertools import count
@@ -14,7 +13,7 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 import httpx2
-from tqdm import tqdm
+from rich.progress import Progress
 from packaging.version import Version
 
 RELEASES_URL = 'https://api.github.com/repos/astral-sh/python-build-standalone/releases'
@@ -35,9 +34,9 @@ def get_assets():
 
     headers = {'Authorization': f'Bearer {token}', 'X-GitHub-Api-Version': '2022-11-28'}
 
-    progress = tqdm(count(1), unit='page')
-    atexit.register(progress.close)
-    for page in progress:
+    progress = Progress()
+    task = progress.add_task("Updating distributions...")
+    for page in count(1):
         response = httpx2.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page, 'per_page': 5})
         releases = response.json()
         if not response.is_success:
@@ -48,8 +47,9 @@ def get_assets():
 
         if last_link := response.links.get('last'):
             query = parse_qs(urlparse(last_link['url']).query)
-            if page_str := next(iter(query.get('page', ())), None):
-                progress.total = int(page_str)
+            if last_page := next(iter(query.get('page', ())), None):
+                progress.update(task, total=int(last_page))
+                progress.start()
 
         if not releases:
             break
@@ -58,10 +58,9 @@ def get_assets():
             for asset in release['assets']:
                 yield asset['name'], asset['browser_download_url']
 
+        progress.advance(task, 1)
 
 def main():
-    print('Updating distributions...')
-
     lines = Path('build.rs').read_text('utf-8').splitlines()
     start = end = -1
     for i, line in enumerate(lines):
