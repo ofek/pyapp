@@ -1,15 +1,23 @@
 # /// script
 # dependencies = [
-#   "httpx",
+#   "httpx2",
 #   "packaging",
+#   "rich",
 # ]
 # ///
+from __future__ import annotations
+
+import sys
 import os
 from collections import defaultdict
+from collections.abc import Callable, Generator
 from contextlib import suppress
+from itertools import count
 from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 
-import httpx
+import httpx2
+from rich.progress import Progress
 from packaging.version import Version
 
 RELEASES_URL = 'https://api.github.com/repos/astral-sh/python-build-standalone/releases'
@@ -23,37 +31,43 @@ def remove_extensions(filename: str) -> str:
     return filename
 
 
-def get_assets():
+def get_assets() -> Generator[tuple[str, str]]:
     token = os.environ.get('GH_TOKEN')
     if not token:
         raise OSError('GH_TOKEN not set')
 
     headers = {'Authorization': f'Bearer {token}', 'X-GitHub-Api-Version': '2022-11-28'}
 
-    page = 1
-    while True:
-        print(f'Fetching page {page}...')
-        response = httpx.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page, 'per_page': 5})
-        releases = response.json()
-        if not response.is_success:
-            import json
+    with Progress() as progress:
+        task = progress.add_task("Updating distributions...")
+        for page in count(1):
+            yield from get_asset_page(page, headers, set_total=lambda total: progress.update(task, total=total))
+            progress.advance(task, 1)
 
-            formatted = json.dumps(releases, indent=2)
-            raise httpx.NetworkError(formatted)
 
-        if not releases:
-            break
+def get_asset_page(page: int, headers: dict[str, str], *, set_total: Callable[[int], None]) -> Generator[tuple[str, str]]:
+    response = httpx2.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page, 'per_page': 5})
+    releases = response.json()
+    if not response.is_success:
+        import json
 
-        for release in releases:
-            for asset in release['assets']:
-                yield asset['name'], asset['browser_download_url']
+        formatted = json.dumps(releases, indent=2)
+        raise httpx2.NetworkError(formatted)
 
-        page += 1
+    if last_link := response.links.get('last'):
+        query = parse_qs(urlparse(last_link['url']).query)
+        if last_page := next(iter(query.get('page', ())), None):
+            set_total(int(last_page))
+
+    if not releases:
+        return
+
+    for release in releases:
+        for asset in release['assets']:
+            yield asset['name'], asset['browser_download_url']
 
 
 def main():
-    print('Updating distributions...')
-
     lines = Path('build.rs').read_text('utf-8').splitlines()
     start = end = -1
     for i, line in enumerate(lines):
@@ -96,8 +110,8 @@ def main():
         raw_version, _, release = release_data.partition('+')
         version = Version(raw_version)
 
-        # Skip prereleases for now
-        if version.pre is not None:
+        # Skip non-rc prereleases for now
+        if version.pre is not None and version.pre[0] != "rc":
             continue
 
         variant_start = 3 if 'apple' in remaining else 4
@@ -164,4 +178,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(-2)
