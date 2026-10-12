@@ -57,7 +57,7 @@ jobs:
           os: macos-14
           test: true
         - target: x86_64-apple-darwin
-          os: macos-13
+          os: macos-15-intel
           test: true
 
     env:

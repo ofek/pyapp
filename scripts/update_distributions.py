@@ -1,26 +1,24 @@
 # /// script
 # dependencies = [
-#   "httpx2",
 #   "packaging",
 #   "rich",
 # ]
 # ///
 from __future__ import annotations
 
+import json
 import os
+import subprocess
 import sys
 from collections import defaultdict
-from collections.abc import Callable, Generator
+from collections.abc import Generator
 from contextlib import suppress
-from itertools import count
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
 
-import httpx2
 from packaging.version import Version
 from rich.progress import Progress
 
-RELEASES_URL = 'https://api.github.com/repos/astral-sh/python-build-standalone/releases'
+RELEASES_ENDPOINT = 'repos/astral-sh/python-build-standalone/releases'
 PLATFORMS = ('linux', 'windows', 'macos')
 
 
@@ -32,43 +30,29 @@ def remove_extensions(filename: str) -> str:
 
 
 def get_assets() -> Generator[tuple[str, str]]:
-    token = os.environ.get('GH_TOKEN')
-    if not token:
-        raise OSError('GH_TOKEN not set')
-
-    headers = {'Authorization': f'Bearer {token}', 'X-GitHub-Api-Version': '2022-11-28'}
-
     with Progress() as progress:
-        task = progress.add_task("Updating distributions...")
-        for page in count(1):
-            has_next = yield from get_asset_page(page, headers, set_total=lambda total: progress.update(task, total=total))
-            progress.advance(task, 1)
-            if not has_next:
-                break
-
-
-def get_asset_page(page: int, headers: dict[str, str], *, set_total: Callable[[int], None]) -> Generator[tuple[str, str], None, bool]:
-    response = httpx2.get(RELEASES_URL, headers=headers, timeout=60, params={'page': page, 'per_page': 5})
-    releases = response.json()
-    if not response.is_success:
-        import json
-
-        formatted = json.dumps(releases, indent=2)
-        raise httpx2.NetworkError(formatted)
-
-    if last_link := response.links.get('last'):
-        query = parse_qs(urlparse(last_link['url']).query)
-        if last_page := next(iter(query.get('page', ())), None):
-            set_total(int(last_page))
-
-    if not releases:
-        return False
-
-    for release in releases:
-        for asset in release['assets']:
-            yield asset['name'], asset['browser_download_url']
-
-    return 'next' in response.links
+        task = progress.add_task("Updating distributions...", total=None)
+        response = subprocess.run(
+            [
+                'gh',
+                'api',
+                '--paginate',
+                '--slurp',
+                '--method',
+                'GET',
+                '--field',
+                'per_page=5',
+                RELEASES_ENDPOINT,
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        for releases in json.loads(response.stdout):
+            for release in releases:
+                for asset in release['assets']:
+                    yield asset['name'], asset['browser_download_url']
+        progress.update(task, total=1, completed=1)
 
 
 def main():
