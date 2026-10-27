@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+***Added:***
+
+- Update default CPython distributions to 20261026
+- Update default PyPy distributions for Python 3.11 and 2.7 to 8.0.1, requiring glibc 2.28 or newer on Linux
+
+***Fixed:***
+
+- Update TLS trust dependencies to address a certificate authority compromise affecting binaries built with the bundled lockfile, including `cargo build --release` and `cargo install pyapp --locked`. Builds using `cargo install pyapp` without `--locked` already resolve the fixed dependencies.
+
 ## 0.30.0 - 2026-10-12
 
 ***Added:***
